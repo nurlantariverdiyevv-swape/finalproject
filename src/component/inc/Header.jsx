@@ -1,0 +1,400 @@
+import { useState } from 'react';
+import { Search, User, Heart, Menu, ShoppingBag, X, ChevronRight, ArrowRight, HelpCircle, MapPin, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useWishlist } from '../../context/WishlistContext';
+import { useBasket } from '../../context/BasketContext';
+
+function Header() {
+  const { wishlist } = useWishlist();
+  const { totalBasketCount } = useBasket(); // BasketContext-dən say çəkilir
+
+  const categories = ['New', 'Shoes', 'Men', 'Women', 'Kids', 'Activities', 'Explore'];
+
+  const desktopMenuData = {
+    New: {
+      subCategories: [
+        { name: 'Men', link: '/shop/men' },
+        { name: 'Women', link: '/shop/women' },
+        { name: 'Sportstyle', link: '/shop/sportstyle' },
+        { name: 'Icons', link: '/shop/icons' },
+        { name: 'See all', link: '/shop' },
+      ],
+      banners: [
+        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=800&auto=format&fit=crop', link: '/shop/new' },
+        { title: 'Best Sellers', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop', link: '/shop/best-sellers' },
+      ],
+    },
+    Shoes: {
+      subCategories: [
+        { name: 'Men Shoes', link: '/shop/men-shoes' },
+        { name: 'Women Shoes', link: '/shop/women-shoes' },
+        { name: 'Sportstyle', link: '/shop/sportstyle' },
+        { name: 'See all', link: '/shop' },
+      ],
+      banners: [
+        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=800&auto=format&fit=crop', link: '/shop/new' },
+        { title: 'Best Sellers', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop', link: '/shop/best-sellers' },
+      ],
+    },
+    Men: {
+      subCategories: [
+        { name: 'Running', link: '/shop/running' },
+        { name: 'Trail Running', link: '/shop/trail-running' },
+        { name: 'Hiking', link: '/shop/hiking' },
+        { name: 'See all', link: '/shop' },
+      ],
+      banners: [
+        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800&auto=format&fit=crop', link: '/shop/men' },
+      ],
+    },
+    Women: {
+      subCategories: [
+        { name: 'Running', link: '/shop/running' },
+        { name: 'Trail Running', link: '/shop/trail-running' },
+        { name: 'Hiking', link: '/shop/hiking' },
+        { name: 'See all', link: '/shop' },
+      ],
+      banners: [
+        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?q=80&w=800&auto=format&fit=crop', link: '/shop/women' },
+      ],
+    },
+    Kids: {
+      subCategories: [
+        { name: 'Shoes', link: '/shop/kids-shoes' },
+        { name: 'Clothing', link: '/shop/kids-clothing' },
+      ],
+      banners: [
+        { title: 'Kids New Collection', img: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?q=80&w=800&auto=format&fit=crop', link: '/shop/kids' },
+      ],
+    },
+    Activities: {
+      subCategories: [
+        { name: 'Trail Running', link: '/shop/trail-running' },
+        { name: 'Road Running', link: '/shop/road-running' },
+        { name: 'Hiking & Backpacking', link: '/shop/hiking' },
+      ],
+      banners: [
+        { title: 'Explore Activities', img: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=800&auto=format&fit=crop', link: '/shop/activities' },
+      ],
+    },
+    Explore: {
+      subCategories: [
+        { name: 'Stories', link: '/shop/stories' },
+        { name: 'Sustainability', link: '/shop/sustainability' },
+      ],
+      banners: [
+        { title: 'Our Stories', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop', link: '/shop/stories' },
+      ],
+    },
+  };
+
+  const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const toggleDesktopMenu = () => {
+    setDesktopMenuOpen((prev) => !prev);
+    setActiveCategory(null);
+  };
+
+  const handleCategoryClick = (cat) => {
+    if (desktopMenuData[cat]) {
+      setActiveCategory(activeCategory === cat ? null : cat);
+    } else {
+      setActiveCategory(null);
+    }
+  };
+
+  const closeAllMenus = () => {
+    setDesktopMenuOpen(false);
+    setMobileMenuOpen(false);
+    setActiveCategory(null);
+  };
+
+  return (
+    <header className="w-full bg-white border-b border-gray-100 select-none relative z-40">
+      {/* 1. TOP ANNOUNCEMENT BAR */}
+      <div className="w-full bg-[#0d0d0d] text-white text-[11px] sm:text-xs py-2 px-4 md:px-8 flex justify-between items-center tracking-wide font-light">
+        <div className="hidden lg:block lg:w-1/3">
+          <Link to="/stores" className="hover:underline transition-all">Find a store</Link>
+        </div>
+
+        <div className="w-full lg:w-1/3 text-center">
+          <Link to="/membership" className="underline underline-offset-4 hover:text-gray-300 transition-all">
+            S/PLUS Members: Free Shipping and More
+          </Link>
+        </div>
+
+        <div className="hidden lg:flex lg:w-1/3 items-center justify-end gap-3 text-gray-200">
+          <Link to="/newsletter" className="hover:underline transition-all">Get exclusive news</Link>
+          <span className="text-white text-[10px]">&bull;</span>
+          <Link to="/help" className="hover:underline transition-all">Help</Link>
+        </div>
+      </div>
+
+      {/* 2. MOBİL HEADER */}
+      <div className="lg:hidden px-4 pt-3 pb-3 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <Link to="/" onClick={closeAllMenus} className="inline-block">
+            <img src="/assets/img/runovalogo.png" alt="Logo" className="h-7 w-auto object-contain" />
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <Link to="/basket" onClick={closeAllMenus} className="relative text-black p-1 hover:opacity-70">
+              <ShoppingBag size={24} strokeWidth={1.5} />
+              {totalBasketCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#c8102e] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {totalBasketCount}
+                </span>
+              )}
+            </Link>
+            <button onClick={() => setMobileMenuOpen(true)} className="text-black p-1 hover:opacity-70 cursor-pointer">
+              <Menu size={26} strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
+
+        <div className="relative w-full">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-500">
+            <Search size={20} strokeWidth={1.5} />
+          </span>
+          <input
+            type="text"
+            placeholder="Search for a product"
+            className="w-full bg-[#f4f4f4] text-sm text-gray-800 placeholder-gray-500 rounded-full pl-11 pr-4 py-2.5 border border-transparent focus:outline-none focus:bg-white focus:border-gray-300 transition-all"
+          />
+        </div>
+      </div>
+
+      {/* 3. DESKTOP HEADER */}
+      <div className="hidden lg:block border-b border-gray-100">
+        <nav className="max-w-[1536px] mx-auto px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-6 w-1/3">
+            <button onClick={toggleDesktopMenu} className="flex items-center gap-2.5 text-black hover:opacity-70 cursor-pointer font-semibold text-sm py-2 px-1">
+              <Menu size={22} strokeWidth={1.8} />
+              <span>Menu</span>
+            </button>
+
+            <div className="relative w-full max-w-xs">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400">
+                <Search size={18} strokeWidth={1.8} />
+              </span>
+              <input
+                type="text"
+                placeholder="Search for a product"
+                className="w-full bg-[#f5f5f5] text-sm text-gray-800 placeholder-gray-400 rounded-full pl-11 pr-4 py-2 focus:outline-none focus:bg-white border border-transparent focus:border-gray-300 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-center w-1/3">
+            <Link to="/" onClick={closeAllMenus}>
+              <img src="/assets/img/runovalogo.png" alt="Logo" className="h-9 w-auto object-contain" />
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-end gap-6 w-1/3">
+            <Link to="/login" className="flex items-center gap-2 text-black hover:opacity-70">
+              <User size={20} strokeWidth={1.5} />
+              <span className="text-sm font-semibold">Log in</span>
+            </Link>
+
+            <Link to="/wishlist" className="relative hover:opacity-70 text-black">
+              <Heart size={22} strokeWidth={1.5} />
+              {wishlist.length > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-[#c8102e] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {wishlist.length}
+                </span>
+              )}
+            </Link>
+
+            <Link to="/basket" className="relative hover:opacity-70 text-black">
+              <ShoppingBag size={22} strokeWidth={1.5} />
+              {totalBasketCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-[#c8102e] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {totalBasketCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </nav>
+      </div>
+
+      {/* 4. FULL SCREEN DRAWER MENYU */}
+      {desktopMenuOpen && (
+        <div className="hidden lg:block fixed inset-0 z-[100] h-screen w-screen overflow-hidden">
+          <div onClick={closeAllMenus} className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" />
+
+          <div className={`relative bg-white h-full shadow-2xl flex z-10 transition-all duration-300 ease-in-out ${activeCategory ? 'w-[950px]' : 'w-[280px]'}`}>
+            {/* 1-ci SÜTUN */}
+            <div className="w-[280px] border-r border-gray-100 p-8 flex flex-col justify-between shrink-0 bg-white h-full">
+              <div>
+                <button onClick={closeAllMenus} className="flex items-center gap-2 text-black font-semibold text-sm mb-10 hover:opacity-70 cursor-pointer">
+                  <X size={20} strokeWidth={1.5} />
+                  <span>Close</span>
+                </button>
+
+                <div className="flex flex-col gap-6">
+                  {categories.map((cat, idx) => {
+                    const hasSub = !!desktopMenuData[cat];
+                    const isActive = activeCategory === cat;
+                    return (
+                      <div key={idx} onClick={() => handleCategoryClick(cat)} className="flex items-center justify-between cursor-pointer group py-0.5">
+                        <span className={`text-base font-bold transition-colors ${isActive ? 'text-black underline underline-offset-4 decoration-2' : 'text-gray-900 group-hover:text-black'}`}>
+                          {cat}
+                        </span>
+                        {hasSub && <ChevronRight size={18} className={`transition-transform duration-200 ${isActive ? 'text-black translate-x-1' : 'text-gray-400 group-hover:text-black'}`} />}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-gray-100 flex items-center justify-between mt-auto">
+                <Link to="/login" onClick={closeAllMenus} className="flex items-center gap-2 text-black font-medium text-sm">
+                  <User size={18} />
+                  <span>Log in</span>
+                </Link>
+                <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
+              </div>
+            </div>
+
+            {/* 2-ci VƏ 3-cü SÜTUNLAR */}
+            {activeCategory && desktopMenuData[activeCategory] && (
+              <div className="flex flex-1 overflow-hidden h-full animate-[fadeIn_0.2s_ease-out]">
+                <div className="w-[260px] border-r border-gray-100 p-8 overflow-y-auto shrink-0 bg-white h-full">
+                  <div className="flex flex-col gap-4">
+                    {desktopMenuData[activeCategory].subCategories.map((sub, i) => (
+                      <Link key={i} to={sub.link} onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-gray-800 hover:text-black py-1 transition-colors">
+                        <span>{sub.name}</span>
+                        <ChevronRight size={16} className="text-gray-400" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex-1 p-8 overflow-y-auto bg-white flex flex-col gap-5 justify-start h-full">
+                  {desktopMenuData[activeCategory].banners.map((banner, i) => (
+                    <Link key={i} to={banner.link} onClick={closeAllMenus} className="group relative w-full h-[220px] overflow-hidden rounded-sm block bg-gray-900 shadow-sm shrink-0">
+                      <img src={banner.img} alt={banner.title} className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-5">
+                        <div className="flex items-center justify-between w-full text-white">
+                          <span className="font-bold text-lg tracking-wide">{banner.title}</span>
+                          <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center shadow-md transition-transform group-hover:translate-x-1">
+                            <ArrowRight size={16} strokeWidth={2} />
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 5. MOBİL SAĞ MENYU */}
+      <div onClick={closeAllMenus} className={`lg:hidden fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} />
+
+      <div className={`lg:hidden fixed top-0 right-0 h-full w-[85%] sm:w-[380px] bg-white z-50 shadow-2xl transition-transform duration-300 transform flex flex-col ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="p-4 flex items-center gap-3">
+          <div className="relative flex-1">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
+              <Search size={18} strokeWidth={1.8} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search for a product"
+              className="w-full bg-[#f4f4f4] text-sm text-gray-800 placeholder-gray-500 rounded-full pl-10 pr-4 py-2 border border-transparent focus:outline-none focus:bg-white focus:border-gray-300 transition-all"
+            />
+          </div>
+
+          <button onClick={closeAllMenus} className="p-1 text-black hover:opacity-70 cursor-pointer shrink-0">
+            <X size={26} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6 py-2 flex flex-col">
+          <div className="flex flex-col">
+            {categories.slice(0, 5).map((category, idx) => (
+              <Link key={idx} to={`/shop/${category.toLowerCase()}`} onClick={closeAllMenus} className="py-3 flex items-center justify-between text-base font-bold text-black border-b border-transparent">
+                <span>{category}</span>
+                <ChevronRight size={18} className="text-black" strokeWidth={1.5} />
+              </Link>
+            ))}
+          </div>
+
+          <div className="my-4 border-t border-gray-100" />
+
+          <div className="flex flex-col">
+            {categories.slice(5).map((category, idx) => (
+              <Link key={idx} to={`/shop/${category.toLowerCase()}`} onClick={closeAllMenus} className="py-3 flex items-center justify-between text-base font-medium text-black">
+                <span>{category}</span>
+                <ChevronRight size={18} className="text-black" strokeWidth={1.5} />
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-auto pt-8 pb-6 flex flex-col gap-5">
+            <Link to="/login" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+              <div className="flex items-center gap-3">
+                <User size={20} strokeWidth={1.5} />
+                <span>Log in</span>
+              </div>
+              <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
+            </Link>
+
+            <Link to="/wishlist" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Heart size={20} strokeWidth={1.5} />
+                  {wishlist.length > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-[#c8102e] text-white text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                      {wishlist.length}
+                    </span>
+                  )}
+                </div>
+                <span>Wishlist</span>
+              </div>
+            </Link>
+
+            <Link to="/basket" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <ShoppingBag size={20} strokeWidth={1.5} />
+                  {totalBasketCount > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-[#c8102e] text-white text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                      {totalBasketCount}
+                    </span>
+                  )}
+                </div>
+                <span>Basket</span>
+              </div>
+            </Link>
+
+            <Link to="/help" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+              <div className="flex items-center gap-3">
+                <HelpCircle size={20} strokeWidth={1.5} />
+                <span>Help</span>
+              </div>
+              <ChevronRight size={16} className="text-black" strokeWidth={1.5} />
+            </Link>
+
+            <Link to="/stores" onClick={closeAllMenus} className="flex items-center gap-3 text-sm font-medium text-black">
+              <MapPin size={20} strokeWidth={1.5} />
+              <span>Find a store</span>
+            </Link>
+
+            <Link to="/newsletter" onClick={closeAllMenus} className="flex items-center gap-3 text-sm font-medium text-black">
+              <Mail size={20} strokeWidth={1.5} />
+              <span>Stay in the loop</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default Header;
