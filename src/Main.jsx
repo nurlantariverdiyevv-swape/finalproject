@@ -6,31 +6,31 @@ function Main({ onAddToCart }) {
   const activities = [
     {
       name: 'Gravel Running',
-      link: '/category/gravel-running',
+      link: '/shop/gravel-running',
       img: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?q=80&w=1200&auto=format&fit=crop',
       position: 'object-center',
     },
     {
       name: 'Trail Running',
-      link: '/category/trail-running',
+      link: '/shop/trail-running',
       img: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=800&auto=format&fit=crop',
       position: 'object-top',
     },
     {
       name: 'Road Running',
-      link: '/category/road-running',
+      link: '/shop/road-running',
       img: 'https://images.unsplash.com/photo-1486218119243-13883505764c?q=80&w=1200&auto=format&fit=crop',
       position: 'object-center',
     },
     {
       name: 'Hiking',
-      link: '/category/hiking',
+      link: '/shop/hiking',
       img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop',
       position: 'object-center',
     },
     {
       name: 'Sportstyle',
-      link: '/category/sportstyle',
+      link: '/shop/sportstyle',
       img: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=1200&auto=format&fit=crop',
       position: 'object-center',
     },
@@ -55,14 +55,14 @@ function Main({ onAddToCart }) {
       title: "TRAILFORCE X1 GORE-TEX",
       subtitle: "Confidence in every step.",
       image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1600&q=80",
-      link: "/category/trail"
+      link: "/shop/trail-running"
     },
     {
       id: "banner-2",
       title: "CITYFLEX X1",
       subtitle: "From street style to everyday comfort.",
       image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1600&q=80",
-      link: "/category/lifestyle"
+      link: "/shop/sportstyle"
     }
   ];
 

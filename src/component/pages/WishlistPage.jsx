@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '../../context/WishlistContext';
@@ -84,7 +84,7 @@ function WishlistPage({ onAddToCart }) {
                     <div className="flex items-center gap-1.5 mb-2 min-h-[28px]">
                       {product.colors?.map((color, cIdx) => {
                         const colorId = color.id || cIdx;
-                        const isActive = activeColor?.id === colorId;
+                        const isActive = activeColor?.id === colorId || activeColor === color;
 
                         return (
                           <button

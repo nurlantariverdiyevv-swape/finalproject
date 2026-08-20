@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Heart, ShoppingBag, SlidersHorizontal, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useDataContext } from '../../context/DataContext';
 import { useWishlist } from '../../context/WishlistContext';
@@ -22,7 +22,58 @@ const categoryRules = {
   'kids': (p) => p.subCategory === 'Kids',
   'shoes': (p) => p.category === 'Shoes',
   'new': (p) => p.badge === 'New',
+
+  // ---- Cinsə görə ayrılmış alt-kateqoriyalar (mega-menyudakı Men/Women bölmələri üçün) ----
+  // Bunlar olmadan "Men" menyusundan "Running"-ə keçmək və "Women" menyusundan "Running"-ə
+  // keçmək eyni /shop/running səhifəsinə aparırdı, ona görə kişi və qadın məhsulları qarışırdı.
+  'men-running': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'running',
+  'women-running': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'running',
+  'men-trail-running': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'trail-running',
+  'women-trail-running': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'trail-running',
+  'men-hiking': (p) => p.subCategory === 'Men' && (slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking'),
+  'women-hiking': (p) => p.subCategory === 'Women' && (slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking'),
+  'men-sportstyle': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'sportstyle',
+  'women-sportstyle': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'sportstyle',
+
+  // ---- "New" menyusu üçün cinsə/tipə görə yeni məhsullar ----
+  'new-men': (p) => p.badge === 'New' && p.subCategory === 'Men',
+  'new-women': (p) => p.badge === 'New' && p.subCategory === 'Women',
+  'new-sportstyle': (p) => p.badge === 'New' && slugify(p.subType) === 'sportstyle',
 };
+
+// Kateqoriya slug-larını başlıq/breadcrumb üçün oxunaqlı adlara çeviririk
+const categoryLabels = {
+  'men-shoes': 'Men’s Shoes',
+  'women-shoes': 'Women’s Shoes',
+  'kids-shoes': 'Kids’ Shoes',
+  'kids-clothing': 'Kids’ Clothing',
+  'trail-running': 'Trail Running',
+  'road-running': 'Road Running',
+  'running': 'Running',
+  'hiking': 'Hiking & Backpacking',
+  'sportstyle': 'Sportstyle',
+  'men': 'Men',
+  'women': 'Women',
+  'kids': 'Kids',
+  'shoes': 'Shoes',
+  'new': 'New Arrivals',
+  'men-running': 'Men’s Running',
+  'women-running': 'Women’s Running',
+  'men-trail-running': 'Men’s Trail Running',
+  'women-trail-running': 'Women’s Trail Running',
+  'men-hiking': 'Men’s Hiking',
+  'women-hiking': 'Women’s Hiking',
+  'men-sportstyle': 'Men’s Sportstyle',
+  'women-sportstyle': 'Women’s Sportstyle',
+  'new-men': 'New in Men',
+  'new-women': 'New in Women',
+  'new-sportstyle': 'New in Sportstyle',
+};
+
+function getCategoryLabel(categoryName) {
+  if (!categoryName) return 'All Products';
+  return categoryLabels[slugify(categoryName)] || categoryName;
+}
 
 function matchesCategory(product, categoryName) {
   if (!categoryName || categoryName.toLowerCase() === 'all') return true;
@@ -37,8 +88,21 @@ function matchesCategory(product, categoryName) {
   return fields.some((f) => slugify(f) === slug);
 }
 
+// ------- Axtarış sözünə görə uyğunlaşdırma -------
+function matchesSearch(product, searchTerm) {
+  if (!searchTerm) return true;
+  const q = searchTerm.toLowerCase();
+  const haystack = [product.name, product.sub, product.subCategory, product.subType, product.category]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
 function ShopPage({ onAddToCart }) {
   const { categoryName } = useParams();
+  const [searchParams] = useSearchParams();
+  const searchTerm = (searchParams.get('search') || '').trim();
 
   const { shopProducts = [], fetchShopProducts, shopLoading } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
@@ -75,8 +139,10 @@ function ShopPage({ onAddToCart }) {
 
   const categoryProducts = useMemo(() => {
     if (!shopProducts || shopProducts.length === 0) return [];
-    return shopProducts.filter((product) => matchesCategory(product, categoryName));
-  }, [shopProducts, categoryName]);
+    return shopProducts
+      .filter((product) => matchesCategory(product, categoryName))
+      .filter((product) => matchesSearch(product, searchTerm));
+  }, [shopProducts, categoryName, searchTerm]);
 
   const availableSizes = useMemo(() => {
     const set = new Set();
@@ -245,12 +311,18 @@ function ShopPage({ onAddToCart }) {
       <div className="text-xs text-gray-500 mb-2 flex items-center gap-1">
         <Link to="/" className="hover:underline">Home</Link>
         <span>/</span>
-        <span className="capitalize text-black font-medium">{categoryName || 'All Products'}</span>
+        <span className="text-black font-medium">
+          {searchTerm ? 'Search results' : getCategoryLabel(categoryName)}
+        </span>
       </div>
 
       {/* Səhifə Başlığı */}
       <h1 className="text-2xl md:text-4xl font-extrabold text-black uppercase tracking-tight mb-4 md:mb-6">
-        {categoryName ? `${categoryName}'s Collection` : 'All Products'}
+        {searchTerm
+          ? `Results for "${searchTerm}"`
+          : categoryName
+            ? `${getCategoryLabel(categoryName)} Collection`
+            : 'All Products'}
       </h1>
 
       {/* CONTROL BAR */}

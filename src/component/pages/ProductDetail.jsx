@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Star, Heart, X, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Truck, Store, Package, Maximize2, ZoomIn, ZoomOut, RotateCcw, Sparkles } from "lucide-react";
+import { Star, Heart, X, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, RotateCcw, Sparkles } from "lucide-react";
 import { useDataContext } from "../../context/DataContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { useBasket } from "../../context/BasketContext";
+import ProductInfoLinks from "./ProductInfoLinks";
 
 const sizeGuideData = [
   { cm: 21.5, inch: 8.5, uk: 3.5, eur: 35 }, { cm: 22, inch: 8.7, uk: 4, eur: 36 },
@@ -44,21 +45,6 @@ function StarRating({ rating = 0 }) {
         );
       })}
     </div>
-  );
-}
-
-function InfoDrawer({ open, onClose, title, children }) {
-  return (
-    <>
-      <div onClick={onClose} className={`fixed inset-0 bg-black/40 z-[110] transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto ${open ? "translate-x-0" : "translate-x-full"}`}>
-        <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h2 className="text-lg font-bold text-black">{title}</h2>
-          <button onClick={onClose} className="p-1 hover:opacity-70 cursor-pointer" aria-label="Close"><X size={20} strokeWidth={2} /></button>
-        </div>
-        <div className="p-6 text-sm text-gray-800 leading-relaxed">{children}</div>
-      </div>
-    </>
   );
 }
 
@@ -168,8 +154,8 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
   const [scale, setScale] = useState(1);
   const total = images.length;
 
-  const goPrev = (e) => { e?.stopPropagation(); setScale(1); setCurrentSlide((prev) => (prev - 1 + total) % total); };
-  const goNext = (e) => { e?.stopPropagation(); setScale(1); setCurrentSlide((prev) => (prev + 1) % total); };
+  const goPrev = useCallback((e) => { e?.stopPropagation(); setScale(1); setCurrentSlide((prev) => (prev - 1 + total) % total); }, [total, setCurrentSlide]);
+  const goNext = useCallback((e) => { e?.stopPropagation(); setScale(1); setCurrentSlide((prev) => (prev + 1) % total); }, [total, setCurrentSlide]);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -180,13 +166,13 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [lightbox]);
+  }, [lightbox, goPrev, goNext]);
 
   return (
     <div className="w-full relative">
       <div className="relative w-full aspect-square bg-[#f7f7f7] rounded-xl overflow-hidden border border-gray-200/60 group">
         <ImageMagnifier src={images[currentSlide]} alt={alt} onClick={() => setLightbox(true)} />
-        
+
         {total > 1 && (
           <>
             <button type="button" onClick={goPrev} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-black shadow-md flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-20"><ChevronLeft size={22} /></button>
@@ -243,12 +229,11 @@ function ProductDetail() {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [activeColorIndex, setActiveColorIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [activeDrawer, setActiveDrawer] = useState(null);
 
   useEffect(() => {
-    if (fetchSlider) fetchSlider();
-    if (fetchShopProducts) fetchShopProducts();
-  }, []);
+    fetchSlider();
+    fetchShopProducts();
+  }, [fetchSlider, fetchShopProducts]);
 
   const allProducts = [...slider, ...shopProducts];
   const product = allProducts.find((item) => String(item.id) === String(id));
@@ -265,7 +250,7 @@ function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!selectedSize) return;
-    addToBasket(product, selectedSize);
+    addToBasket(product, selectedSize, activeColor?.name, activeColor?.img);
   };
 
   return (
@@ -342,24 +327,13 @@ function ProductDetail() {
             </button>
           </div>
 
-          <div className="pt-2 border-t border-gray-200 text-sm">
-            <button onClick={() => setActiveDrawer("returns")} className="w-full py-3 flex items-center justify-between border-b border-gray-200 hover:bg-gray-50 text-left cursor-pointer">
-              <div className="flex items-center gap-3"><Package className="w-5 h-5" strokeWidth={1.5} /><span className="font-medium">Free Returns Within 45 Days</span></div>
-            </button>
-            <button onClick={() => setActiveDrawer("shipping")} className="w-full py-3 flex items-center justify-between border-b border-gray-200 hover:bg-gray-50 text-left cursor-pointer">
-              <div className="flex items-center gap-3"><Truck className="w-5 h-5" strokeWidth={1.5} /><span className="font-medium">Free Shipping for S/PLUS Members</span></div>
-            </button>
-            <button onClick={() => setActiveDrawer("store")} className="w-full py-3 flex items-center justify-between border-b border-gray-200 hover:bg-gray-50 text-left cursor-pointer">
-              <div className="flex items-center gap-3"><Store className="w-5 h-5" strokeWidth={1.5} /><span className="font-medium">Find in store</span></div>
-            </button>
-          </div>
+          {/* Əvvəllər burda 3 ayrı buton + 3 ayrı InfoDrawer var idi.
+              İndi hamısı ProductInfoLinks komponentinin içindədir. */}
+          <ProductInfoLinks />
         </div>
       </div>
 
       <SizeGuidePanel open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} categoryLabel={categoryLabel} maxRows={product.sizes?.length} />
-      <InfoDrawer open={activeDrawer === "returns"} onClose={() => setActiveDrawer(null)} title="Free Returns Within 45 Days"><p>Free returns by mail within 45 days of delivery.</p></InfoDrawer>
-      <InfoDrawer open={activeDrawer === "shipping"} onClose={() => setActiveDrawer(null)} title="Free Shipping"><p>S/Plus Members will receive free shipping on every purchase.</p></InfoDrawer>
-      <InfoDrawer open={activeDrawer === "store"} onClose={() => setActiveDrawer(null)} title="Find in store"><p>Check stock availability in nearby stores.</p></InfoDrawer>
     </div>
   );
 }

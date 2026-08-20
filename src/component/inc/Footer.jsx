@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { RiFacebookCircleFill, RiInstagramFill, RiYoutubeFill } from 'react-icons/ri';

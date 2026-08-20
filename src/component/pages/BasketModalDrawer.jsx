@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { useBasket } from '../../context/BasketContext';
 
+// 1. Size Selection Modal
 export function SizeSelectionModal() {
   const { sizeModalProduct, closeSizeModal, addToBasket } = useBasket();
   const [selectedSize, setSelectedSize] = useState('');
@@ -13,6 +14,9 @@ export function SizeSelectionModal() {
   const sizesToRender = sizeModalProduct.sizes?.length
     ? sizeModalProduct.sizes.map((s) => (typeof s === 'object' ? s.label : s))
     : defaultSizes;
+
+  const selectedColor = sizeModalProduct.selectedColor || sizeModalProduct.color || sizeModalProduct.colors?.[0]?.name || 'Default';
+  const selectedImage = sizeModalProduct.selectedImage || sizeModalProduct.images?.[0] || sizeModalProduct.img;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs">
@@ -30,7 +34,14 @@ export function SizeSelectionModal() {
             {sizesToRender.map((size) => {
               const isSelected = selectedSize === size;
               return (
-                <button type="button" key={size} onClick={() => setSelectedSize(size)} className={`py-3 px-4 text-xs font-semibold rounded-xs border transition-all cursor-pointer ${isSelected ? 'border-black bg-black text-white' : 'border-gray-200 bg-gray-50 text-gray-900 hover:border-black'}`}>
+                <button
+                  type="button"
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={`py-3 px-4 text-xs font-semibold rounded-xs border transition-all cursor-pointer ${
+                    isSelected ? 'border-black bg-black text-white' : 'border-gray-200 bg-gray-50 text-gray-900 hover:border-black'
+                  }`}
+                >
                   {size}
                 </button>
               );
@@ -39,12 +50,23 @@ export function SizeSelectionModal() {
         </div>
 
         <div>
-          <button type="button" disabled={!selectedSize} onClick={() => addToBasket(sizeModalProduct, selectedSize)} className={`w-full py-3.5 rounded-full text-sm font-bold transition-all cursor-pointer ${selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+          <button
+            type="button"
+            disabled={!selectedSize}
+            onClick={() => addToBasket(sizeModalProduct, selectedSize, selectedColor, selectedImage)}
+            className={`w-full py-3.5 rounded-full text-sm font-bold transition-all cursor-pointer ${
+              selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+          >
             Add to cart
           </button>
 
           <div className="text-center mt-4">
-            <Link to={`/product/${sizeModalProduct.id}`} onClick={closeSizeModal} className="text-xs font-semibold text-black underline hover:text-gray-600">
+            <Link
+              to={`/product/${sizeModalProduct.id}`}
+              onClick={closeSizeModal}
+              className="text-xs font-semibold text-black underline hover:text-gray-600"
+            >
               Product details {sizeModalProduct.colors?.length ? `• ${sizeModalProduct.colors.length} colors` : ''}
             </Link>
           </div>
@@ -54,10 +76,14 @@ export function SizeSelectionModal() {
   );
 }
 
+// 2. Added To Bag Drawer
 export function AddedToBagDrawer({ recommendedProducts = [] }) {
   const { addedSuccessProduct, setAddedSuccessProduct, totalBasketCount } = useBasket();
 
   if (!addedSuccessProduct) return null;
+
+  const itemColor = addedSuccessProduct.selectedColor || addedSuccessProduct.color || addedSuccessProduct.colors?.[0]?.name || 'Default';
+  const itemImage = addedSuccessProduct.selectedImage || addedSuccessProduct.images?.[0] || addedSuccessProduct.img;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs">
@@ -72,22 +98,34 @@ export function AddedToBagDrawer({ recommendedProducts = [] }) {
 
           <div className="flex gap-4 mb-6">
             <div className="w-24 h-24 bg-[#f5f5f5] rounded-xs overflow-hidden shrink-0">
-              <img src={addedSuccessProduct.images?.[0] || addedSuccessProduct.img} alt={addedSuccessProduct.name} className="w-full h-full object-cover" />
+              <img src={itemImage} alt={addedSuccessProduct.name} className="w-full h-full object-cover" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-black uppercase tracking-tight">{addedSuccessProduct.name}</h3>
               <p className="text-xs text-gray-500 mt-1">{addedSuccessProduct.subCategory || 'Sneakers'} - Unisex</p>
-              <p className="text-xs text-gray-500 mt-0.5">Size: {addedSuccessProduct.selectedSize}</p>
+              <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+                <span>Size: {addedSuccessProduct.selectedSize}</span>
+                <span>•</span>
+                <span>Color: {itemColor}</span>
+              </div>
               <p className="text-sm font-bold text-black mt-2">${addedSuccessProduct.price}</p>
             </div>
           </div>
 
           <div className="space-y-2 mb-8">
-            <Link to="/basket" onClick={() => setAddedSuccessProduct(null)} className="block w-full py-3 border border-black rounded-full text-center text-xs font-bold text-black hover:bg-black hover:text-white transition-all">
+            <Link
+              to="/basket"
+              onClick={() => setAddedSuccessProduct(null)}
+              className="block w-full py-3 border border-black rounded-full text-center text-xs font-bold text-black hover:bg-black hover:text-white transition-all"
+            >
               See cart ({totalBasketCount})
             </Link>
 
-            <Link to="/basket" onClick={() => setAddedSuccessProduct(null)} className="block w-full py-3 bg-black text-white rounded-full text-center text-xs font-bold hover:bg-gray-900 transition-all">
+            <Link
+              to="/basket"
+              onClick={() => setAddedSuccessProduct(null)}
+              className="block w-full py-3 bg-black text-white rounded-full text-center text-xs font-bold hover:bg-gray-900 transition-all"
+            >
               Proceed to checkout
             </Link>
           </div>

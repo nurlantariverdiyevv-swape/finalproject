@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Search, User, Heart, Menu, ShoppingBag, X, ChevronRight, ArrowRight, HelpCircle, MapPin, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
 import { useBasket } from '../../context/BasketContext';
 import { useDataContext } from '../../context/DataContext';
@@ -12,6 +12,7 @@ const popularSearches = [
 ];
 
 function Header() {
+  const navigate = useNavigate();
   const { wishlist } = useWishlist();
   const { totalBasketCount } = useBasket();
   const { slider = [], shopProducts = [], fetchSlider, fetchShopProducts } = useDataContext();
@@ -21,15 +22,14 @@ function Header() {
   const desktopMenuData = {
     New: {
       subCategories: [
-        { name: 'Men', link: '/shop/men' },
-        { name: 'Women', link: '/shop/women' },
-        { name: 'Sportstyle', link: '/shop/sportstyle' },
-        { name: 'Icons', link: '/shop/icons' },
-        { name: 'See all', link: '/shop' },
+        { name: 'Men', link: '/shop/new-men' },
+        { name: 'Women', link: '/shop/new-women' },
+        { name: 'Sportstyle', link: '/shop/new-sportstyle' },
+        { name: 'See all', link: '/shop/new' },
       ],
       banners: [
-        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=800&auto=format&fit=crop', link: '/shop/new' },
-        { title: 'Best Sellers', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop', link: '/shop/best-sellers' },
+        { title: 'New Arrivals', img: '/assets/img/reklam.jpeg', link: '/shop/new' },
+        { title: 'Best Sellers', img: '/assets/img/gravel.jpeg', link: '/shop' },
       ],
     },
     Shoes: {
@@ -37,33 +37,35 @@ function Header() {
         { name: 'Men Shoes', link: '/shop/men-shoes' },
         { name: 'Women Shoes', link: '/shop/women-shoes' },
         { name: 'Sportstyle', link: '/shop/sportstyle' },
-        { name: 'See all', link: '/shop' },
+        { name: 'See all', link: '/shop/shoes' },
       ],
       banners: [
-        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=800&auto=format&fit=crop', link: '/shop/new' },
-        { title: 'Best Sellers', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop', link: '/shop/best-sellers' },
+        { title: 'New Arrivals', img: '/assets/img/reklam.jpeg', link: '/shop/new' },
+        { title: 'Sportstyle', img: '/assets/img/sportstyle.jpeg', link: '/shop/sportstyle' },
       ],
     },
     Men: {
       subCategories: [
-        { name: 'Running', link: '/shop/running' },
-        { name: 'Trail Running', link: '/shop/trail-running' },
-        { name: 'Hiking', link: '/shop/hiking' },
-        { name: 'See all', link: '/shop' },
+        { name: 'Running', link: '/shop/men-running' },
+        { name: 'Trail Running', link: '/shop/men-trail-running' },
+        { name: 'Hiking', link: '/shop/men-hiking' },
+        { name: 'Sportstyle', link: '/shop/men-sportstyle' },
+        { name: 'See all', link: '/shop/men' },
       ],
       banners: [
-        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800&auto=format&fit=crop', link: '/shop/men' },
+        { title: 'Shop Men', img: '/assets/img/road.jpeg', link: '/shop/men' },
       ],
     },
     Women: {
       subCategories: [
-        { name: 'Running', link: '/shop/running' },
-        { name: 'Trail Running', link: '/shop/trail-running' },
-        { name: 'Hiking', link: '/shop/hiking' },
-        { name: 'See all', link: '/shop' },
+        { name: 'Running', link: '/shop/women-running' },
+        { name: 'Trail Running', link: '/shop/women-trail-running' },
+        { name: 'Hiking', link: '/shop/women-hiking' },
+        { name: 'Sportstyle', link: '/shop/women-sportstyle' },
+        { name: 'See all', link: '/shop/women' },
       ],
       banners: [
-        { title: 'New Arrivals', img: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?q=80&w=800&auto=format&fit=crop', link: '/shop/women' },
+        { title: 'Shop Women', img: '/assets/img/hiking.jpeg', link: '/shop/women' },
       ],
     },
     Kids: {
@@ -82,7 +84,7 @@ function Header() {
         { name: 'Hiking & Backpacking', link: '/shop/hiking' },
       ],
       banners: [
-        { title: 'Explore Activities', img: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=800&auto=format&fit=crop', link: '/shop/activities' },
+        { title: 'Explore Activities', img: '/assets/img/gravel.jpeg', link: '/shop' },
       ],
     },
     Explore: {
@@ -91,7 +93,7 @@ function Header() {
         { name: 'Sustainability', link: '/shop/sustainability' },
       ],
       banners: [
-        { title: 'Our Stories', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop', link: '/shop/stories' },
+        { title: 'Our Stories', img: '/assets/img/trail.jpeg', link: '/shop/stories' },
       ],
     },
   };
@@ -178,6 +180,18 @@ function Header() {
   }, [allProducts, searchQuery]);
 
   const bestSellers = useMemo(() => allProducts.slice(0, 5), [allProducts]);
+
+  // Axtarış nəticələrinin dropdown-da göstərilən maksimum sayı
+  const SEARCH_RESULTS_PREVIEW_LIMIT = 5;
+
+  const seeAllResultsLink = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim() !== '') {
+      navigate(seeAllResultsLink);
+      closeSearch();
+    }
+  };
 
   const DesktopProductCard = ({ product, onNavigate }) => {
     const activeColor = product.colors?.[0];
@@ -546,6 +560,7 @@ function Header() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
                     placeholder="Search for a product"
                     className="w-full bg-[#f4f4f4] text-base text-black placeholder-gray-500 rounded-full pl-10 pr-10 py-2.5 border border-transparent focus:outline-none focus:bg-white focus:border-gray-300 transition-all"
                   />
@@ -560,8 +575,6 @@ function Header() {
                     </button>
                   )}
                 </div>
-
-                <span className="font-black tracking-tight text-lg text-black select-none">SALOMON</span>
 
                 <button
                   type="button"
@@ -608,14 +621,14 @@ function Header() {
               ) : searchResults.length > 0 ? (
                 <div>
                   <div className="grid grid-cols-5 gap-5 mb-8">
-                    {searchResults.slice(0, 10).map((product) => (
+                    {searchResults.slice(0, SEARCH_RESULTS_PREVIEW_LIMIT).map((product) => (
                       <DesktopProductCard key={product.id} product={product} onNavigate={closeSearch} />
                     ))}
                   </div>
 
-                  {searchResults.length > 10 && (
+                  {searchResults.length > SEARCH_RESULTS_PREVIEW_LIMIT && (
                     <div className="flex justify-center">
-                      <Link to="/shop" onClick={closeSearch} className="px-6 py-3 border border-gray-300 rounded-full text-sm font-semibold text-black hover:bg-black hover:text-white transition-all">
+                      <Link to={seeAllResultsLink} onClick={closeSearch} className="px-6 py-3 border border-gray-300 rounded-full text-sm font-semibold text-black hover:bg-black hover:text-white transition-all">
                         See all results ({searchResults.length})
                       </Link>
                     </div>
@@ -654,6 +667,7 @@ function Header() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
                 placeholder="Search for a product"
                 className="w-full bg-[#f4f4f4] text-sm text-black placeholder-gray-500 rounded-full pl-11 pr-4 py-3 border border-transparent focus:outline-none focus:bg-white focus:border-gray-300 transition-all"
               />
@@ -718,10 +732,22 @@ function Header() {
                   <>
                     <h3 className="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4">Results</h3>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                      {searchResults.slice(0, 10).map((product) => (
+                      {searchResults.slice(0, SEARCH_RESULTS_PREVIEW_LIMIT).map((product) => (
                         <MobileProductCard key={product.id} product={product} />
                       ))}
                     </div>
+
+                    {searchResults.length > SEARCH_RESULTS_PREVIEW_LIMIT && (
+                      <div className="flex justify-center mt-6">
+                        <Link
+                          to={seeAllResultsLink}
+                          onClick={closeSearch}
+                          className="px-6 py-3 border border-gray-300 rounded-full text-sm font-semibold text-black hover:bg-black hover:text-white transition-all"
+                        >
+                          See all results ({searchResults.length})
+                        </Link>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="text-sm text-gray-600 py-6">

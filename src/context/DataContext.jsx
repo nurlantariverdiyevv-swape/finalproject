@@ -54,4 +54,5 @@ export const DataProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useDataContext = () => useContext(DataContext);

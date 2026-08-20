@@ -41,7 +41,7 @@ function ProductSlider({ onAddToCart }) {
 
   useEffect(() => {
     fetchSlider();
-  }, []);
+  }, [fetchSlider]);
 
   return (
     <section className="max-w-360 mx-auto px-4 md:px-10 py-10 select-none">
@@ -93,7 +93,7 @@ function ProductSlider({ onAddToCart }) {
                 <div className="flex items-center gap-1.5 mb-2 min-h-[28px]">
                   {product.colors?.map((color, cIdx) => {
                     const colorId = color.id || cIdx;
-                    const isActive = activeColor?.id === colorId;
+                    const isActive = activeColor?.id === colorId || activeColor === color;
 
                     return (
                       <button type="button" key={colorId} onClick={(e) => changeColor(e, identifier, color)} className={`w-6 h-6 rounded-xs overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>

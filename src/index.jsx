@@ -5,16 +5,16 @@ import App from './App'
 import { BrowserRouter } from 'react-router-dom'
 import { DataProvider } from './context/DataContext'
 import WishlistProvider from './context/WishlistContext'
-import BasketContextWrapper from './context/BasketContext'
+import BasketProvider from './context/BasketContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <DataProvider>
         <WishlistProvider>
-          <BasketContextWrapper>
+          <BasketProvider>
             <App />
-          </BasketContextWrapper>
+          </BasketProvider>
         </WishlistProvider>
       </DataProvider>
     </BrowserRouter>
