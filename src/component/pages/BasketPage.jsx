@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, Plus, Minus, ChevronRight, Package, X } from 'lucide-react';
 import { useBasket } from '../../context/BasketContext';
@@ -9,12 +9,12 @@ function InfoDrawer({ open, onClose, title, children }) {
       <div onClick={onClose} className={`fixed inset-0 bg-black/40 z-[110] transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
       <div className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h2 className="text-base font-bold text-black">{title}</h2>
+          <h2 className="text-[14px] font-semibold text-black">{title}</h2>
           <button onClick={onClose} className="p-1 hover:opacity-70 cursor-pointer" aria-label="Close">
             <X size={18} strokeWidth={1.5} />
           </button>
         </div>
-        <div className="p-6 text-xs text-gray-700 leading-relaxed font-normal">{children}</div>
+        <div className="p-6 text-[11px] text-gray-700 leading-relaxed font-light">{children}</div>
       </div>
     </>
   );
@@ -39,15 +39,15 @@ function BasketPage() {
   ];
 
   return (
-    <div className="bg-[#f5f5f5] min-h-screen py-8 text-black font-sans antialiased">
+    <div className="bg-[#f5f5f5] min-h-screen py-8 text-black antialiased" style={{ fontFamily: "Inter, sans-serif" }}>
       <div className="max-w-[1440px] mx-auto px-4 md:px-8">
         
         {basket.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* SOL TƏRƏF */}
-            <div className="lg:col-span-6 bg-white p-6 md:p-7 rounded-xl border border-gray-200/80">
-              <h1 className="text-base font-bold mb-6 text-black">
+            <div className="lg:col-span-6 bg-white p-[28px] rounded-xl border border-gray-200/80">
+              <h1 className="text-[17px] leading-[1.3] font-bold mb-[24px] text-black">
                 Your bag ({totalItems} {totalItems === 1 ? 'item' : 'items'})
               </h1>
 
@@ -62,26 +62,26 @@ function BasketPage() {
                     <div key={uniqueKey} className="py-5 first:pt-0 last:pb-0 flex items-start justify-between gap-4">
                       
                       <div className="flex gap-4 items-start">
-                        <Link to={`/product/${item.id}`} className="w-20 h-20 md:w-24 md:h-24 bg-[#f5f5f5] rounded-lg overflow-hidden shrink-0 flex items-center justify-center cursor-pointer">
+                        <Link to={`/product/${item.id}`} className="w-[96px] h-[96px] bg-[#f5f5f5] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center cursor-pointer">
                           <img src={itemImage} alt={item.name} className="w-full h-full object-cover" />
                         </Link>
 
-                        <div className="flex flex-col gap-1">
-                          <Link to={`/product/${item.id}`} className="text-xs md:text-sm font-bold uppercase tracking-tight text-black hover:underline cursor-pointer">
+                        <div className="flex flex-col gap-[3px]">
+                          <Link to={`/product/${item.id}`} className="text-[15px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black hover:underline cursor-pointer">
                             {item.name}
                           </Link>
                           
-                          <div className="flex flex-col text-xs text-gray-500 font-normal mt-0.5">
+                          <div className="flex flex-col text-[15px] leading-[1.5] text-gray-500 font-light mt-[2px]">
                             <p>Size: {itemSize}</p>
                             <p>Color: {itemColor}</p>
                           </div>
 
-                          <div className="mt-2 inline-flex items-center border border-gray-300 rounded-full px-2.5 py-1 w-fit bg-white gap-3">
+                          <div className="mt-[10px] inline-flex items-center border border-gray-300 rounded-full px-[12px] py-[5px] w-fit bg-white gap-[12px]">
                             <button type="button" onClick={() => updateQuantity(item.id, itemSize, itemColor, -1)} className="text-black hover:opacity-70 cursor-pointer">
                               {item.quantity === 1 ? <Trash2 size={12} strokeWidth={1.5} /> : <Minus size={12} strokeWidth={1.5} />}
                             </button>
                             
-                            <span className="text-xs font-semibold select-none">{item.quantity}</span>
+                            <span className="text-[15px] font-semibold select-none min-w-[8px] text-center">{item.quantity}</span>
                             
                             <button type="button" onClick={() => updateQuantity(item.id, itemSize, itemColor, 1)} className="text-black hover:opacity-70 cursor-pointer">
                               <Plus size={12} strokeWidth={1.5} />
@@ -91,7 +91,7 @@ function BasketPage() {
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="text-sm md:text-base font-bold text-black">${item.price * item.quantity}</span>
+                        <span className="text-[16px] font-semibold text-black whitespace-nowrap">${item.price * item.quantity}</span>
                       </div>
 
                     </div>
@@ -101,68 +101,68 @@ function BasketPage() {
             </div>
 
             {/* SAĞ TƏRƏF */}
-            <div className="lg:col-span-6 bg-white p-6 md:p-7 rounded-xl border border-gray-200/80 sticky top-6">
-              <h2 className="text-base font-bold mb-5 text-black">Order Summary</h2>
+            <div className="lg:col-span-6 bg-white p-[28px] rounded-xl border border-gray-200/80 sticky top-6">
+              <h2 className="text-[17px] leading-[1.3] font-bold mb-[24px] text-black">Order Summary</h2>
 
               <div className="mb-5">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-black select-none">
-                  <input type="checkbox" checked={hasPromoCode} onChange={(e) => setHasPromoCode(e.target.checked)} className="w-4 h-4 rounded border-black text-black accent-black cursor-pointer" />
+                <label className="flex items-center gap-2 cursor-pointer text-[15px] font-semibold text-black select-none">
+                  <input type="checkbox" checked={hasPromoCode} onChange={(e) => setHasPromoCode(e.target.checked)} className="w-[15px] h-[15px] rounded border-black text-black accent-black cursor-pointer" />
                   <span>Have a promo code?</span>
                 </label>
 
                 {hasPromoCode && (
                   <div className="flex gap-2 mt-3">
-                    <input type="text" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} placeholder="Type your code" className="flex-1 px-3.5 py-2 border border-gray-300 rounded-md text-xs font-normal outline-none focus:border-black placeholder-gray-400 text-black" />
-                    <button type="button" className="px-5 py-2 bg-black text-white rounded-full text-xs font-bold hover:bg-gray-800 transition-colors cursor-pointer">
+                    <input type="text" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} placeholder="Type your code" className="flex-1 px-[14px] py-[9px] border border-gray-300 rounded-[6px] text-[15px] font-light outline-none focus:border-black placeholder-gray-400 text-black" />
+                    <button type="button" className="px-[22px] py-[9px] bg-black text-white rounded-full text-[15px] font-semibold hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap">
                       Apply
                     </button>
                   </div>
                 )}
               </div>
 
-              <div className="space-y-2.5 pb-4 text-xs font-medium text-gray-700">
+              <div className="space-y-[5px] pb-4 text-[15px] font-normal text-gray-700">
                 <div className="flex justify-between items-center">
                   <span>Subtotal</span>
-                  <span className="font-bold text-black">${subtotal}</span>
+                  <span className="font-semibold text-black">${subtotal}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Tax</span>
-                  <span className="font-bold text-black">$0</span>
+                  <span className="font-semibold text-black">$0</span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center py-3 text-base font-bold border-t border-gray-100 text-black">
+              <div className="flex justify-between items-center py-[14px] text-[19px] font-semibold border-t border-gray-100 text-black">
                 <span>Total</span>
-                <span className="font-bold">${subtotal}</span>
+                <span className="font-semibold">${subtotal}</span>
               </div>
 
-              <button type="button" className="w-full py-3 bg-black text-white rounded-full text-xs font-bold tracking-wide hover:bg-gray-800 transition-all cursor-pointer my-2">
+              <button type="button" className="w-full py-[14px] bg-black text-white rounded-full text-[15px] font-semibold tracking-wide hover:bg-gray-800 transition-all cursor-pointer my-[6px]">
                 Proceed to checkout
               </button>
 
-              <div className="divide-y divide-gray-100 text-xs text-black mt-3 border-t border-gray-100">
-                <button type="button" onClick={() => setActiveDrawer("points")} className="w-full flex items-center justify-between py-3 cursor-pointer group text-left">
+              <div className="divide-y divide-gray-100 text-[15px] text-black mt-2 border-t border-gray-100">
+                <button type="button" onClick={() => setActiveDrawer("points")} className="w-full flex items-center justify-between py-[13px] cursor-pointer group text-left">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold italic text-xs">s/+</span>
-                    <span className="font-medium text-gray-800">+{subtotal} points with this purchase</span>
+                    <span className="font-semibold italic text-[15px]">s/+</span>
+                    <span className="font-normal text-gray-800">+{subtotal} points with this purchase</span>
                   </div>
                   <ChevronRight size={14} strokeWidth={1.5} className="text-black group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
-                <button type="button" onClick={() => setActiveDrawer("returns")} className="w-full flex items-center justify-between py-3 cursor-pointer group text-left">
+                <button type="button" onClick={() => setActiveDrawer("returns")} className="w-full flex items-center justify-between py-[13px] cursor-pointer group text-left">
                   <div className="flex items-center gap-2">
                     <Package size={16} className="text-black" strokeWidth={1.5} />
-                    <span className="font-medium text-gray-800">Free Returns Within 45 Days</span>
+                    <span className="font-normal text-gray-800">Free Returns Within 45 Days</span>
                   </div>
                   <ChevronRight size={14} strokeWidth={1.5} className="text-black group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>
 
-              <div className="mt-6 text-center border-t border-gray-100 pt-4">
-                <span className="text-[11px] text-gray-500 font-normal block mb-2.5">Easy payment</span>
-                <div className="flex items-center justify-center flex-wrap gap-1.5">
+              <div className="mt-[22px] text-center border-t border-gray-100 pt-4">
+                <span className="text-[14px] text-gray-500 font-light block mb-[10px]">Easy payment</span>
+                <div className="flex items-center justify-center flex-wrap gap-[10px]">
                   {paymentLogos.map((logo) => (
-                    <div key={logo.name} className="h-4 w-7 bg-[#f4f4f4] rounded-[2px] flex items-center justify-center p-0.5">
+                    <div key={logo.name} className="h-[16px] w-[28px] bg-[#f4f4f2] rounded-[2px] flex items-center justify-center p-[2px]">
                       <img src={logo.url} alt={logo.name} className="max-h-full max-w-full object-contain" />
                     </div>
                   ))}
@@ -174,9 +174,9 @@ function BasketPage() {
           </div>
         ) : (
           <div className="bg-white rounded-xl p-10 text-center border border-gray-200/80 max-w-xl mx-auto">
-            <h1 className="text-base font-bold mb-2 text-black">Your cart is empty</h1>
-            <p className="text-xs text-gray-500 mb-5 font-normal">Discover our product range</p>
-            <Link to="/shop" className="px-6 py-2.5 bg-black text-white rounded-full text-xs font-bold inline-block hover:bg-gray-800">
+            <h1 className="text-[14px] font-semibold mb-2 text-black">Your cart is empty</h1>
+            <p className="text-[11px] text-gray-500 mb-5 font-light">Discover our product range</p>
+            <Link to="/shop" className="px-6 py-[10px] bg-black text-white rounded-full text-[11px] font-semibold inline-block hover:bg-gray-800">
               Start Shopping
             </Link>
           </div>
