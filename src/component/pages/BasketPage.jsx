@@ -46,7 +46,7 @@ function BasketPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* SOL TƏRƏF */}
-            <div className="lg:col-span-6 bg-white p-[28px] rounded-xl border border-gray-200/80">
+            <div className="lg:col-span-6 bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80">
               <h1 className="text-[17px] leading-[1.3] font-bold mb-[24px] text-black">
                 Your bag ({totalItems} {totalItems === 1 ? 'item' : 'items'})
               </h1>
@@ -101,9 +101,10 @@ function BasketPage() {
             </div>
 
             {/* SAĞ TƏRƏF */}
-            <div className="lg:col-span-6 bg-white p-[28px] rounded-xl border border-gray-200/80 sticky top-6">
+            <div className="lg:col-span-6 bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80 sticky top-6">
               <h2 className="text-[17px] leading-[1.3] font-bold mb-[24px] text-black">Order Summary</h2>
 
+              {/* PROMO KOD HİSSƏSİ (OPTIMIZASIYA OLUNDU) */}
               <div className="mb-5">
                 <label className="flex items-center gap-2 cursor-pointer text-[15px] font-semibold text-black select-none">
                   <input type="checkbox" checked={hasPromoCode} onChange={(e) => setHasPromoCode(e.target.checked)} className="w-[15px] h-[15px] rounded border-black text-black accent-black cursor-pointer" />
@@ -111,8 +112,14 @@ function BasketPage() {
                 </label>
 
                 {hasPromoCode && (
-                  <div className="flex gap-2 mt-3">
-                    <input type="text" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} placeholder="Type your code" className="flex-1 px-[14px] py-[9px] border border-gray-300 rounded-[6px] text-[15px] font-light outline-none focus:border-black placeholder-gray-400 text-black" />
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3 items-stretch sm:items-center">
+                    <input 
+                      type="text" 
+                      value={promoInput} 
+                      onChange={(e) => setPromoInput(e.target.value)} 
+                      placeholder="Type your code" 
+                      className="w-full sm:w-auto sm:max-w-[240px] px-[14px] py-[9px] border border-gray-300 rounded-[6px] text-[15px] font-light outline-none focus:border-black placeholder-gray-400 text-black" 
+                    />
                     <button type="button" className="px-[22px] py-[9px] bg-black text-white rounded-full text-[15px] font-semibold hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap">
                       Apply
                     </button>
