@@ -1,17 +1,59 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { loginWithEmail, loginWithGoogle, loginWithApple } = useAuth();
+
+  const redirectTo = location.state?.from || '/';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  // Hansı düymənin loading vəziyyətində olduğunu izləyirik: 'email' | 'google' | 'apple' | null
+  const [loading, setLoading] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Backend hazır olanda sign-in məntiqi burada işə düşəcək
+    setError('');
+    setLoading('email');
+    const { error: authError } = await loginWithEmail(email, password);
+    setLoading(null);
+    if (authError) {
+      setError(authError);
+      return;
+    }
+    navigate(redirectTo, { replace: true });
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading('google');
+    const { error: authError } = await loginWithGoogle();
+    setLoading(null);
+    if (authError) {
+      setError(authError);
+      return;
+    }
+    navigate(redirectTo, { replace: true });
+  };
+
+  const handleAppleLogin = async () => {
+    setError('');
+    setLoading('apple');
+    const { error: authError } = await loginWithApple();
+    setLoading(null);
+    if (authError) {
+      setError(authError);
+      return;
+    }
+    navigate(redirectTo, { replace: true });
   };
 
   return (
@@ -23,14 +65,30 @@ function LoginPage() {
             ACCESS YOUR<br />ACCOUNT
           </h1>
 
+          {error && (
+            <div className="mb-5 rounded-md bg-red-50 border border-red-200 text-[#c8102e] text-sm px-4 py-3">
+              {error}
+            </div>
+          )}
+
           <div className="flex flex-col gap-3">
-            <button type="button" className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer">
-              <FcGoogle size={20} />
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading !== null}
+              className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading === 'google' ? <Loader2 size={18} className="animate-spin" /> : <FcGoogle size={20} />}
               <span>Continue with Google</span>
             </button>
 
-            <button type="button" className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer">
-              <FaApple size={20} />
+            <button
+              type="button"
+              onClick={handleAppleLogin}
+              disabled={loading !== null}
+              className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <FaApple size={20} />}
               <span>Continue with Apple</span>
             </button>
           </div>
@@ -46,7 +104,7 @@ function LoginPage() {
               <label htmlFor="email" className="block text-sm font-bold text-black mb-2">
                 Email address <span className="text-[#c8102e]">*</span>
               </label>
-              <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
+              <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
             </div>
 
             <div>
@@ -54,7 +112,7 @@ function LoginPage() {
                 Password <span className="text-[#c8102e]">*</span>
               </label>
               <div className="relative">
-                <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border border-gray-300 rounded-md px-4 py-3 pr-11 text-sm text-black focus:outline-none focus:border-black transition-colors" />
+                <input id="password" type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border border-gray-300 rounded-md px-4 py-3 pr-11 text-sm text-black focus:outline-none focus:border-black transition-colors" />
                 <button type="button" onClick={() => setShowPassword((prev) => !prev)} className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 hover:text-black cursor-pointer" aria-label={showPassword ? 'Hide password' : 'Show password'}>
                   {showPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                 </button>
@@ -65,8 +123,13 @@ function LoginPage() {
               Forgot your password?
             </Link>
 
-            <button type="submit" className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer">
-              Sign in
+            <button
+              type="submit"
+              disabled={loading !== null}
+              className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading === 'email' && <Loader2 size={16} className="animate-spin" />}
+              <span>Sign in</span>
             </button>
           </form>
         </div>

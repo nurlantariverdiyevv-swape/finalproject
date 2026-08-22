@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
 import { useBasket } from '../../context/BasketContext';
 import { useDataContext } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 import { DesktopSearchOverlay, MobileSearchOverlay } from '../pages/SearchOverlay';
 
 const popularSearches = [
@@ -17,6 +18,7 @@ function Header() {
   const { wishlist } = useWishlist();
   const { totalBasketCount } = useBasket();
   const { slider = [], shopProducts = [], fetchSlider, fetchShopProducts } = useDataContext();
+  const { user, logout } = useAuth();
 
   const categories = ['New', 'Shoes', 'Men', 'Women', 'Kids', 'Activities', 'Explore'];
 
@@ -273,10 +275,21 @@ function Header() {
           </div>
 
           <div className="flex items-center justify-end gap-6 w-1/3">
-            <Link to="/login" className="flex items-center gap-2 text-black hover:opacity-70">
-              <User size={20} strokeWidth={1.5} />
-              <span className="text-sm font-semibold">Log in</span>
-            </Link>
+            {user ? (
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="flex items-center gap-2 text-black hover:opacity-70 cursor-pointer"
+              >
+                <User size={20} strokeWidth={1.5} />
+                <span className="text-sm font-semibold">{user.displayName ? user.displayName.split(' ')[0] : 'Account'}</span>
+              </button>
+            ) : (
+              <Link to="/login" className="flex items-center gap-2 text-black hover:opacity-70">
+                <User size={20} strokeWidth={1.5} />
+                <span className="text-sm font-semibold">Log in</span>
+              </Link>
+            )}
 
             <Link to="/wishlist" className="relative hover:opacity-70 text-black">
               <Heart size={22} strokeWidth={1.5} />
@@ -329,10 +342,21 @@ function Header() {
               </div>
 
               <div className="pt-6 border-t border-gray-100 flex items-center justify-between mt-auto">
-                <Link to="/login" onClick={closeAllMenus} className="flex items-center gap-2 text-black font-medium text-sm">
-                  <User size={18} />
-                  <span>Log in</span>
-                </Link>
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={() => { logout(); closeAllMenus(); }}
+                    className="flex items-center gap-2 text-black font-medium text-sm cursor-pointer"
+                  >
+                    <User size={18} />
+                    <span>Log out</span>
+                  </button>
+                ) : (
+                  <Link to="/login" onClick={closeAllMenus} className="flex items-center gap-2 text-black font-medium text-sm">
+                    <User size={18} />
+                    <span>Log in</span>
+                  </Link>
+                )}
                 <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
               </div>
             </div>
@@ -412,13 +436,27 @@ function Header() {
           </div>
 
           <div className="mt-auto pt-8 pb-6 flex flex-col gap-5">
-            <Link to="/login" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
-              <div className="flex items-center gap-3">
-                <User size={20} strokeWidth={1.5} />
-                <span>Log in</span>
-              </div>
-              <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
-            </Link>
+            {user ? (
+              <button
+                type="button"
+                onClick={() => { logout(); closeAllMenus(); }}
+                className="flex items-center justify-between text-sm font-medium text-black cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <User size={20} strokeWidth={1.5} />
+                  <span>Log out</span>
+                </div>
+                <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
+              </button>
+            ) : (
+              <Link to="/login" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+                <div className="flex items-center gap-3">
+                  <User size={20} strokeWidth={1.5} />
+                  <span>Log in</span>
+                </div>
+                <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
+              </Link>
+            )}
 
             <Link to="/wishlist" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
               <div className="flex items-center gap-3">

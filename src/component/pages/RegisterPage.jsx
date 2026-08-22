@@ -1,8 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
+import { updateProfile } from 'firebase/auth';
+import { useAuth } from '../../context/AuthContext';
 
 function RegisterPage() {
+  const navigate = useNavigate();
+  const { registerWithEmail } = useAuth();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -17,6 +22,8 @@ function RegisterPage() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const availableCategories = [
     'Gravel Running',
@@ -58,9 +65,30 @@ function RegisterPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Register Data:', formData);
+    setError('');
+    setLoading(true);
+
+    const { user, error: authError } = await registerWithEmail(formData.email, formData.password);
+
+    if (authError) {
+      setLoading(false);
+      setError(authError);
+      return;
+    }
+
+    const fullName = [formData.firstName, formData.lastName].filter(Boolean).join(' ');
+    if (user && fullName) {
+      try {
+        await updateProfile(user, { displayName: fullName });
+      } catch {
+        // Ad yenilənməsə də qeydiyyat uğurludur, bu addım kritik deyil
+      }
+    }
+
+    setLoading(false);
+    navigate('/', { replace: true });
   };
 
   return (
@@ -75,6 +103,12 @@ function RegisterPage() {
           <p className="text-xs text-gray-600 leading-relaxed mb-8">
             Create your free account for instant access to free shipping, special rewards, and more. It's quick and easy to join.
           </p>
+
+          {error && (
+            <div className="mb-5 rounded-md bg-red-50 border border-red-200 text-[#c8102e] text-sm px-4 py-3">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             
@@ -202,8 +236,13 @@ function RegisterPage() {
               </div>
             </div>
 
-            <button type="submit" className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer mt-4">
-              Sign up
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer mt-4 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading && <Loader2 size={16} className="animate-spin" />}
+              <span>Sign up</span>
             </button>
           </form>
         </div>
