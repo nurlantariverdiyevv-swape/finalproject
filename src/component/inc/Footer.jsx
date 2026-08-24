@@ -15,7 +15,7 @@ function Footer() {
 
   const footerData = [
     {
-      title: "Salomon",
+      title: "Runova",
       links: [
         { label: "Who We Are", path: "/who-we-are" },
         { label: "Become an S/PLUS Member", path: "/s-plus-member" },
@@ -159,7 +159,7 @@ function Footer() {
 
           {/* Copyright Text */}
           <div className="text-[14px] text-[#e5e5e5] w-full md:w-auto text-left md:text-center">
-            ©2026 — Playing in the French Alps since 1947
+            ©2026 — by Nurlan Tarıverdiyev
           </div>
         </div>
 
