@@ -6,8 +6,10 @@ const DataContext = createContext();
 export const DataProvider = ({ children }) => {
   const [slider, setSlider] = useState([]);
   const [shopProducts, setShopProducts] = useState([]);
+  const [content, setContent] = useState(null);
   const [sliderLoading, setSliderLoading] = useState(false);
   const [shopLoading, setShopLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
   const [loaded, setLoaded] = useState({});
 
   const fetchSlider = async () => {
@@ -38,6 +40,24 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  // Header/Footer/Main/RegisterPage/ShopPage/BasketPage/ProductDetail
+  // üçün əvvəllər hardcode olunmuş bütün statik məzmunu (menyu, banner,
+  // footer linkləri, sıralama seçimləri, ölçü cədvəli və s.) vercel API-dən
+  // tək dəfə çəkib bütün tətbiqə paylaşır.
+  const fetchContent = async () => {
+    if (loaded.content) return;
+    try {
+      setContentLoading(true);
+      const contentData = await Api.getContent();
+      setContent(contentData || null);
+      setLoaded((prev) => ({ ...prev, content: true }));
+    } catch (error) {
+      console.error("Content API Error:", error);
+    } finally {
+      setContentLoading(false);
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -47,6 +67,9 @@ export const DataProvider = ({ children }) => {
         shopProducts,
         fetchShopProducts,
         shopLoading,
+        content,
+        fetchContent,
+        contentLoading,
       }}
     >
       {children}

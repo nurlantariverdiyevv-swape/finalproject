@@ -2,9 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { RiFacebookCircleFill, RiInstagramFill, RiYoutubeFill } from 'react-icons/ri';
+import { useDataContext } from '../../context/DataContext';
 
 function Footer() {
   const [openSections, setOpenSections] = useState({});
+  // Footer sütunları artıq hardcode deyil, vercel API-dəki content.json-dan
+  // (content.footer) gəlir.
+  const { content } = useDataContext();
+  const footerData = content?.footer || [];
 
   const toggleSection = (title) => {
     setOpenSections((prev) => ({
@@ -12,57 +17,6 @@ function Footer() {
       [title]: !prev[title],
     }));
   };
-
-  const footerData = [
-    {
-      title: "Runova",
-      links: [
-        { label: "Who We Are", path: "/who-we-are" },
-        { label: "Become an S/PLUS Member", path: "/s-plus-member" },
-        { label: "Pro Deal Access", path: "/pro-deal" },
-        { label: "Affiliate Program", path: "/affiliate" },
-        { label: "Salomon Forces", path: "/forces" },
-        { label: "Press Center", path: "/press" },
-        { label: "Careers", path: "/careers" },
-        { label: "Newsletter", path: "/newsletter" }
-      ]
-    },
-    {
-      title: "Help Center",
-      links: [
-        { label: "Size Guide", path: "/size-guide" },
-        { label: "Order/return tracking", path: "/order-tracking" },
-        { label: "Gift Cards", path: "/gift-cards" },
-        { label: "Warranty", path: "/warranty" },
-        { label: "Shipping", path: "/shipping-info" },
-        { label: "Returns", path: "/returns" },
-        { label: "FAQ", path: "/faq" },
-        { label: "Contact", path: "/contact" },
-        { label: "Find a Shop", path: "/find-a-shop" },
-        { label: "Tax Exempt", path: "/tax-exempt" }
-      ]
-    },
-    {
-      title: "Legal",
-      links: [
-        { label: "Terms & Conditions", path: "/terms" },
-        { label: "S/PLUS - Terms & Conditions", path: "/s-plus-terms" },
-        { label: "Cookie Preferences", path: "/cookie-preferences" },
-        { label: "Cookie Policy", path: "/cookie-policy" },
-        { label: "Privacy", path: "/privacy" },
-        { label: "Accessibility", path: "/accessibility" },
-        { label: "Declaration of conformity", path: "/conformity" },
-        { label: "Product Recall", path: "/product-recall" },
-        { label: "Customer Reviews", path: "/reviews" }
-      ]
-    },
-    {
-      title: "Sustainability",
-      links: [
-        { label: "Our Responsible Commitments", path: "/sustainability" }
-      ]
-    }
-  ];
 
   return (
     <footer className="bg-black text-white pt-12 pb-8 px-6 md:px-16 font-sans">

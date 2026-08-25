@@ -104,7 +104,7 @@ function ShopPage({ onAddToCart }) {
   const [searchParams] = useSearchParams();
   const searchTerm = (searchParams.get('search') || '').trim();
 
-  const { shopProducts = [], fetchShopProducts, shopLoading } = useDataContext();
+  const { shopProducts = [], fetchShopProducts, shopLoading, content } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
   const [showFilters, setShowFilters] = useState(true);
@@ -218,12 +218,9 @@ function ShopPage({ onAddToCart }) {
     setActiveCardColors((prev) => ({ ...prev, [productId]: colorObj }));
   };
 
-  const sortOptions = [
-    { id: 'featured', label: 'Featured' },
-    { id: 'newest', label: 'Newest' },
-    { id: 'price-low', label: 'Price: Low to High' },
-    { id: 'price-high', label: 'Price: High to Low' },
-  ];
+  // Sıralama seçimləri artıq hardcode deyil, vercel API-dəki content.json-dan
+  // (content.shop.sortOptions) gəlir.
+  const sortOptions = content?.shop?.sortOptions || [];
   const currentSortLabel = sortOptions.find((o) => o.id === sortBy)?.label || 'Featured';
 
   if (shopLoading && shopProducts.length === 0) {

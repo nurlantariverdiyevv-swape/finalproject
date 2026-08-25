@@ -6,25 +6,6 @@ import { useWishlist } from "../../context/WishlistContext";
 import { useBasket } from "../../context/BasketContext";
 import ProductInfoLinks from "./ProductInfoLinks";
 
-const sizeGuideData = [
-  { cm: 21.5, inch: 8.5, uk: 3.5, eur: 35 }, { cm: 22, inch: 8.7, uk: 4, eur: 36 },
-  { cm: 22.5, inch: 8.9, uk: 4.5, eur: 37 }, { cm: 23, inch: 9.1, uk: 5, eur: 37.5 },
-  { cm: 23.5, inch: 9.3, uk: 5.5, eur: 38 }, { cm: 24, inch: 9.4, uk: 6, eur: 39 },
-  { cm: 24.5, inch: 9.6, uk: 6.5, eur: 39.5 }, { cm: 25, inch: 9.8, uk: 7, eur: 40 },
-  { cm: 25.5, inch: 10, uk: 7.5, eur: 41 }, { cm: 26, inch: 10.2, uk: 8, eur: 42 },
-  { cm: 26.5, inch: 10.4, uk: 8.5, eur: 42.5 }, { cm: 27, inch: 10.6, uk: 9, eur: 43 },
-  { cm: 27.5, inch: 10.8, uk: 9.5, eur: 44 }, { cm: 28, inch: 11, uk: 10, eur: 44.5 },
-  { cm: 28.5, inch: 11.2, uk: 10.5, eur: 45 }, { cm: 29, inch: 11.4, uk: 11, eur: 46 }
-];
-
-const measureSteps = [
-  "Place a sheet of paper on the floor and against a wall",
-  "Make sure you are wearing the same socks that you would normally wear with this type of shoe",
-  "Wearing these socks, stand on the sheet of paper with your foot perpendicular to the wall and your heel against the wall.",
-  "Then use a pen to draw a line just in front of your big toe. Repeat for both feet and take the longer distance to determine your size.",
-  "Using a ruler, measure the distance between the wall and the line you drew to find your size."
-];
-
 function StarRating({ rating = 0 }) {
   const numericRating = parseFloat(rating) || 0;
 
@@ -221,9 +202,14 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
 
 function ProductDetail() {
   const { id } = useParams();
-  const { slider = [], fetchSlider, sliderLoading, shopProducts = [], fetchShopProducts, shopLoading } = useDataContext();
+  const { slider = [], fetchSlider, sliderLoading, shopProducts = [], fetchShopProducts, shopLoading, content } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
   const { addToBasket } = useBasket();
+
+  // Ölçü cədvəli və ölçmə addımları artıq hardcode deyil, vercel API-dəki
+  // content.json-dan (content.productDetail) gəlir.
+  const sizeGuideData = content?.productDetail?.sizeGuide || [];
+  const measureSteps = content?.productDetail?.measureSteps || [];
 
   const [selectedSize, setSelectedSize] = useState("");
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);

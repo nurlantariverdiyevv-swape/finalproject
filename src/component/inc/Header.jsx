@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Search, User, Heart, Menu, ShoppingBag, X, ChevronRight, ArrowRight, HelpCircle, MapPin, Mail } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Search, User, Heart, Menu, ShoppingBag, X, ChevronRight, ArrowRight, HelpCircle, MapPin, Mail, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
 import { useBasket } from '../../context/BasketContext';
@@ -7,103 +7,61 @@ import { useDataContext } from '../../context/DataContext';
 import { useAuth } from '../../context/AuthContext';
 import { DesktopSearchOverlay, MobileSearchOverlay } from '../pages/SearchOverlay';
 
-const popularSearches = [
-  'xt 6', 'speedcross', 'gore tex', 'xt 4',
-  'snowboard', 'maison margiela', 'xt whisper', 'margiela',
-  'xa pro 3d', 'whisper', 'x ultra',
-];
-
 function Header() {
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
   const { totalBasketCount } = useBasket();
-  const { slider = [], shopProducts = [], fetchSlider, fetchShopProducts } = useDataContext();
+  const { slider = [], shopProducts = [], fetchSlider, fetchShopProducts, content } = useDataContext();
   const { user, logout } = useAuth();
 
-  const categories = ['New', 'Shoes', 'Men', 'Women', 'Kids', 'Activities', 'Explore'];
-
-  const desktopMenuData = {
-    New: {
-      subCategories: [
-        { name: 'Men', link: '/shop/new-men' },
-        { name: 'Women', link: '/shop/new-women' },
-        { name: 'Sportstyle', link: '/shop/new-sportstyle' },
-        { name: 'See all', link: '/shop/new' },
-      ],
-      banners: [
-        { title: 'New Arrivals', img: '/assets/img/reklam.jpeg', link: '/shop/new' },
-        { title: 'Best Sellers', img: '/assets/img/gravel.jpeg', link: '/shop' },
-      ],
-    },
-    Shoes: {
-      subCategories: [
-        { name: 'Men Shoes', link: '/shop/men-shoes' },
-        { name: 'Women Shoes', link: '/shop/women-shoes' },
-        { name: 'Sportstyle', link: '/shop/sportstyle' },
-        { name: 'See all', link: '/shop/shoes' },
-      ],
-      banners: [
-        { title: 'New Arrivals', img: '/assets/img/reklam.jpeg', link: '/shop/new' },
-        { title: 'Sportstyle', img: '/assets/img/sportstyle.jpeg', link: '/shop/sportstyle' },
-      ],
-    },
-    Men: {
-      subCategories: [
-        { name: 'Running', link: '/shop/men-running' },
-        { name: 'Trail Running', link: '/shop/men-trail-running' },
-        { name: 'Hiking', link: '/shop/men-hiking' },
-        { name: 'Sportstyle', link: '/shop/men-sportstyle' },
-        { name: 'See all', link: '/shop/men' },
-      ],
-      banners: [
-        { title: 'Shop Men', img: '/assets/img/road.jpeg', link: '/shop/men' },
-      ],
-    },
-    Women: {
-      subCategories: [
-        { name: 'Running', link: '/shop/women-running' },
-        { name: 'Trail Running', link: '/shop/women-trail-running' },
-        { name: 'Hiking', link: '/shop/women-hiking' },
-        { name: 'Sportstyle', link: '/shop/women-sportstyle' },
-        { name: 'See all', link: '/shop/women' },
-      ],
-      banners: [
-        { title: 'Shop Women', img: '/assets/img/hiking.jpeg', link: '/shop/women' },
-      ],
-    },
-    Kids: {
-      subCategories: [
-        { name: 'Shoes', link: '/shop/kids-shoes' },
-        { name: 'Clothing', link: '/shop/kids-clothing' },
-      ],
-      banners: [
-        { title: 'Kids New Collection', img: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?q=80&w=800&auto=format&fit=crop', link: '/shop/kids' },
-      ],
-    },
-    Activities: {
-      subCategories: [
-        { name: 'Trail Running', link: '/shop/trail-running' },
-        { name: 'Road Running', link: '/shop/road-running' },
-        { name: 'Hiking & Backpacking', link: '/shop/hiking' },
-      ],
-      banners: [
-        { title: 'Explore Activities', img: '/assets/img/gravel.jpeg', link: '/shop' },
-      ],
-    },
-    Explore: {
-      subCategories: [
-        { name: 'Stories', link: '/shop/stories' },
-        { name: 'Sustainability', link: '/shop/sustainability' },
-      ],
-      banners: [
-        { title: 'Our Stories', img: '/assets/img/trail.jpeg', link: '/shop/stories' },
-      ],
-    },
-  };
+  // Menyu, banner və axtarış təklifləri artıq hardcode deyil, vercel
+  // API-dəki content.json-dan (content.header) gəlir.
+  const categories = content?.header?.categories || [];
+  const desktopMenuData = content?.header?.desktopMenuData || {};
+  const popularSearches = content?.header?.popularSearches || [];
 
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // ------- HESAB DROPDOWN (Log out) -------
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(e.target)) {
+        setAccountMenuOpen(false);
+      }
+    };
+    if (accountMenuOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [accountMenuOpen]);
+
+  const handleLogout = () => {
+    logout();
+    setAccountMenuOpen(false);
+  };
+
+  // Mobil versiya üçün ayrıca hesab dropdown-u (login/basket menyudan
+  // kənarda, birbaşa yuxarı barda görünür)
+  const [mobileAccountMenuOpen, setMobileAccountMenuOpen] = useState(false);
+  const mobileAccountMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutsideMobile = (e) => {
+      if (mobileAccountMenuRef.current && !mobileAccountMenuRef.current.contains(e.target)) {
+        setMobileAccountMenuOpen(false);
+      }
+    };
+    if (mobileAccountMenuOpen) document.addEventListener('mousedown', handleClickOutsideMobile);
+    return () => document.removeEventListener('mousedown', handleClickOutsideMobile);
+  }, [mobileAccountMenuOpen]);
+
+  const handleMobileLogout = () => {
+    logout();
+    setMobileAccountMenuOpen(false);
+  };
 
   // ------- AXTARIŞ STATE-İ -------
   const [searchOpen, setSearchOpen] = useState(false);
@@ -225,6 +183,40 @@ function Header() {
           </Link>
 
           <div className="flex items-center gap-3">
+            {/* Hesaba giriş: menyunu açmağa ehtiyac qalmadan birbaşa yuxarı barda */}
+            {user ? (
+              <div className="relative" ref={mobileAccountMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setMobileAccountMenuOpen((prev) => !prev)}
+                  className="text-black p-1 hover:opacity-70 cursor-pointer"
+                  aria-label="Account"
+                >
+                  <User size={24} strokeWidth={1.5} />
+                </button>
+
+                {mobileAccountMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1">
+                    <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 truncate">
+                      {user.displayName || user.email || 'Hesabım'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleMobileLogout}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 cursor-pointer"
+                    >
+                      <LogOut size={16} strokeWidth={1.5} />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" onClick={closeAllMenus} className="text-black p-1 hover:opacity-70" aria-label="Log in">
+                <User size={24} strokeWidth={1.5} />
+              </Link>
+            )}
+
             <Link to="/basket" onClick={closeAllMenus} className="relative text-black p-1 hover:opacity-70">
               <ShoppingBag size={24} strokeWidth={1.5} />
               {totalBasketCount > 0 && (
@@ -276,14 +268,30 @@ function Header() {
 
           <div className="flex items-center justify-end gap-6 w-1/3">
             {user ? (
-              <button
-                type="button"
-                onClick={() => logout()}
-                className="flex items-center gap-2 text-black hover:opacity-70 cursor-pointer"
-              >
-                <User size={20} strokeWidth={1.5} />
-                <span className="text-sm font-semibold">{user.displayName ? user.displayName.split(' ')[0] : 'Account'}</span>
-              </button>
+              <div className="relative" ref={accountMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setAccountMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-2 text-black hover:opacity-70 cursor-pointer"
+                >
+                  <User size={20} strokeWidth={1.5} />
+                  <span className="text-sm font-semibold">{user.displayName ? user.displayName.split(' ')[0] : 'Account'}</span>
+                </button>
+
+                {/* Log in adının üstünə basanda açılan dropdown - Log out buradadır */}
+                {accountMenuOpen && (
+                  <div className="absolute right-0 top-full mt-3 w-44 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1 animate-[fadeIn_0.15s_ease-out]">
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 cursor-pointer"
+                    >
+                      <LogOut size={16} strokeWidth={1.5} />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link to="/login" className="flex items-center gap-2 text-black hover:opacity-70">
                 <User size={20} strokeWidth={1.5} />
@@ -436,26 +444,22 @@ function Header() {
           </div>
 
           <div className="mt-auto pt-8 pb-6 flex flex-col gap-5">
-            {user ? (
-              <button
-                type="button"
-                onClick={() => { logout(); closeAllMenus(); }}
-                className="flex items-center justify-between text-sm font-medium text-black cursor-pointer"
-              >
+            {/* Login/Logout indi yuxarı mobil barda (menyunun kənarında) idarə olunur.
+                Burada, giriş edildikdən sonra sadəcə istifadəçinin adı göstərilir. */}
+            {user && (
+              <div className="flex items-center justify-between text-sm font-medium text-black">
                 <div className="flex items-center gap-3">
                   <User size={20} strokeWidth={1.5} />
-                  <span>Log out</span>
+                  <span className="truncate max-w-[160px]">{user.displayName ? user.displayName.split(' ')[0] : (user.email || 'Hesabım')}</span>
                 </div>
-                <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
-              </button>
-            ) : (
-              <Link to="/login" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
-                <div className="flex items-center gap-3">
-                  <User size={20} strokeWidth={1.5} />
-                  <span>Log in</span>
-                </div>
-                <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
-              </Link>
+                <button
+                  type="button"
+                  onClick={() => { logout(); closeAllMenus(); }}
+                  className="text-xs font-bold text-gray-500 hover:text-black underline underline-offset-4 cursor-pointer"
+                >
+                  Log out
+                </button>
+              </div>
             )}
 
             <Link to="/wishlist" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
@@ -469,20 +473,6 @@ function Header() {
                   )}
                 </div>
                 <span>Wishlist</span>
-              </div>
-            </Link>
-
-            <Link to="/basket" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <ShoppingBag size={20} strokeWidth={1.5} />
-                  {totalBasketCount > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-[#c8102e] text-white text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                      {totalBasketCount}
-                    </span>
-                  )}
-                </div>
-                <span>Basket</span>
               </div>
             </Link>
 

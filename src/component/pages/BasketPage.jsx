@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, Plus, Minus, ChevronRight, Package, X } from 'lucide-react';
 import { useBasket } from '../../context/BasketContext';
+import { useDataContext } from '../../context/DataContext';
 
 function InfoDrawer({ open, onClose, title, children }) {
   return (
@@ -28,15 +29,10 @@ function BasketPage() {
 
   const totalItems = basket.reduce((a, b) => a + b.quantity, 0);
 
-  const paymentLogos = [
-    { name: 'Visa', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Visa_Inc._logo_%282021%E2%80%93present%29.svg/3840px-Visa_Inc._logo_%282021%E2%80%93present%29.svg.png' },
-    { name: 'Mastercard', url: 'https://logos-world.net/wp-content/uploads/2020/09/Mastercard-Logo.png' },
-    { name: 'Amex', url: 'https://1000logos.net/wp-content/uploads/2016/10/American-Express-Color.png' },
-    { name: 'Discover', url: 'https://1000logos.net/wp-content/uploads/2021/05/Discover-logo.png' },
-    { name: 'PayPal', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/1280px-PayPal.svg.png' },
-    { name: 'Apple Pay', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Apple_Pay_logo.svg/960px-Apple_Pay_logo.svg.png' },
-    { name: 'Google Pay', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/1280px-Google_Pay_Logo.svg.png' },
-  ];
+  // Ödəniş loqoları artıq hardcode deyil, vercel API-dəki content.json-dan
+  // (content.basket.paymentLogos) gəlir.
+  const { content } = useDataContext();
+  const paymentLogos = content?.basket?.paymentLogos || [];
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen py-8 text-black antialiased" style={{ fontFamily: "Inter, sans-serif" }}>

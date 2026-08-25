@@ -3,10 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
 import { useAuth } from '../../context/AuthContext';
+import { useDataContext } from '../../context/DataContext';
 
 function RegisterPage() {
   const navigate = useNavigate();
   const { registerWithEmail } = useAuth();
+  // Kateqoriyalar və şifrə qaydaları artıq hardcode deyil, vercel API-dəki
+  // content.json-dan (content.register) gəlir.
+  const { content } = useDataContext();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -25,25 +29,12 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const availableCategories = [
-    'Gravel Running',
-    'Nordic Skiing',
-    'Alpine Skiing',
-    'Hiking',
-    'Road Running',
-    'Freeskiing & Ski Touring',
-    'Snowboarding',
-    'Sportstyle',
-    'Trail Running'
-  ];
+  const availableCategories = content?.register?.availableCategories || [];
 
-  const passwordValidations = [
-    { label: 'Minimum 8 characters', valid: formData.password.length >= 8 },
-    { label: 'At least 1 uppercase letter', valid: /[A-Z]/.test(formData.password) },
-    { label: 'At least 1 lowercase letter', valid: /[a-z]/.test(formData.password) },
-    { label: 'At least 1 number', valid: /[0-9]/.test(formData.password) },
-    { label: 'At least 1 special character (!@#$%^&*)', valid: /[!@#$%^&*]/.test(formData.password) },
-  ];
+  const passwordValidations = (content?.register?.passwordRules || []).map((rule) => ({
+    label: rule.label,
+    valid: new RegExp(rule.pattern).test(formData.password),
+  }));
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
