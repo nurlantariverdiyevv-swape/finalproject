@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Star, Heart, X, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, RotateCcw, Sparkles } from "lucide-react";
 import { useDataContext } from "../../context/DataContext";
@@ -225,7 +225,17 @@ function ProductDetail() {
     fetchShopProducts();
   }, [fetchSlider, fetchShopProducts]);
 
-  const allProducts = [...slider, ...shopProducts];
+  // Trimmed productSlider.json (yalnız slayder kartı üçün lazım olan sahələr) və
+  // tam məlumatlı products.json birləşdirilir. Eyni id hər ikisində varsa (12 slayder
+  // məhsulu products.json-da da mövcuddur), shopProducts-dakı TAM versiya üstünlük
+  // təşkil etməlidir ki, ölçülər/təsvir/qalereya kimi sahələr itməsin.
+  const allProducts = useMemo(() => {
+    const map = new Map();
+    [...slider, ...shopProducts].forEach((p) => {
+      if (p && p.id != null) map.set(p.id, { ...map.get(p.id), ...p });
+    });
+    return Array.from(map.values());
+  }, [slider, shopProducts]);
   const product = allProducts.find((item) => String(item.id) === String(id));
   const isLiked = product ? wishlist.some((item) => item.id === product.id) : false;
   const isLoading = (sliderLoading && slider.length === 0) || (shopLoading && shopProducts.length === 0);

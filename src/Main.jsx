@@ -43,7 +43,7 @@ function Main({ onAddToCart }) {
             Confidence in every step
           </p>
 
-          <Link to="/shop/x-ultra-5" className="bg-white text-black font-bold text-xs sm:text-sm px-5 py-2 sm:px-8 sm:py-3.5 rounded-full hover:bg-gray-200 transition-all duration-200 active:scale-95 shadow-lg">
+          <Link to="/product/x-ultra-5-gtx-blackcoffee" className="bg-white text-black font-bold text-xs sm:text-sm px-5 py-2 sm:px-8 sm:py-3.5 rounded-full hover:bg-gray-200 transition-all duration-200 active:scale-95 shadow-lg">
             Shop Now
           </Link>
         </div>

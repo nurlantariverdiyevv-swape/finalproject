@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { RiFacebookCircleFill, RiInstagramFill, RiYoutubeFill } from 'react-icons/ri';
 import { useDataContext } from '../../context/DataContext';
+import ShippingReturnsBar from './ShippingReturnsBar';
 
 function Footer() {
   const [openSections, setOpenSections] = useState({});
@@ -19,7 +20,11 @@ function Footer() {
   };
 
   return (
-    <footer className="bg-black text-white pt-12 pb-8 px-6 md:px-16 font-sans">
+    <footer className="font-sans">
+      {/* Footerin üstündəki "Free Returns / Free Shipping" zolağı (Salomon saytındakı kimi) */}
+      <ShippingReturnsBar />
+
+      <div className="bg-black text-white pt-12 pb-8 px-6 md:px-16">
       <div className="max-w-[1400px] mx-auto">
 
         {/* DESKTOP VIEW */}
@@ -117,6 +122,7 @@ function Footer() {
           </div>
         </div>
 
+      </div>
       </div>
     </footer>
   );

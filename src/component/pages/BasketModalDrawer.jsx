@@ -94,16 +94,26 @@ export function AddedToBagDrawer() {
   const { slider = [], shopProducts = [] } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
+  // Trimmed slider datası ilə tam shopProducts datası birləşdirilir, eyni id-lər
+  // (12 slayder məhsulu products.json-da da var) təkrarlanmasın deyə id üzrə
+  // deduplikasiya edilir (shopProducts-dakı tam versiya üstünlük təşkil edir).
+  const allProducts = useMemo(() => {
+    const map = new Map();
+    [...slider, ...shopProducts].forEach((p) => {
+      if (p && p.id != null) map.set(p.id, { ...map.get(p.id), ...p });
+    });
+    return Array.from(map.values());
+  }, [slider, shopProducts]);
+
   // "Complete this product with..." hissəsi üçün data-dan real məhsullar,
   // eyni kateqoriyadan (varsa) seçilir, alt-alta (stacked) siyahı kimi göstərilir.
   const recommendedProducts = useMemo(() => {
     if (!addedSuccessProduct) return [];
-    const allProducts = [...slider, ...shopProducts];
     const pool = allProducts.filter((p) => p.id !== addedSuccessProduct.id);
     const sameCategory = pool.filter((p) => p.category === addedSuccessProduct.category);
     const rest = pool.filter((p) => p.category !== addedSuccessProduct.category);
     return [...sameCategory, ...rest].slice(0, 4);
-  }, [addedSuccessProduct, slider, shopProducts]);
+  }, [addedSuccessProduct, allProducts]);
 
   if (!addedSuccessProduct) return null;
 

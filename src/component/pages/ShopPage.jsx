@@ -14,6 +14,9 @@ const categoryRules = {
   'kids-clothing': (p) => p.category === 'Gear' && p.subCategory === 'Kids',
   'trail-running': (p) => slugify(p.subType) === 'trail-running',
   'road-running': (p) => slugify(p.subType) === 'running',
+  // Gravel running üçün ayrıca subType yoxdur, ən yaxın uyğun olan
+  // yol/asfalt qaçış (Running) məhsulları göstərilir ki, tile boş qalmasın.
+  'gravel-running': (p) => slugify(p.subType) === 'running',
   'running': (p) => slugify(p.subType) === 'running' || slugify(p.subType) === 'trail-running',
   'hiking': (p) => slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking',
   'sportstyle': (p) => slugify(p.subType) === 'sportstyle',
@@ -22,6 +25,15 @@ const categoryRules = {
   'kids': (p) => p.subCategory === 'Kids',
   'shoes': (p) => p.category === 'Shoes',
   'new': (p) => p.badge === 'New',
+  // Header-də ən üst səviyyəli "Activities" / "Explore" linkləri (əsasən
+  // mobil menyuda) birbaşa basılanda heç bir alt-kateqoriya seçilmədən
+  // /shop/activities və /shop/explore-a düşür - bunlar üçün də uyğun
+  // məhsul dəstləri təyin edirik ki, səhifə boş görünməsin.
+  'activities': (p) =>
+    ['running', 'trail-running', 'hiking', 'hiking-&-backpacking', 'sportstyle'].includes(slugify(p.subType)),
+  'explore': (p) => p.badge === 'New',
+  'stories': (p) => p.badge === 'New',
+  'sustainability': (p) => slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking',
 
   // ---- Cinsə görə ayrılmış alt-kateqoriyalar (mega-menyudakı Men/Women bölmələri üçün) ----
   // Bunlar olmadan "Men" menyusundan "Running"-ə keçmək və "Women" menyusundan "Running"-ə
@@ -49,7 +61,12 @@ const categoryLabels = {
   'kids-clothing': 'Kids’ Clothing',
   'trail-running': 'Trail Running',
   'road-running': 'Road Running',
+  'gravel-running': 'Gravel Running',
   'running': 'Running',
+  'activities': 'Activities',
+  'explore': 'Explore',
+  'stories': 'Our Stories',
+  'sustainability': 'Sustainability',
   'hiking': 'Hiking & Backpacking',
   'sportstyle': 'Sportstyle',
   'men': 'Men',
