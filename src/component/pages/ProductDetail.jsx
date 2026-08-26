@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Star, Heart, X, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, RotateCcw, Sparkles } from "lucide-react";
 import { useDataContext } from "../../context/DataContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { useBasket } from "../../context/BasketContext";
+import { useAuth } from "../../context/AuthContext";
 import ProductInfoLinks from "./ProductInfoLinks";
 
 function StarRating({ rating = 0 }) {
@@ -202,6 +203,9 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
 
 function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const { slider = [], fetchSlider, sliderLoading, shopProducts = [], fetchShopProducts, shopLoading, content } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
   const { addToBasket } = useBasket();
@@ -236,6 +240,11 @@ function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!selectedSize) return;
+    // Hesaba giriş edilməyibsə, sebətə əlavə etməzdən əvvəl Login səhifəsinə yönləndir.
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
     addToBasket(product, selectedSize, activeColor?.name, activeColor?.img);
   };
 

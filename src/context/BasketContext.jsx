@@ -1,8 +1,14 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const BasketContext = createContext();
 
 export function BasketProvider({ children }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [basket, setBasket] = useState(() => {
     const saved = localStorage.getItem('salomon_basket');
     return saved ? JSON.parse(saved) : [];
@@ -15,7 +21,15 @@ export function BasketProvider({ children }) {
     localStorage.setItem('salomon_basket', JSON.stringify(basket));
   }, [basket]);
 
-  const openSizeModal = (product) => setSizeModalProduct(product);
+  const openSizeModal = (product) => {
+    // Hesaba giriş edilməyibsə, ölçü seçib sebətə əlavə etməzdən əvvəl Login
+    // səhifəsinə yönləndir. Login-dən sonra istifadəçi olduğu səhifəyə geri qayıdır.
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
+    setSizeModalProduct(product);
+  };
   const closeSizeModal = () => setSizeModalProduct(null);
 
   // 4 Parametr: product, size, color, image

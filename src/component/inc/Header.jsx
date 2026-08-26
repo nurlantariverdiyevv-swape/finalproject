@@ -63,7 +63,8 @@ function Header() {
     setMobileAccountMenuOpen(false);
   };
 
-  // ------- AXTARIŞ STATE-İ -------
+  // ------- S/PLUS MEMBERS MODALI -------
+  const [splusModalOpen, setSplusModalOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -163,9 +164,13 @@ function Header() {
         </div>
 
         <div className="w-full lg:w-1/3 text-center">
-          <Link to="/membership" className="underline underline-offset-4 hover:text-gray-300 transition-all">
+          <button
+            type="button"
+            onClick={() => setSplusModalOpen(true)}
+            className="underline underline-offset-4 hover:text-gray-300 transition-all cursor-pointer bg-transparent border-0 p-0 text-white text-[11px] sm:text-xs font-light tracking-wide"
+          >
             S/PLUS Members: Free Shipping and More
-          </Link>
+          </button>
         </div>
 
         <div className="hidden lg:flex lg:w-1/3 items-center justify-end gap-3 text-gray-200">
@@ -525,6 +530,52 @@ function Header() {
         SEARCH_RESULTS_PREVIEW_LIMIT={SEARCH_RESULTS_PREVIEW_LIMIT}
         seeAllResultsLink={seeAllResultsLink}
       />
+
+      {/* 8. S/PLUS MEMBERS MODALI (sağdan sürüşən panel, Salomon nümunəsindəki kimi) */}
+      {splusModalOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex justify-end bg-black/40 backdrop-blur-xs"
+          onClick={() => setSplusModalOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-white h-full shadow-2xl p-6 sm:p-8 overflow-y-auto animate-in slide-in-from-right duration-300"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-black leading-snug">
+                S/PLUS Members: Free Shipping and More
+              </h2>
+              <button
+                type="button"
+                onClick={() => setSplusModalOpen(false)}
+                className="shrink-0 p-1 hover:opacity-70 cursor-pointer"
+                aria-label="Close"
+              >
+                <X size={22} className="text-black" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            <div className="text-[15px] leading-relaxed text-black space-y-4">
+              <p>
+                <span className="font-bold underline underline-offset-2">S/Plus Members</span> will receive free
+                ground shipping on every purchase and will be gifted +50 bonus points after signing up.
+              </p>
+              <p>
+                +50 bonus points are only applicable to new members. Unfortunately, we cannot accommodate PO, FPO,
+                or APO boxes at this time.
+              </p>
+              <Link
+                to="/register"
+                onClick={() => setSplusModalOpen(false)}
+                className="inline-block font-semibold underline underline-offset-4 hover:text-gray-600"
+              >
+                Click here to sign up.
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

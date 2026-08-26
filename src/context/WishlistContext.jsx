@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import WishlistToast from '../component/pages/WishlistToast';
+import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext();
 
@@ -7,6 +9,10 @@ const WishlistContext = createContext();
 export const useWishlist = () => useContext(WishlistContext);
 
 export default function WishlistProvider({ children }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [wishlist, setWishlist] = useState(() => {
     const saved = localStorage.getItem('wishlist');
     return saved ? JSON.parse(saved) : [];
@@ -19,6 +25,13 @@ export default function WishlistProvider({ children }) {
   }, [wishlist]);
 
   const toggleWishlist = (product) => {
+    // Hesaba giriş edilməyibsə, wishlist-ə əlavə etməzdən əvvəl Login səhifəsinə yönləndir.
+    // Login-dən sonra istifadəçi hardan gəldiyi səhifəyə geri qayıdır (location.state.from).
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
+
     const exists = wishlist.some((item) => item.id === product.id);
 
     if (exists) {
