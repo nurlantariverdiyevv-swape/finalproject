@@ -4,6 +4,7 @@ import { Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
 import { useAuth } from '../../context/AuthContext';
 import { useDataContext } from '../../context/DataContext';
+import AuthTopBar from '../inc/AuthTopBar';
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -84,6 +85,7 @@ function RegisterPage() {
 
   return (
     <div className="w-full min-h-screen bg-white">
+      <AuthTopBar />
       <div className="max-w-md mx-auto px-4 py-10 sm:py-14">
         <div className="border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8">
           

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 🔴 BURAYA ÖZÜNÜN VERCEL LİNKİNİ YAZ (projectapi-ni Vercel-ə qaldırandan sonra) 🔴
 // Nümunə: "https://sizin-layihe-adi.vercel.app/api/"
-const API_BASE = "https://allapi-tan.vercel.app/api/";
+const API_BASE = "https://allapi-tan.vercel.app/api";
 
 const api = axios.create({
   baseURL: API_BASE,

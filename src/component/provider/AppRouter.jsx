@@ -7,13 +7,15 @@ import ShopPage from "../pages/ShopPage";
 import BasketPage from "../pages/BasketPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 
 function AppRouter({ onAddToCart }) {
   return (
     <Routes>
-      {/* Login və Register: heç bir Header/Footer olmadan, tamamilə ayrıca səhifə */}
+      {/* Login, Register və Forgot Password: heç bir Header/Footer olmadan, tamamilə ayrıca səhifə */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* Qalan bütün səhifələr Header + Footer ilə (Layout daxilində) */}
       <Route element={<Layout onAddToCart={onAddToCart} />}>

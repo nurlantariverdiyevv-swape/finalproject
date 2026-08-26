@@ -29,7 +29,7 @@ function StarRating({ rating = 0 }) {
   );
 }
 
-function SizeGuidePanel({ open, onClose, categoryLabel, maxRows }) {
+function SizeGuidePanel({ open, onClose, categoryLabel, maxRows, sizeGuideData = [], measureSteps = [] }) {
   const [openSections, setOpenSections] = useState({ measure: true, guide: true });
   const [unit, setUnit] = useState("cm");
   const visibleRows = maxRows ? sizeGuideData.slice(0, maxRows) : sizeGuideData;
@@ -319,7 +319,7 @@ function ProductDetail() {
         </div>
       </div>
 
-      <SizeGuidePanel open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} categoryLabel={categoryLabel} maxRows={product.sizes?.length} />
+      <SizeGuidePanel open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} categoryLabel={categoryLabel} maxRows={product.sizes?.length} sizeGuideData={sizeGuideData} measureSteps={measureSteps} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import AuthTopBar from '../inc/AuthTopBar';
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ function LoginPage() {
 
   return (
     <div className="w-full min-h-screen bg-white">
+      <AuthTopBar />
       <div className="max-w-md mx-auto px-4 py-10 sm:py-14">
         {/* Ümumi karta rounded-2xl verildi */}
         <div className="border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8">

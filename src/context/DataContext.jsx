@@ -11,16 +11,30 @@ export const DataProvider = ({ children }) => {
   const [shopLoading, setShopLoading] = useState(false);
   const [contentLoading, setContentLoading] = useState(false);
   const [loaded, setLoaded] = useState({});
+  const [apiNotConfigured, setApiNotConfigured] = useState(false);
 
   const fetchSlider = async () => {
     if (loaded.slider) return;
     try {
       setSliderLoading(true);
       const sliderData = await Api.getSliderProduct();
-      setSlider(sliderData?.slider || sliderData || []);
-      setLoaded((prev) => ({ ...prev, slider: true }));
+      const list = Array.isArray(sliderData)
+        ? sliderData
+        : Array.isArray(sliderData?.slider)
+        ? sliderData.slider
+        : null;
+      if (list) {
+        setSlider(list);
+        setLoaded((prev) => ({ ...prev, slider: true }));
+      } else {
+        // Api.js-də API_BASE hələ doldurulmayıb (vercel linki boşdur) və ya
+        // backend gözlənilən formatda cavab vermir - array-ə çevirməyib boş saxlayırıq.
+        console.warn("Slider API gözlənilən formatda deyil. Api.js-də API_BASE (vercel linki) doldurulubmu?", sliderData);
+        setApiNotConfigured(true);
+      }
     } catch (error) {
       console.error("Slider API Error:", error);
+      setApiNotConfigured(true);
     } finally {
       setSliderLoading(false);
     }
@@ -31,10 +45,21 @@ export const DataProvider = ({ children }) => {
     try {
       setShopLoading(true);
       const shopData = await Api.getShopProducts();
-      setShopProducts(shopData?.products || shopData || []);
-      setLoaded((prev) => ({ ...prev, shop: true }));
+      const list = Array.isArray(shopData)
+        ? shopData
+        : Array.isArray(shopData?.products)
+        ? shopData.products
+        : null;
+      if (list) {
+        setShopProducts(list);
+        setLoaded((prev) => ({ ...prev, shop: true }));
+      } else {
+        console.warn("Shop Products API gözlənilən formatda deyil. Api.js-də API_BASE (vercel linki) doldurulubmu?", shopData);
+        setApiNotConfigured(true);
+      }
     } catch (error) {
       console.error("Shop Products API Error:", error);
+      setApiNotConfigured(true);
     } finally {
       setShopLoading(false);
     }
@@ -49,10 +74,17 @@ export const DataProvider = ({ children }) => {
     try {
       setContentLoading(true);
       const contentData = await Api.getContent();
-      setContent(contentData || null);
-      setLoaded((prev) => ({ ...prev, content: true }));
+      const isValidObject = contentData && typeof contentData === "object" && !Array.isArray(contentData);
+      if (isValidObject) {
+        setContent(contentData);
+        setLoaded((prev) => ({ ...prev, content: true }));
+      } else {
+        console.warn("Content API gözlənilən formatda deyil. Api.js-də API_BASE (vercel linki) doldurulubmu?", contentData);
+        setApiNotConfigured(true);
+      }
     } catch (error) {
       console.error("Content API Error:", error);
+      setApiNotConfigured(true);
     } finally {
       setContentLoading(false);
     }
@@ -70,6 +102,9 @@ export const DataProvider = ({ children }) => {
         content,
         fetchContent,
         contentLoading,
+        // true olduqda deməkdir ki, Api.js-dəki API_BASE hələ boşdur (və ya
+        // backend hələ Vercel-ə qaldırılmayıb) - UI bunu istəsə göstərə bilər.
+        apiNotConfigured,
       }}
     >
       {children}

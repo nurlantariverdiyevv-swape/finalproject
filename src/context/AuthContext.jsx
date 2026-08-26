@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth, googleProvider, appleProvider } from '../services/firebase';
 
@@ -27,6 +28,8 @@ function mapAuthError(error) {
       return 'Şifrə ən azı 6 simvol olmalıdır.';
     case 'auth/popup-closed-by-user':
       return 'Pəncərə bağlandı, giriş tamamlanmadı.';
+    case 'auth/too-many-requests':
+      return 'Çox sayda cəhd edildi. Bir az sonra yenidən cəhd edin.';
     default:
       return 'Nəsə səhv getdi. Yenidən cəhd edin.';
   }
@@ -82,6 +85,17 @@ export function AuthProvider({ children }) {
 
   const logout = () => signOut(auth);
 
+  // Şifrəni sıfırlamaq üçün Firebase-in özünə real reset linki olan email göndərməsi.
+  // İstifadəçi həmin linkə klikləyib yeni şifrə təyin edə bilər.
+  const resetPassword = async (email) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { error: null };
+    } catch (error) {
+      return { error: mapAuthError(error) };
+    }
+  };
+
   const value = {
     user,
     authLoading,
@@ -90,6 +104,7 @@ export function AuthProvider({ children }) {
     loginWithGoogle,
     loginWithApple,
     logout,
+    resetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
