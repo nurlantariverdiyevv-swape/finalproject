@@ -7,14 +7,16 @@ import RouteTransitionLoader from './component/inc/RouteTransitionLoader'
 
 function App() {
   const { openSizeModal } = useBasket();
-  const { fetchContent } = useDataContext();
+  const { fetchContent, fetchCategories } = useDataContext();
 
   // All static content needed by Header, Footer, Main, and other pages
   // (menu, banners, footer links, etc.) is fetched once from the Vercel
-  // API when the app opens.
+  // API when the app opens. ShopPage's category filter rules/labels come
+  // from the same API and are fetched here too so they're ready in time.
   useEffect(() => {
     if (fetchContent) fetchContent();
-  }, [fetchContent]);
+    if (fetchCategories) fetchCategories();
+  }, [fetchContent, fetchCategories]);
 
   return (
     <>

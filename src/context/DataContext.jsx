@@ -7,6 +7,7 @@ export const DataProvider = ({ children }) => {
   const [slider, setSlider] = useState([]);
   const [shopProducts, setShopProducts] = useState([]);
   const [content, setContent] = useState(null);
+  const [categories, setCategories] = useState({});
   const [sliderLoading, setSliderLoading] = useState(false);
   const [shopLoading, setShopLoading] = useState(false);
   const [contentLoading, setContentLoading] = useState(false);
@@ -90,6 +91,26 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  // ShopPage's category matching rules & labels (used to be hardcoded
+  // categoryRules/categoryLabels objects) - fetched once, same pattern as content.
+  const fetchCategories = async () => {
+    if (loaded.categories) return;
+    try {
+      const categoriesData = await Api.getCategories();
+      const isValidObject = categoriesData && typeof categoriesData === "object" && !Array.isArray(categoriesData);
+      if (isValidObject) {
+        setCategories(categoriesData);
+        setLoaded((prev) => ({ ...prev, categories: true }));
+      } else {
+        console.warn("Categories API did not return the expected format. Has API_BASE (Vercel link) been set in Api.js?", categoriesData);
+        setApiNotConfigured(true);
+      }
+    } catch (error) {
+      console.error("Categories API Error:", error);
+      setApiNotConfigured(true);
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -102,6 +123,8 @@ export const DataProvider = ({ children }) => {
         content,
         fetchContent,
         contentLoading,
+        categories,
+        fetchCategories,
         // true means API_BASE in Api.js is still empty (or the backend
         // hasn't been deployed to Vercel yet) - the UI can surface this if it wants to.
         apiNotConfigured,

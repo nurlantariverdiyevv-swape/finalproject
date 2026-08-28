@@ -7,6 +7,8 @@ import { useBasket } from "../../context/BasketContext";
 import { useAuth } from "../../context/AuthContext";
 import ProductInfoLinks from "./ProductInfoLinks";
 
+const slugify = (str) => (str || "").toString().toLowerCase().trim().replace(/\s+/g, "-");
+
 function StarRating({ rating = 0 }) {
   const numericRating = parseFloat(rating) || 0;
 
@@ -120,7 +122,7 @@ function ImageMagnifier({ src, alt, onClick }) {
 
   return (
     <div className="relative w-full h-full overflow-hidden cursor-crosshair group" onMouseEnter={handleMouseEnter} onMouseMove={handleMouseMove} onMouseLeave={() => setShow(false)} onClick={onClick}>
-      <img src={src} alt={alt} className="w-full h-full object-cover select-none transition-transform duration-300 group-hover:scale-105" />
+      <img src={src} alt={alt} className="w-full h-full object-cover select-none" />
       {show && (
         <div style={{ position: "absolute", pointerEvents: "none", height: `${magSize}px`, width: `${magSize}px`, top: `${xy.y - magSize / 2}px`, left: `${xy.x - magSize / 2}px`, borderRadius: "50%", border: "2px solid white", boxShadow: "0 10px 25px rgba(0,0,0,0.3)", backgroundImage: `url('${src}')`, backgroundRepeat: "no-repeat", backgroundSize: `${size.width * zoom}px ${size.height * zoom}px`, backgroundPositionX: `${-xy.x * zoom + magSize / 2}px`, backgroundPositionY: `${-xy.y * zoom + magSize / 2}px`, zIndex: 30 }} />
       )}
@@ -263,9 +265,9 @@ function ProductDetail() {
       <nav className="flex items-center gap-2 text-sm text-gray-700 mb-6">
         <Link to="/" className="hover:underline">Home</Link>
         <span className="text-gray-400">/</span>
-        <Link to="#" className="hover:underline">Sportstyle</Link>
+        <Link to={`/shop/${slugify(product.category)}`} className="hover:underline">{product.category}</Link>
         <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-normal">Sneakers</span>
+        <span className="text-gray-900 font-normal">{product.subType || product.sub}</span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">

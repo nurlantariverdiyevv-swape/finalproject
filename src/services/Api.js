@@ -28,8 +28,16 @@ const getContent = async () => {
   return res.data;
 };
 
+// ShopPage's category filtering rules & labels (used to be hardcoded
+// categoryRules/categoryLabels objects) now come from this endpoint.
+const getCategories = async () => {
+  const res = await api.get("categories");
+  return res.data;
+};
+
 export default {
   getSliderProduct,
   getShopProducts,
   getContent,
+  getCategories,
 };

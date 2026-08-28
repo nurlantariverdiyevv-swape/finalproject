@@ -7,98 +7,33 @@ import { useWishlist } from '../../context/WishlistContext';
 // ------- Slug matching helpers -------
 const slugify = (str) => (str || '').toString().toLowerCase().trim().replace(/\s+/g, '-');
 
-const categoryRules = {
-  'men-shoes': (p) => p.category === 'Shoes' && p.subCategory === 'Men',
-  'women-shoes': (p) => p.category === 'Shoes' && p.subCategory === 'Women',
-  'kids-shoes': (p) => p.category === 'Shoes' && p.subCategory === 'Kids',
-  'kids-clothing': (p) => p.category === 'Gear' && p.subCategory === 'Kids',
-  'trail-running': (p) => slugify(p.subType) === 'trail-running',
-  'road-running': (p) => slugify(p.subType) === 'running',
-  // There's no dedicated subType for gravel running, so the closest match
-  // (road/asphalt Running products) is shown instead so the tile isn't empty.
-  'gravel-running': (p) => slugify(p.subType) === 'running',
-  'running': (p) => slugify(p.subType) === 'running' || slugify(p.subType) === 'trail-running',
-  'hiking': (p) => slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking',
-  'sportstyle': (p) => slugify(p.subType) === 'sportstyle',
-  'men': (p) => p.subCategory === 'Men',
-  'women': (p) => p.subCategory === 'Women',
-  'kids': (p) => p.subCategory === 'Kids',
-  'shoes': (p) => p.category === 'Shoes',
-  'new': (p) => p.badge === 'New',
-  // The top-level "Activities" / "Explore" links in the Header (mostly
-  // in the mobile menu) land on /shop/activities and /shop/explore with
-  // no sub-category chosen - we define matching product sets for these
-  // too so the page never looks empty.
-  'activities': (p) =>
-    ['running', 'trail-running', 'hiking', 'hiking-&-backpacking', 'sportstyle'].includes(slugify(p.subType)),
-  'explore': (p) => p.badge === 'New',
-  'stories': (p) => p.badge === 'New',
-  'sustainability': (p) => slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking',
-
-  // ---- Gender-specific sub-categories (for the Men/Women mega-menu sections) ----
-  // Without these, going to "Running" from the "Men" menu and going to "Running"
-  // from the "Women" menu both landed on the same /shop/running page, mixing men's and women's items.
-  'men-running': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'running',
-  'women-running': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'running',
-  'men-trail-running': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'trail-running',
-  'women-trail-running': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'trail-running',
-  'men-hiking': (p) => p.subCategory === 'Men' && (slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking'),
-  'women-hiking': (p) => p.subCategory === 'Women' && (slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking'),
-  'men-sportstyle': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'sportstyle',
-  'women-sportstyle': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'sportstyle',
-
-  // ---- "New" menu items split by gender/type ----
-  'new-men': (p) => p.badge === 'New' && p.subCategory === 'Men',
-  'new-women': (p) => p.badge === 'New' && p.subCategory === 'Women',
-  'new-sportstyle': (p) => p.badge === 'New' && slugify(p.subType) === 'sportstyle',
-};
-
-// Converts category slugs into readable titles/breadcrumbs
-const categoryLabels = {
-  'men-shoes': 'Men’s Shoes',
-  'women-shoes': 'Women’s Shoes',
-  'kids-shoes': 'Kids’ Shoes',
-  'kids-clothing': 'Kids’ Clothing',
-  'trail-running': 'Trail Running',
-  'road-running': 'Road Running',
-  'gravel-running': 'Gravel Running',
-  'running': 'Running',
-  'activities': 'Activities',
-  'explore': 'Explore',
-  'stories': 'Our Stories',
-  'sustainability': 'Sustainability',
-  'hiking': 'Hiking & Backpacking',
-  'sportstyle': 'Sportstyle',
-  'men': 'Men',
-  'women': 'Women',
-  'kids': 'Kids',
-  'shoes': 'Shoes',
-  'new': 'New Arrivals',
-  'men-running': 'Men’s Running',
-  'women-running': 'Women’s Running',
-  'men-trail-running': 'Men’s Trail Running',
-  'women-trail-running': 'Women’s Trail Running',
-  'men-hiking': 'Men’s Hiking',
-  'women-hiking': 'Women’s Hiking',
-  'men-sportstyle': 'Men’s Sportstyle',
-  'women-sportstyle': 'Women’s Sportstyle',
-  'new-men': 'New in Men',
-  'new-women': 'New in Women',
-  'new-sportstyle': 'New in Sportstyle',
-};
-
-function getCategoryLabel(categoryName) {
-  if (!categoryName) return 'All Products';
-  return categoryLabels[slugify(categoryName)] || categoryName;
+// Category filter rules & labels (used to be two big hardcoded objects here)
+// now come from the API's /categories endpoint. Each entry looks like:
+//   { label: 'Men’s Running', match: { subCategory: 'Men', subType: 'running' } }
+// `match` fields are ANDed together; an array value means "match any of these" (OR).
+// `subType` is compared after slugify (since product subTypes are things like
+// "Trail Running"); other fields are compared as-is.
+function ruleMatches(product, match) {
+  return Object.entries(match).every(([field, expected]) => {
+    const actual = field === 'subType' ? slugify(product.subType) : product[field];
+    const expectedList = Array.isArray(expected) ? expected : [expected];
+    return expectedList.includes(actual);
+  });
 }
 
-function matchesCategory(product, categoryName) {
+function getCategoryLabel(categoryName, categories) {
+  if (!categoryName) return 'All Products';
+  return categories[slugify(categoryName)]?.label || categoryName;
+}
+
+function matchesCategory(product, categoryName, categories) {
   if (!categoryName || categoryName.toLowerCase() === 'all') return true;
 
   const slug = slugify(categoryName);
+  const rule = categories[slug];
 
-  if (categoryRules[slug]) {
-    return categoryRules[slug](product);
+  if (rule) {
+    return ruleMatches(product, rule.match);
   }
 
   const fields = [product.category, product.subCategory, product.subType, product.sub];
@@ -121,7 +56,7 @@ function ShopPage({ onAddToCart }) {
   const [searchParams] = useSearchParams();
   const searchTerm = (searchParams.get('search') || '').trim();
 
-  const { shopProducts = [], fetchShopProducts, shopLoading, content } = useDataContext();
+  const { shopProducts = [], fetchShopProducts, shopLoading, content, categories = {} } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
   const [showFilters, setShowFilters] = useState(true);
@@ -157,9 +92,9 @@ function ShopPage({ onAddToCart }) {
   const categoryProducts = useMemo(() => {
     if (!shopProducts || shopProducts.length === 0) return [];
     return shopProducts
-      .filter((product) => matchesCategory(product, categoryName))
+      .filter((product) => matchesCategory(product, categoryName, categories))
       .filter((product) => matchesSearch(product, searchTerm));
-  }, [shopProducts, categoryName, searchTerm]);
+  }, [shopProducts, categoryName, searchTerm, categories]);
 
   const availableSizes = useMemo(() => {
     const set = new Set();
@@ -326,7 +261,7 @@ function ShopPage({ onAddToCart }) {
         <Link to="/" className="hover:underline">Home</Link>
         <span>/</span>
         <span className="text-black font-medium">
-          {searchTerm ? 'Search results' : getCategoryLabel(categoryName)}
+          {searchTerm ? 'Search results' : getCategoryLabel(categoryName, categories)}
         </span>
       </div>
 
@@ -335,7 +270,7 @@ function ShopPage({ onAddToCart }) {
         {searchTerm
           ? `Results for "${searchTerm}"`
           : categoryName
-            ? `${getCategoryLabel(categoryName)} Collection`
+            ? `${getCategoryLabel(categoryName, categories)} Collection`
             : 'All Products'}
       </h1>
 

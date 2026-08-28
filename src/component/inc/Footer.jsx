@@ -1,29 +1,13 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { RiFacebookCircleFill, RiInstagramFill, RiYoutubeFill } from 'react-icons/ri';
 import { useDataContext } from '../../context/DataContext';
 import ShippingReturnsBar from './ShippingReturnsBar';
 
-// Runova is a demo store built on top of Salomon's real catalog, but pages
-// like "Terms & Conditions", "Size Guide", "Careers" etc. don't actually
-// exist on this site. Rather than link to blank/broken internal routes,
-// every footer link opens the real, official Salomon website instead.
-const SALOMON_SITE_URL = 'https://www.salomon.com/en-us';
-
 function Footer() {
-  const [openSections, setOpenSections] = useState({});
   // The footer columns are no longer hardcoded, they come from the Vercel
   // API's content.json (content.footer).
   const { content } = useDataContext();
   const footerData = content?.footer || [];
-
-  const toggleSection = (title) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
-  };
 
   return (
     <footer className="font-sans">
@@ -40,15 +24,13 @@ function Footer() {
               <h3 className="font-bold text-[17px] text-white">{section.title}</h3>
               <div className="flex flex-col gap-3">
                 {section.links.map((link) => (
-                  <a
+                  <Link
                     key={link.label}
-                    href={SALOMON_SITE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    to={link.path}
                     className="text-[15px] font-medium text-[#e5e5e5] hover:text-white transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -73,35 +55,24 @@ function Footer() {
           </div>
         </div>
 
-        {/* MOBILE VIEW (Accordion) */}
+        {/* MOBILE VIEW (plain links, same as desktop - no expand/collapse) */}
         <div className="md:hidden flex flex-col pb-8">
-          {footerData.map((section) => {
-            const isOpen = openSections[section.title];
-            return (
-              <div key={section.title} className="border-b border-[#333]">
-                <button type="button" onClick={() => toggleSection(section.title)} className="w-full py-4 flex items-center justify-between text-left font-bold text-[17px] text-white">
-                  <span>{section.title}</span>
-                  {isOpen ? <ChevronUp className="w-5 h-5 text-white" /> : <ChevronDown className="w-5 h-5 text-white" />}
-                </button>
-
-                {isOpen && (
-                  <div className="pb-4 flex flex-col gap-3">
-                    {section.links.map((link) => (
-                      <a
-                        key={link.label}
-                        href={SALOMON_SITE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block"
-                      >
-                        {link.label}
-                      </a>
-                    ))}
-                  </div>
-                )}
+          {footerData.map((section) => (
+            <div key={section.title} className="py-4 border-b border-[#333]">
+              <h3 className="font-bold text-[17px] text-white mb-3">{section.title}</h3>
+              <div className="flex flex-col gap-3">
+                {section.links.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.path}
+                    className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
-            );
-          })}
+            </div>
+          ))}
 
           {/* Shipping Mobile */}
           <div className="py-4 border-b border-[#333]">
