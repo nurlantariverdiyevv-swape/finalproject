@@ -12,12 +12,12 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 function AppRouter({ onAddToCart }) {
   return (
     <Routes>
-      {/* Login, Register və Forgot Password: heç bir Header/Footer olmadan, tamamilə ayrıca səhifə */}
+      {/* Login, Register and Forgot Password: standalone pages with no Header/Footer */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      {/* Qalan bütün səhifələr Header + Footer ilə (Layout daxilində) */}
+      {/* All other pages render with Header + Footer (inside Layout) */}
       <Route element={<Layout onAddToCart={onAddToCart} />}>
         <Route path="/" element={<Main onAddToCart={onAddToCart} />} />
         <Route path="/product/:id" element={<ProductDetail />} />

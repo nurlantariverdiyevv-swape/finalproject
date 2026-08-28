@@ -25,8 +25,8 @@ export default function WishlistProvider({ children }) {
   }, [wishlist]);
 
   const toggleWishlist = (product) => {
-    // Hesaba giriş edilməyibsə, wishlist-ə əlavə etməzdən əvvəl Login səhifəsinə yönləndir.
-    // Login-dən sonra istifadəçi hardan gəldiyi səhifəyə geri qayıdır (location.state.from).
+    // If not logged in, redirect to the Login page before adding to the wishlist.
+    // After logging in, the user is sent back to wherever they came from (location.state.from).
     if (!user) {
       navigate('/login', { state: { from: location.pathname } });
       return;

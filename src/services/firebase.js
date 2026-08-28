@@ -5,8 +5,8 @@ import {
   OAuthProvider,
 } from "firebase/auth";
 
-// Bu dəyərlər .env faylından gəlir (bax: .env.example).
-// Vite-də bütün env dəyişənləri "VITE_" ilə başlamalıdır ki, koda daxil ola bilsin.
+// These values come from the .env file (see .env.example).
+// In Vite, every env variable must start with "VITE_" to be exposed to the code.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -22,8 +22,8 @@ export const auth = getAuth(app);
 
 export const googleProvider = new GoogleAuthProvider();
 
-// Apple provider: Firebase konsolunda "Apple" sign-in metodunu aktivləşdirib
-// Services ID-ni bağladıqdan sonra bu işə düşəcək.
+// Apple provider: once the "Apple" sign-in method is enabled in the Firebase
+// console and the Services ID is linked, this will start working.
 export const appleProvider = new OAuthProvider("apple.com");
 
 export default app;

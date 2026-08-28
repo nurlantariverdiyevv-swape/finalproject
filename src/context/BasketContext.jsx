@@ -10,7 +10,7 @@ export function BasketProvider({ children }) {
   const location = useLocation();
 
   const [basket, setBasket] = useState(() => {
-    const saved = localStorage.getItem('salomon_basket');
+    const saved = localStorage.getItem('runova_basket');
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -18,12 +18,12 @@ export function BasketProvider({ children }) {
   const [addedSuccessProduct, setAddedSuccessProduct] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('salomon_basket', JSON.stringify(basket));
+    localStorage.setItem('runova_basket', JSON.stringify(basket));
   }, [basket]);
 
   const openSizeModal = (product) => {
-    // Hesaba giriş edilməyibsə, ölçü seçib sebətə əlavə etməzdən əvvəl Login
-    // səhifəsinə yönləndir. Login-dən sonra istifadəçi olduğu səhifəyə geri qayıdır.
+    // If not logged in, redirect to the Login page before selecting a size
+    // and adding to the basket. After logging in, the user returns to the same page.
     if (!user) {
       navigate('/login', { state: { from: location.pathname } });
       return;
@@ -50,7 +50,7 @@ export function BasketProvider({ children }) {
         updated[existingIndex] = {
           ...updated[existingIndex],
           quantity: updated[existingIndex].quantity + 1,
-          selectedImage: selectedImage, // Şəkli də yeniləyirik
+          selectedImage: selectedImage, // Update the image too
         };
         return updated;
       }

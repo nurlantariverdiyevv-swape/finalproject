@@ -4,8 +4,8 @@ import ProductSlider from './component/pages/ProductSlider';
 import { useDataContext } from './context/DataContext';
 
 function Main({ onAddToCart }) {
-  // "Shop by activity" və bannerlər artıq hardcode deyil, vercel API-dəki
-  // content.json-dan (content.home.activities / content.home.banners) gəlir.
+  // "Shop by activity" and the banners are no longer hardcoded, they come
+  // from the Vercel API's content.json (content.home.activities / content.home.banners).
   const { content } = useDataContext();
   const activities = content?.home?.activities || [];
   const bannerData = content?.home?.banners || [];
@@ -85,7 +85,7 @@ function Main({ onAddToCart }) {
         </div>
       </section>
 
-      {/* 2-li Banner Bölməsi */}
+      {/* Two-Banner Section */}
       <section className="w-full py-6 select-none">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-1.5">
           {bannerData.map((banner) => (

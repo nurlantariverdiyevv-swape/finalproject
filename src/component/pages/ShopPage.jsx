@@ -4,7 +4,7 @@ import { Heart, ShoppingBag, SlidersHorizontal, ChevronDown, ChevronUp, X } from
 import { useDataContext } from '../../context/DataContext';
 import { useWishlist } from '../../context/WishlistContext';
 
-// ------- Slug uyğunlaşdırma köməkçiləri -------
+// ------- Slug matching helpers -------
 const slugify = (str) => (str || '').toString().toLowerCase().trim().replace(/\s+/g, '-');
 
 const categoryRules = {
@@ -14,8 +14,8 @@ const categoryRules = {
   'kids-clothing': (p) => p.category === 'Gear' && p.subCategory === 'Kids',
   'trail-running': (p) => slugify(p.subType) === 'trail-running',
   'road-running': (p) => slugify(p.subType) === 'running',
-  // Gravel running üçün ayrıca subType yoxdur, ən yaxın uyğun olan
-  // yol/asfalt qaçış (Running) məhsulları göstərilir ki, tile boş qalmasın.
+  // There's no dedicated subType for gravel running, so the closest match
+  // (road/asphalt Running products) is shown instead so the tile isn't empty.
   'gravel-running': (p) => slugify(p.subType) === 'running',
   'running': (p) => slugify(p.subType) === 'running' || slugify(p.subType) === 'trail-running',
   'hiking': (p) => slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking',
@@ -25,19 +25,19 @@ const categoryRules = {
   'kids': (p) => p.subCategory === 'Kids',
   'shoes': (p) => p.category === 'Shoes',
   'new': (p) => p.badge === 'New',
-  // Header-də ən üst səviyyəli "Activities" / "Explore" linkləri (əsasən
-  // mobil menyuda) birbaşa basılanda heç bir alt-kateqoriya seçilmədən
-  // /shop/activities və /shop/explore-a düşür - bunlar üçün də uyğun
-  // məhsul dəstləri təyin edirik ki, səhifə boş görünməsin.
+  // The top-level "Activities" / "Explore" links in the Header (mostly
+  // in the mobile menu) land on /shop/activities and /shop/explore with
+  // no sub-category chosen - we define matching product sets for these
+  // too so the page never looks empty.
   'activities': (p) =>
     ['running', 'trail-running', 'hiking', 'hiking-&-backpacking', 'sportstyle'].includes(slugify(p.subType)),
   'explore': (p) => p.badge === 'New',
   'stories': (p) => p.badge === 'New',
   'sustainability': (p) => slugify(p.subType) === 'hiking' || slugify(p.subType) === 'hiking-&-backpacking',
 
-  // ---- Cinsə görə ayrılmış alt-kateqoriyalar (mega-menyudakı Men/Women bölmələri üçün) ----
-  // Bunlar olmadan "Men" menyusundan "Running"-ə keçmək və "Women" menyusundan "Running"-ə
-  // keçmək eyni /shop/running səhifəsinə aparırdı, ona görə kişi və qadın məhsulları qarışırdı.
+  // ---- Gender-specific sub-categories (for the Men/Women mega-menu sections) ----
+  // Without these, going to "Running" from the "Men" menu and going to "Running"
+  // from the "Women" menu both landed on the same /shop/running page, mixing men's and women's items.
   'men-running': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'running',
   'women-running': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'running',
   'men-trail-running': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'trail-running',
@@ -47,13 +47,13 @@ const categoryRules = {
   'men-sportstyle': (p) => p.subCategory === 'Men' && slugify(p.subType) === 'sportstyle',
   'women-sportstyle': (p) => p.subCategory === 'Women' && slugify(p.subType) === 'sportstyle',
 
-  // ---- "New" menyusu üçün cinsə/tipə görə yeni məhsullar ----
+  // ---- "New" menu items split by gender/type ----
   'new-men': (p) => p.badge === 'New' && p.subCategory === 'Men',
   'new-women': (p) => p.badge === 'New' && p.subCategory === 'Women',
   'new-sportstyle': (p) => p.badge === 'New' && slugify(p.subType) === 'sportstyle',
 };
 
-// Kateqoriya slug-larını başlıq/breadcrumb üçün oxunaqlı adlara çeviririk
+// Converts category slugs into readable titles/breadcrumbs
 const categoryLabels = {
   'men-shoes': 'Men’s Shoes',
   'women-shoes': 'Women’s Shoes',
@@ -105,7 +105,7 @@ function matchesCategory(product, categoryName) {
   return fields.some((f) => slugify(f) === slug);
 }
 
-// ------- Axtarış sözünə görə uyğunlaşdırma -------
+// ------- Search-query matching -------
 function matchesSearch(product, searchTerm) {
   if (!searchTerm) return true;
   const q = searchTerm.toLowerCase();
@@ -235,8 +235,8 @@ function ShopPage({ onAddToCart }) {
     setActiveCardColors((prev) => ({ ...prev, [productId]: colorObj }));
   };
 
-  // Sıralama seçimləri artıq hardcode deyil, vercel API-dəki content.json-dan
-  // (content.shop.sortOptions) gəlir.
+  // Sort options are no longer hardcoded, they come from the Vercel
+  // API's content.json (content.shop.sortOptions).
   const sortOptions = content?.shop?.sortOptions || [];
   const currentSortLabel = sortOptions.find((o) => o.id === sortBy)?.label || 'Featured';
 
@@ -330,7 +330,7 @@ function ShopPage({ onAddToCart }) {
         </span>
       </div>
 
-      {/* Səhifə Başlığı */}
+      {/* Page Title */}
       <h1 className="text-2xl md:text-4xl font-extrabold text-black uppercase tracking-tight mb-4 md:mb-6">
         {searchTerm
           ? `Results for "${searchTerm}"`
@@ -364,7 +364,7 @@ function ShopPage({ onAddToCart }) {
           </div>
         )}
 
-        {/* MƏHSULLAR GRID-İ */}
+        {/* PRODUCT GRID */}
         <div className="flex-1">
           {filteredProducts.length > 0 ? (
             <div className={`grid gap-x-3 gap-y-6 sm:gap-6 grid-cols-2 ${showFilters ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
@@ -432,7 +432,7 @@ function ShopPage({ onAddToCart }) {
         </div>
       </div>
 
-      {/* SALOMON MOBIL FILTER DRAWER */}
+      {/* RUNOVA MOBILE FILTER DRAWER */}
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-50 bg-white flex flex-col justify-between overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between shrink-0">

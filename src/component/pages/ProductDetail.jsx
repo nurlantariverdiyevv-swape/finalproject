@@ -210,8 +210,8 @@ function ProductDetail() {
   const { wishlist, toggleWishlist } = useWishlist();
   const { addToBasket } = useBasket();
 
-  // Ölçü cədvəli və ölçmə addımları artıq hardcode deyil, vercel API-dəki
-  // content.json-dan (content.productDetail) gəlir.
+  // The size chart and measuring steps are no longer hardcoded, they come
+  // from the Vercel API's content.json (content.productDetail).
   const sizeGuideData = content?.productDetail?.sizeGuide || [];
   const measureSteps = content?.productDetail?.measureSteps || [];
 
@@ -225,10 +225,10 @@ function ProductDetail() {
     fetchShopProducts();
   }, [fetchSlider, fetchShopProducts]);
 
-  // Trimmed productSlider.json (yalnız slayder kartı üçün lazım olan sahələr) və
-  // tam məlumatlı products.json birləşdirilir. Eyni id hər ikisində varsa (12 slayder
-  // məhsulu products.json-da da mövcuddur), shopProducts-dakı TAM versiya üstünlük
-  // təşkil etməlidir ki, ölçülər/təsvir/qalereya kimi sahələr itməsin.
+  // The trimmed productSlider.json (only the fields the slider card needs) is
+  // merged with the full products.json. If the same id exists in both (all 12
+  // slider products also exist in products.json), the FULL version from
+  // shopProducts must win so sizes/description/gallery aren't lost.
   const allProducts = useMemo(() => {
     const map = new Map();
     [...slider, ...shopProducts].forEach((p) => {
@@ -240,8 +240,8 @@ function ProductDetail() {
   const isLiked = product ? wishlist.some((item) => item.id === product.id) : false;
   const isLoading = (sliderLoading && slider.length === 0) || (shopLoading && shopProducts.length === 0);
 
-  if (isLoading && !product) return <div className="p-10 text-center font-bold">Yüklənir...</div>;
-  if (!product) return <div className="p-10 text-center font-bold text-red-600">Məhsul tapılmadı!</div>;
+  if (isLoading && !product) return <div className="p-10 text-center font-bold">Loading...</div>;
+  if (!product) return <div className="p-10 text-center font-bold text-red-600">Product not found!</div>;
 
   const categoryLabel = product.subCategory ? `${product.subCategory} Footwear` : "Footwear";
   const activeColor = product.colors?.[activeColorIndex] || product.colors?.[0];
@@ -250,7 +250,7 @@ function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!selectedSize) return;
-    // Hesaba giriş edilməyibsə, sebətə əlavə etməzdən əvvəl Login səhifəsinə yönləndir.
+    // If not logged in, redirect to the Login page before adding to the basket.
     if (!user) {
       navigate('/login', { state: { from: location.pathname } });
       return;
@@ -332,8 +332,8 @@ function ProductDetail() {
             </button>
           </div>
 
-          {/* Əvvəllər burda 3 ayrı buton + 3 ayrı InfoDrawer var idi.
-              İndi hamısı ProductInfoLinks komponentinin içindədir. */}
+          {/* This used to be 3 separate buttons + 3 separate InfoDrawers.
+              It all now lives inside the ProductInfoLinks component. */}
           <ProductInfoLinks />
         </div>
       </div>

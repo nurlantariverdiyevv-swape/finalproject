@@ -14,8 +14,8 @@ function Header() {
   const { slider = [], shopProducts = [], fetchSlider, fetchShopProducts, content } = useDataContext();
   const { user, logout } = useAuth();
 
-  // Menyu, banner və axtarış təklifləri artıq hardcode deyil, vercel
-  // API-dəki content.json-dan (content.header) gəlir.
+  // Menu, banners, and search suggestions are no longer hardcoded,
+  // they come from the Vercel API's content.json (content.header).
   const categories = content?.header?.categories || [];
   const desktopMenuData = content?.header?.desktopMenuData || {};
   const popularSearches = content?.header?.popularSearches || [];
@@ -43,8 +43,8 @@ function Header() {
     setAccountMenuOpen(false);
   };
 
-  // Mobil versiya üçün ayrıca hesab dropdown-u (login/basket menyudan
-  // kənarda, birbaşa yuxarı barda görünür)
+  // A separate account dropdown for the mobile version (shown right in
+  // the top bar, outside the login/basket menu)
   const [mobileAccountMenuOpen, setMobileAccountMenuOpen] = useState(false);
   const mobileAccountMenuRef = useRef(null);
 
@@ -143,7 +143,7 @@ function Header() {
 
   const bestSellers = useMemo(() => allProducts.slice(0, 5), [allProducts]);
 
-  // Axtarış nəticələrinin dropdown-da göstərilən maksimum sayı
+  // Max number of search results shown in the dropdown
   const SEARCH_RESULTS_PREVIEW_LIMIT = 5;
 
   const seeAllResultsLink = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
@@ -180,7 +180,7 @@ function Header() {
         </div>
       </div>
 
-      {/* 2. MOBİL HEADER */}
+      {/* 2. MOBILE HEADER */}
       <div className="lg:hidden px-4 pt-3 pb-3 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <Link to="/" onClick={closeAllMenus} className="inline-block">
@@ -188,7 +188,7 @@ function Header() {
           </Link>
 
           <div className="flex items-center gap-3">
-            {/* Hesaba giriş: menyunu açmağa ehtiyac qalmadan birbaşa yuxarı barda */}
+            {/* Account access: right in the top bar, no need to open the menu */}
             {user ? (
               <div className="relative" ref={mobileAccountMenuRef}>
                 <button
@@ -203,7 +203,7 @@ function Header() {
                 {mobileAccountMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1">
                     <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 truncate">
-                      {user.displayName || user.email || 'Hesabım'}
+                      {user.displayName || user.email || 'My Account'}
                     </div>
                     <button
                       type="button"
@@ -283,7 +283,7 @@ function Header() {
                   <span className="text-sm font-semibold">{user.displayName ? user.displayName.split(' ')[0] : 'Account'}</span>
                 </button>
 
-                {/* Log in adının üstünə basanda açılan dropdown - Log out buradadır */}
+                {/* Dropdown that opens when clicking the account name - Log out lives here */}
                 {accountMenuOpen && (
                   <div className="absolute right-0 top-full mt-3 w-44 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1 animate-[fadeIn_0.15s_ease-out]">
                     <button
@@ -408,7 +408,7 @@ function Header() {
         </div>
       )}
 
-      {/* 5. MOBİL SAĞ MENYU */}
+      {/* 5. MOBILE RIGHT MENU */}
       <div onClick={closeAllMenus} className={`lg:hidden fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} />
 
       <div className={`lg:hidden fixed top-0 right-0 h-full w-[85%] sm:w-[380px] bg-white z-50 shadow-2xl transition-transform duration-300 transform flex flex-col ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -449,13 +449,13 @@ function Header() {
           </div>
 
           <div className="mt-auto pt-8 pb-6 flex flex-col gap-5">
-            {/* Login/Logout indi yuxarı mobil barda (menyunun kənarında) idarə olunur.
-                Burada, giriş edildikdən sonra sadəcə istifadəçinin adı göstərilir. */}
+            {/* Login/Logout is now handled in the top mobile bar (outside the menu).
+                Here, only the signed-in user's name is shown. */}
             {user && (
               <div className="flex items-center justify-between text-sm font-medium text-black">
                 <div className="flex items-center gap-3">
                   <User size={20} strokeWidth={1.5} />
-                  <span className="truncate max-w-[160px]">{user.displayName ? user.displayName.split(' ')[0] : (user.email || 'Hesabım')}</span>
+                  <span className="truncate max-w-[160px]">{user.displayName ? user.displayName.split(' ')[0] : (user.email || 'My Account')}</span>
                 </div>
                 <button
                   type="button"
@@ -502,7 +502,7 @@ function Header() {
         </div>
       </div>
 
-      {/* 6. DESKTOP AXTARIŞ OVERLAY */}
+      {/* 6. DESKTOP SEARCH OVERLAY */}
       <DesktopSearchOverlay
         searchOpen={searchOpen}
         closeSearch={closeSearch}
@@ -516,7 +516,7 @@ function Header() {
         seeAllResultsLink={seeAllResultsLink}
       />
 
-      {/* 7. MOBİL AXTARIŞ OVERLAY */}
+      {/* 7. MOBILE SEARCH OVERLAY */}
       <MobileSearchOverlay
         searchOpen={searchOpen}
         closeSearch={closeSearch}
@@ -531,7 +531,7 @@ function Header() {
         seeAllResultsLink={seeAllResultsLink}
       />
 
-      {/* 8. S/PLUS MEMBERS MODALI (sağdan sürüşən panel, Salomon nümunəsindəki kimi) */}
+      {/* 8. S/PLUS MEMBERS MODAL (right-side sliding panel, matches the real site) */}
       {splusModalOpen && (
         <div
           className="fixed inset-0 z-[60] flex justify-end bg-black/40 backdrop-blur-xs"

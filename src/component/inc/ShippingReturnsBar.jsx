@@ -5,8 +5,8 @@ import { useDataContext } from '../../context/DataContext';
 
 const ICONS = { package: Package, truck: Truck };
 
-// Backend (content.json) hələ yenilənməyibsə də bar boş qalmasın deyə
-// defolt məzmun - API-dən content.infoBar gələn kimi o üstünlük təşkil edir.
+// Fallback content so the bar never appears empty even if the backend
+// (content.json) hasn't been updated yet - content.infoBar from the API takes priority once available.
 const DEFAULT_ITEMS = [
   {
     icon: 'package',
@@ -30,11 +30,11 @@ const DEFAULT_ITEMS = [
   },
 ];
 
-// Salomon saytındakı kimi: footerin üstündə "Free Returns Within 45 Days" /
-// "Free Shipping for S/PLUS Members" sətirləri, üstünə basanda sağdan
-// sürüşən panel açılır (Header-dəki S/PLUS modalı ilə eyni stil).
-// Məzmun content.json-dan (content.infoBar) gəlir; backend hələ
-// yenilənməyibsə DEFAULT_ITEMS istifadə olunur ki, bar heç vaxt yox olmasın.
+// Matches the real site: "Free Returns Within 45 Days" /
+// "Free Shipping for S/PLUS Members" rows above the footer, clicking opens
+// a right-side sliding panel (same style as the S/PLUS modal in Header).
+// Content comes from content.json (content.infoBar); if the backend
+// hasn't been updated yet, DEFAULT_ITEMS is used so the bar is never missing.
 function ShippingReturnsBar({ variant = 'bar' }) {
   const { content } = useDataContext();
   const items = content?.infoBar?.length ? content.infoBar : DEFAULT_ITEMS;
@@ -71,7 +71,7 @@ function ShippingReturnsBar({ variant = 'bar' }) {
         })}
       </div>
 
-      {/* SAĞDAN SÜRÜŞƏN PANEL */}
+      {/* RIGHT-SIDE SLIDING PANEL */}
       <div
         onClick={() => setActiveItem(null)}
         className={`fixed inset-0 z-[100] bg-black/40 backdrop-blur-xs transition-opacity duration-300 ${

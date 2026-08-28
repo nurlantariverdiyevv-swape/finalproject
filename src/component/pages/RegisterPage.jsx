@@ -9,8 +9,8 @@ import AuthTopBar from '../inc/AuthTopBar';
 function RegisterPage() {
   const navigate = useNavigate();
   const { registerWithEmail } = useAuth();
-  // Kateqoriyalar və şifrə qaydaları artıq hardcode deyil, vercel API-dəki
-  // content.json-dan (content.register) gəlir.
+  // Categories and password rules are no longer hardcoded, they come
+  // from the Vercel API's content.json (content.register).
   const { content } = useDataContext();
 
   const [formData, setFormData] = useState({
@@ -75,7 +75,7 @@ function RegisterPage() {
       try {
         await updateProfile(user, { displayName: fullName });
       } catch {
-        // Ad yenilənməsə də qeydiyyat uğurludur, bu addım kritik deyil
+        // Registration still succeeds even if the display name update fails, this step isn't critical
       }
     }
 
@@ -125,7 +125,7 @@ function RegisterPage() {
                 </button>
               </div>
 
-              {/* Password Tələbləri */}
+              {/* Password Requirements */}
               <div className="mt-3 flex flex-col gap-1.5">
                 {passwordValidations.map((item, index) => (
                   <div key={index} className="flex items-center gap-2 text-xs">
@@ -179,7 +179,7 @@ function RegisterPage() {
             <div className="mt-2 flex flex-col gap-4">
               <span className="block text-sm font-bold text-black">Stay in the loop</span>
               
-              {/* By Email Hissəsi */}
+              {/* By Email Section */}
               <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" name="stayInLoopEmail" checked={formData.stayInLoopEmail} onChange={handleInputChange} className="accent-black w-4 h-4 cursor-pointer" />
@@ -187,22 +187,22 @@ function RegisterPage() {
                 </label>
 
                 <p className="text-xs text-gray-700 leading-relaxed">
-                  Yes, I want to receive personalized commercial offers from Salomon via email or social media based on my profile, interests and recent interactions with the Salomon brand. I can unsubscribe at any time (for more information, please consult our <Link to="/privacy" className="underline">Privacy Policy</Link>).
+                  Yes, I want to receive personalized commercial offers from Runova via email or social media based on my profile, interests and recent interactions with the Runova brand. I can unsubscribe at any time (for more information, please consult our <Link to="/privacy" className="underline">Privacy Policy</Link>).
                 </p>
               </div>
 
-              {/* By Text Hissəsi */}
+              {/* By Text Section */}
               <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" name="stayInLoopText" checked={formData.stayInLoopText} onChange={handleInputChange} className="accent-black w-4 h-4 cursor-pointer" />
                   <span className="text-xs font-bold text-black">By text</span>
                 </label>
 
-                {/* By Text seçildikdə birbaşa kvadratın altından başlayan hissə */}
+                {/* Section that appears right under the checkbox when "By Text" is selected */}
                 {formData.stayInLoopText && (
                   <div className="flex flex-col gap-3 mt-1">
                     <p className="text-xs text-gray-700 leading-relaxed">
-                      By providing my number, I agree to receive recurring automated promotional and personalized marketing text messages (e.g. cart reminders) from Salomon at this number. Consent is not a condition of any purchase. Reply HELP for help and STOP to cancel. Message frequency varies. Message & data rates may apply. View <Link to="/terms" className="underline">Terms of service</Link> and <Link to="/privacy" className="underline">Privacy</Link>.
+                      By providing my number, I agree to receive recurring automated promotional and personalized marketing text messages (e.g. cart reminders) from Runova at this number. Consent is not a condition of any purchase. Reply HELP for help and STOP to cancel. Message frequency varies. Message & data rates may apply. View <Link to="/terms" className="underline">Terms of service</Link> and <Link to="/privacy" className="underline">Privacy</Link>.
                     </p>
 
                     <div>

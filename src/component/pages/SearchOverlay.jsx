@@ -78,10 +78,10 @@ export function DesktopSearchOverlay({
 
   return (
     <div className="hidden lg:block fixed inset-0 z-[200]">
-      {/* Arxa fon - səhifənin qalanı bulanıq/tündləşmiş görünür */}
+      {/* Backdrop - the rest of the page appears blurred/dimmed */}
       <div onClick={closeSearch} className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" />
 
-      {/* Yuxarı ağ panel - yalnız məzmun qədər hündürlükdə */}
+      {/* Top white panel - only as tall as its content */}
       <div className="relative bg-white shadow-2xl max-h-[85vh] overflow-y-auto">
         <div className="w-full bg-[#0d0d0d] text-white text-[11px] sm:text-xs py-2 px-4 md:px-8 flex justify-between items-center tracking-wide font-light">
           <div className="w-1/3">

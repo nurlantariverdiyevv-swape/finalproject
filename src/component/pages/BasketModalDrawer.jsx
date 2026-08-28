@@ -94,9 +94,9 @@ export function AddedToBagDrawer() {
   const { slider = [], shopProducts = [] } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
-  // Trimmed slider datası ilə tam shopProducts datası birləşdirilir, eyni id-lər
-  // (12 slayder məhsulu products.json-da da var) təkrarlanmasın deyə id üzrə
-  // deduplikasiya edilir (shopProducts-dakı tam versiya üstünlük təşkil edir).
+  // The trimmed slider data is merged with the full shopProducts data; matching ids
+  // (all 12 slider products also exist in products.json) are deduplicated by id
+  // so nothing shows twice (the full shopProducts version takes priority).
   const allProducts = useMemo(() => {
     const map = new Map();
     [...slider, ...shopProducts].forEach((p) => {
@@ -105,8 +105,8 @@ export function AddedToBagDrawer() {
     return Array.from(map.values());
   }, [slider, shopProducts]);
 
-  // "Complete this product with..." hissəsi üçün data-dan real məhsullar,
-  // eyni kateqoriyadan (varsa) seçilir, alt-alta (stacked) siyahı kimi göstərilir.
+  // For the "Complete this product with..." section, real products from the data
+  // are picked (same category first, if available) and shown as a stacked list.
   const recommendedProducts = useMemo(() => {
     if (!addedSuccessProduct) return [];
     const pool = allProducts.filter((p) => p.id !== addedSuccessProduct.id);
@@ -184,8 +184,8 @@ export function AddedToBagDrawer() {
           <div>
             <h4 className="text-[13px] font-bold text-black uppercase tracking-wide mb-4">Complete this product with...</h4>
 
-            {/* Alt-alta (stacked) siyahı: hər sətirə basanda detail səhifəsinə keçir,
-                sətirin sağında isə birbaşa sebətə/wishlist-ə əlavə etmək düymələri var */}
+            {/* Stacked list: clicking a row goes to the detail page,
+                while the right side of the row has quick add-to-basket/wishlist buttons */}
             <div className="divide-y divide-gray-100 border-t border-gray-100">
               {recommendedProducts.map((item) => {
                 const isLiked = wishlist.some((w) => w.id === item.id);

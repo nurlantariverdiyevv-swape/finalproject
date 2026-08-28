@@ -26,7 +26,7 @@ function WishlistPage({ onAddToCart }) {
   };
 
   return (
-    // Basket səhifəsi ilə eyni font (Inter) və eyni fon/kart üslubu
+    // Same font (Inter) and same background/card style as the Basket page
     <div className="bg-[#f5f5f5] min-h-screen py-8 text-black antialiased" style={{ fontFamily: "Inter, sans-serif" }}>
       <div className="max-w-[1440px] mx-auto px-4 md:px-8">
         <div className="bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80">

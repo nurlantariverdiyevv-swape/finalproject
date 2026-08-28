@@ -17,7 +17,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  // Hansı düymənin loading vəziyyətində olduğunu izləyirik: 'email' | 'google' | 'apple' | null
+  // Tracks which button is in a loading state: 'email' | 'google' | 'apple' | null
   const [loading, setLoading] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -36,24 +36,29 @@ function LoginPage() {
   const handleGoogleLogin = async () => {
     setError('');
     setLoading('google');
-    const { error: authError } = await loginWithGoogle();
+    const { error: authError, redirecting } = await loginWithGoogle(redirectTo);
     setLoading(null);
     if (authError) {
       setError(authError);
       return;
     }
+    // On mobile the browser is navigating away to Google right now; once it
+    // comes back, AuthProvider's redirect-result handler takes care of the
+    // navigation, so there's nothing further to do here.
+    if (redirecting) return;
     navigate(redirectTo, { replace: true });
   };
 
   const handleAppleLogin = async () => {
     setError('');
     setLoading('apple');
-    const { error: authError } = await loginWithApple();
+    const { error: authError, redirecting } = await loginWithApple(redirectTo);
     setLoading(null);
     if (authError) {
       setError(authError);
       return;
     }
+    if (redirecting) return;
     navigate(redirectTo, { replace: true });
   };
 
@@ -61,7 +66,7 @@ function LoginPage() {
     <div className="w-full min-h-screen bg-white">
       <AuthTopBar />
       <div className="max-w-md mx-auto px-4 py-10 sm:py-14">
-        {/* Ümumi karta rounded-2xl verildi */}
+        {/* rounded-2xl applied to the outer card */}
         <div className="border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8">
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-black mt-3 mb-8 leading-tight">
             ACCESS YOUR<br />ACCOUNT

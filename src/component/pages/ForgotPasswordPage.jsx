@@ -17,8 +17,8 @@ function ForgotPasswordPage() {
     setError('');
     setLoading(true);
 
-    // Firebase-in özünə reset linki olan real bir email göndərir.
-    // İstifadəçi maildəki linkə klikləyib yeni şifrə təyin edə bilər.
+    // Sends a real email with Firebase's own reset link.
+    // The person can click the link in the email to set a new password.
     const { error: authError } = await resetPassword(email);
 
     setLoading(false);

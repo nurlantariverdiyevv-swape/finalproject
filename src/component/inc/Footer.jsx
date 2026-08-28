@@ -5,10 +5,16 @@ import { RiFacebookCircleFill, RiInstagramFill, RiYoutubeFill } from 'react-icon
 import { useDataContext } from '../../context/DataContext';
 import ShippingReturnsBar from './ShippingReturnsBar';
 
+// Runova is a demo store built on top of Salomon's real catalog, but pages
+// like "Terms & Conditions", "Size Guide", "Careers" etc. don't actually
+// exist on this site. Rather than link to blank/broken internal routes,
+// every footer link opens the real, official Salomon website instead.
+const SALOMON_SITE_URL = 'https://www.salomon.com/en-us';
+
 function Footer() {
   const [openSections, setOpenSections] = useState({});
-  // Footer sütunları artıq hardcode deyil, vercel API-dəki content.json-dan
-  // (content.footer) gəlir.
+  // The footer columns are no longer hardcoded, they come from the Vercel
+  // API's content.json (content.footer).
   const { content } = useDataContext();
   const footerData = content?.footer || [];
 
@@ -21,7 +27,7 @@ function Footer() {
 
   return (
     <footer className="font-sans">
-      {/* Footerin üstündəki "Free Returns / Free Shipping" zolağı (Salomon saytındakı kimi) */}
+      {/* The "Free Returns / Free Shipping" bar above the footer (matches the real site) */}
       <ShippingReturnsBar />
 
       <div className="bg-black text-white pt-12 pb-8 px-6 md:px-16">
@@ -34,15 +40,21 @@ function Footer() {
               <h3 className="font-bold text-[17px] text-white">{section.title}</h3>
               <div className="flex flex-col gap-3">
                 {section.links.map((link) => (
-                  <Link key={link.label} to={link.path} className="text-[15px] font-medium text-[#e5e5e5] hover:text-white transition-colors">
+                  <a
+                    key={link.label}
+                    href={SALOMON_SITE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[15px] font-medium text-[#e5e5e5] hover:text-white transition-colors"
+                  >
                     {link.label}
-                  </Link>
+                  </a>
                 ))}
               </div>
             </div>
           ))}
 
-          {/* Shipping Bölməsi */}
+          {/* Shipping Section */}
           <div className="flex flex-col gap-4">
             <h3 className="font-bold text-[17px] text-white">Shipping</h3>
             <Link to="/country-select" className="flex items-center gap-2.5 text-[15px] font-medium text-white">
@@ -75,9 +87,15 @@ function Footer() {
                 {isOpen && (
                   <div className="pb-4 flex flex-col gap-3">
                     {section.links.map((link) => (
-                      <Link key={link.label} to={link.path} className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block">
+                      <a
+                        key={link.label}
+                        href={SALOMON_SITE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block"
+                      >
                         {link.label}
-                      </Link>
+                      </a>
                     ))}
                   </div>
                 )}
@@ -101,9 +119,9 @@ function Footer() {
           </div>
         </div>
 
-        {/* AŞAĞI HİSSƏ VƏ NAZİK BOZ XƏTT */}
+        {/* BOTTOM SECTION AND THIN GRAY DIVIDER */}
         <div className="pt-8 border-t border-[#333] flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Sosial Medya İkonları */}
+          {/* Social Media Icons */}
           <div className="flex items-center gap-5 w-full md:w-auto">
             <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity">
               <RiFacebookCircleFill className="w-8 h-8 text-white" />
@@ -118,7 +136,7 @@ function Footer() {
 
           {/* Copyright Text */}
           <div className="text-[14px] text-[#e5e5e5] w-full md:w-auto text-left md:text-center">
-            ©2026 — by Nurlan Tarıverdiyev
+            ©2026 Runova. All rights reserved.
           </div>
         </div>
 

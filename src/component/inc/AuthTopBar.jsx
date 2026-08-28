@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 
-// Login / Register / Forgot Password səhifələrinin yuxarısında görünən,
-// yalnız Runova loqosunu göstərən sadə bar (Header/Footer yoxdur, çünki
-// bu səhifələr AppRouter-də Layout-un kənarında, tam ayrıca açılır).
+// A simple bar shown above the Login / Register / Forgot Password pages,
+// showing only the Runova logo (no Header/Footer, since these pages
+// render fully standalone in AppRouter, outside of Layout).
 function AuthTopBar() {
   return (
     <div className="w-full border-b border-gray-100 bg-white">

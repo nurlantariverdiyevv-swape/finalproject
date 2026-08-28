@@ -27,9 +27,9 @@ export const DataProvider = ({ children }) => {
         setSlider(list);
         setLoaded((prev) => ({ ...prev, slider: true }));
       } else {
-        // Api.js-də API_BASE hələ doldurulmayıb (vercel linki boşdur) və ya
-        // backend gözlənilən formatda cavab vermir - array-ə çevirməyib boş saxlayırıq.
-        console.warn("Slider API gözlənilən formatda deyil. Api.js-də API_BASE (vercel linki) doldurulubmu?", sliderData);
+        // API_BASE in Api.js hasn't been set yet (the Vercel link is empty), or
+        // the backend isn't responding in the expected format - we keep it as an empty array instead of coercing it.
+        console.warn("Slider API did not return the expected format. Has API_BASE (Vercel link) been set in Api.js?", sliderData);
         setApiNotConfigured(true);
       }
     } catch (error) {
@@ -54,7 +54,7 @@ export const DataProvider = ({ children }) => {
         setShopProducts(list);
         setLoaded((prev) => ({ ...prev, shop: true }));
       } else {
-        console.warn("Shop Products API gözlənilən formatda deyil. Api.js-də API_BASE (vercel linki) doldurulubmu?", shopData);
+        console.warn("Shop Products API did not return the expected format. Has API_BASE (Vercel link) been set in Api.js?", shopData);
         setApiNotConfigured(true);
       }
     } catch (error) {
@@ -66,9 +66,9 @@ export const DataProvider = ({ children }) => {
   };
 
   // Header/Footer/Main/RegisterPage/ShopPage/BasketPage/ProductDetail
-  // üçün əvvəllər hardcode olunmuş bütün statik məzmunu (menyu, banner,
-  // footer linkləri, sıralama seçimləri, ölçü cədvəli və s.) vercel API-dən
-  // tək dəfə çəkib bütün tətbiqə paylaşır.
+  // Fetches all the static content that used to be hardcoded (menu, banners,
+  // footer links, sort options, size chart, etc.) once from the Vercel API
+  // and shares it with the whole app.
   const fetchContent = async () => {
     if (loaded.content) return;
     try {
@@ -79,7 +79,7 @@ export const DataProvider = ({ children }) => {
         setContent(contentData);
         setLoaded((prev) => ({ ...prev, content: true }));
       } else {
-        console.warn("Content API gözlənilən formatda deyil. Api.js-də API_BASE (vercel linki) doldurulubmu?", contentData);
+        console.warn("Content API did not return the expected format. Has API_BASE (Vercel link) been set in Api.js?", contentData);
         setApiNotConfigured(true);
       }
     } catch (error) {
@@ -102,8 +102,8 @@ export const DataProvider = ({ children }) => {
         content,
         fetchContent,
         contentLoading,
-        // true olduqda deməkdir ki, Api.js-dəki API_BASE hələ boşdur (və ya
-        // backend hələ Vercel-ə qaldırılmayıb) - UI bunu istəsə göstərə bilər.
+        // true means API_BASE in Api.js is still empty (or the backend
+        // hasn't been deployed to Vercel yet) - the UI can surface this if it wants to.
         apiNotConfigured,
       }}
     >

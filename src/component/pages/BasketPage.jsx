@@ -29,8 +29,8 @@ function BasketPage() {
 
   const totalItems = basket.reduce((a, b) => a + b.quantity, 0);
 
-  // Ödəniş loqoları artıq hardcode deyil, vercel API-dəki content.json-dan
-  // (content.basket.paymentLogos) gəlir.
+  // The payment logos are no longer hardcoded, they come from the Vercel
+  // API's content.json (content.basket.paymentLogos).
   const { content } = useDataContext();
   const paymentLogos = content?.basket?.paymentLogos || [];
 
@@ -96,11 +96,11 @@ function BasketPage() {
               </div>
             </div>
 
-            {/* SAĞ TƏRƏF */}
+            {/* RIGHT SIDE */}
             <div className="lg:col-span-6 bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80 sticky top-6">
               <h2 className="text-[17px] leading-[1.3] font-bold mb-[24px] text-black">Order Summary</h2>
 
-              {/* PROMO KOD HİSSƏSİ (OPTIMIZASIYA OLUNDU) */}
+              {/* PROMO CODE SECTION (OPTIMIZED) */}
               <div className="mb-5">
                 <label className="flex items-center gap-2 cursor-pointer text-[15px] font-semibold text-black select-none">
                   <input type="checkbox" checked={hasPromoCode} onChange={(e) => setHasPromoCode(e.target.checked)} className="w-[15px] h-[15px] rounded border-black text-black accent-black cursor-pointer" />
