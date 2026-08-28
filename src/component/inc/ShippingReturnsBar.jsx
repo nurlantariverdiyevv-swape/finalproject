@@ -5,15 +5,39 @@ import { useDataContext } from '../../context/DataContext';
 
 const ICONS = { package: Package, truck: Truck };
 
+// Backend (content.json) hələ yenilənməyibsə də bar boş qalmasın deyə
+// defolt məzmun - API-dən content.infoBar gələn kimi o üstünlük təşkil edir.
+const DEFAULT_ITEMS = [
+  {
+    icon: 'package',
+    title: 'Free Returns Within 45 Days',
+    body: [
+      'Free returns by mail within 45 days of delivery.',
+      'Items must be unworn, in their original packaging, with all tags attached.',
+    ],
+    linkTo: '/returns',
+    linkLabel: 'Learn more here.',
+  },
+  {
+    icon: 'truck',
+    title: 'Free Shipping for S/PLUS Members',
+    body: [
+      'S/Plus Members will receive free ground delivery shipping on every purchase and will be gifted +50 bonus points after signing up.',
+      'Unfortunately, we cannot accommodate PO, FPO, or APO boxes at this time.',
+    ],
+    linkTo: '/s-plus-member',
+    linkLabel: 'Become a member.',
+  },
+];
+
 // Salomon saytındakı kimi: footerin üstündə "Free Returns Within 45 Days" /
 // "Free Shipping for S/PLUS Members" sətirləri, üstünə basanda sağdan
 // sürüşən panel açılır (Header-dəki S/PLUS modalı ilə eyni stil).
-// Məzmun hardcode deyil, content.json-dan (content.infoBar) gəlir ki,
-// bu komponent Footer-də və digər səhifələrdə (Basket, Product) də
-// eyni datadan istifadə edərək təkrar-təkrar işlədilə bilsin.
+// Məzmun content.json-dan (content.infoBar) gəlir; backend hələ
+// yenilənməyibsə DEFAULT_ITEMS istifadə olunur ki, bar heç vaxt yox olmasın.
 function ShippingReturnsBar({ variant = 'bar' }) {
   const { content } = useDataContext();
-  const items = content?.infoBar || [];
+  const items = content?.infoBar?.length ? content.infoBar : DEFAULT_ITEMS;
   const [activeItem, setActiveItem] = useState(null);
 
   if (items.length === 0) return null;
