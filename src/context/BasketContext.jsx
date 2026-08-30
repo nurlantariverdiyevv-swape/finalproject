@@ -9,17 +9,28 @@ export function BasketProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [basket, setBasket] = useState(() => {
-    const saved = localStorage.getItem('runova_basket');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [basket, setBasket] = useState([]);
 
   const [sizeModalProduct, setSizeModalProduct] = useState(null);
   const [addedSuccessProduct, setAddedSuccessProduct] = useState(null);
 
+  // Basket is stored per-account (key includes the user's uid). Logging out
+  // clears it from view immediately; logging back into the SAME account
+  // restores it from that account's own storage slot. Logged-out visitors
+  // never read/write any saved basket.
   useEffect(() => {
-    localStorage.setItem('runova_basket', JSON.stringify(basket));
-  }, [basket]);
+    if (!user) {
+      setBasket([]);
+      return;
+    }
+    const saved = localStorage.getItem(`runova_basket_${user.uid}`);
+    setBasket(saved ? JSON.parse(saved) : []);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    localStorage.setItem(`runova_basket_${user.uid}`, JSON.stringify(basket));
+  }, [basket, user]);
 
   const openSizeModal = (product) => {
     // If not logged in, redirect to the Login page before selecting a size

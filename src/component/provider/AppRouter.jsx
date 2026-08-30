@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Layout from "../../layout/Layout";
 import Main from "../../Main";
 import ProductDetail from "../pages/ProductDetail";
@@ -9,6 +9,8 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import StaticInfoPage from "../pages/StaticInfoPage";
+import NotFoundPage from "../pages/NotFoundPage";
+import ErrorBoundary from "../ErrorBoundary";
 
 // Every footer link (and the header's country selector) points to one of
 // these paths. They all render the same generic StaticInfoPage since this
@@ -25,25 +27,39 @@ const STATIC_INFO_PATHS = [
 ];
 
 function AppRouter({ onAddToCart }) {
+  const location = useLocation();
+
+  // Every page element is wrapped in its own ErrorBoundary so a bug on ONE
+  // page (e.g. ProductDetail throwing on bad data) shows a small inline
+  // fallback instead of crashing the whole app/router. `resetKey` is tied to
+  // the current URL, so navigating to a different page (or a different
+  // /shop/:categoryName, /product/:id, etc. on the SAME route) automatically
+  // clears a previously-crashed boundary instead of leaving that page stuck
+  // on the fallback forever.
+  const withBoundary = (element) => (
+    <ErrorBoundary resetKey={location.pathname + location.search}>{element}</ErrorBoundary>
+  );
+
   return (
     <Routes>
       {/* Login, Register and Forgot Password: standalone pages with no Header/Footer */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/login" element={withBoundary(<LoginPage />)} />
+      <Route path="/register" element={withBoundary(<RegisterPage />)} />
+      <Route path="/forgot-password" element={withBoundary(<ForgotPasswordPage />)} />
 
       {/* All other pages render with Header + Footer (inside Layout) */}
       <Route element={<Layout onAddToCart={onAddToCart} />}>
-        <Route path="/" element={<Main onAddToCart={onAddToCart} />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/wishlist" element={<WishlistPage onAddToCart={onAddToCart} />} />
-        <Route path="/basket" element={<BasketPage />} />
-        <Route path="/shop" element={<ShopPage onAddToCart={onAddToCart} />} />
-        <Route path="/shop/:categoryName" element={<ShopPage onAddToCart={onAddToCart} />} />
+        <Route path="/" element={withBoundary(<Main onAddToCart={onAddToCart} />)} />
+        <Route path="/product/:id" element={withBoundary(<ProductDetail />)} />
+        <Route path="/wishlist" element={withBoundary(<WishlistPage onAddToCart={onAddToCart} />)} />
+        <Route path="/basket" element={withBoundary(<BasketPage />)} />
+        <Route path="/shop" element={withBoundary(<ShopPage onAddToCart={onAddToCart} />)} />
+        <Route path="/shop/:categoryName" element={withBoundary(<ShopPage onAddToCart={onAddToCart} />)} />
         {STATIC_INFO_PATHS.map((path) => (
-          <Route key={path} path={path} element={<StaticInfoPage />} />
+          <Route key={path} path={path} element={withBoundary(<StaticInfoPage />)} />
         ))}
-        <Route path="*" element={<Main onAddToCart={onAddToCart} />} />
+        {/* Unknown/broken URLs (bad slugs, typos, dead links) -> 404 page */}
+        <Route path="*" element={withBoundary(<NotFoundPage />)} />
       </Route>
     </Routes>
   );

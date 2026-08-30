@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, User, Heart, Menu, ShoppingBag, X, ChevronRight, ArrowRight, HelpCircle, MapPin, Mail, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
@@ -11,7 +11,7 @@ function Header() {
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
   const { totalBasketCount } = useBasket();
-  const { slider = [], shopProducts = [], fetchSlider, fetchShopProducts, content } = useDataContext();
+  const { shopProducts = [], fetchShopProducts, content } = useDataContext();
   const { user, logout } = useAuth();
 
   // Menu, banners, and search suggestions are no longer hardcoded,
@@ -90,7 +90,6 @@ function Header() {
   const openSearch = () => {
     closeAllMenus();
     setSearchOpen(true);
-    if (fetchSlider) fetchSlider();
     if (fetchShopProducts) fetchShopProducts();
   };
 
@@ -111,15 +110,9 @@ function Header() {
     document.body.style.overflow = searchOpen ? 'hidden' : 'unset';
   }, [searchOpen]);
 
-  const allProducts = useMemo(() => {
-    const map = new Map();
-    [...slider, ...shopProducts].forEach((p) => {
-      if (p && p.id != null) map.set(p.id, p);
-    });
-    return Array.from(map.values());
-  }, [slider, shopProducts]);
+  const allProducts = shopProducts;
 
-  const searchResults = useMemo(() => {
+  const searchResults = (() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
     return allProducts.filter((p) => {
@@ -129,9 +122,9 @@ function Header() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [allProducts, searchQuery]);
+  })();
 
-  const matchingSuggestions = useMemo(() => {
+  const matchingSuggestions = (() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
     const names = new Set();
@@ -139,9 +132,9 @@ function Header() {
       if (p.name && p.name.toLowerCase().includes(q)) names.add(p.name);
     });
     return Array.from(names).slice(0, 5);
-  }, [allProducts, searchQuery]);
+  })();
 
-  const bestSellers = useMemo(() => allProducts.slice(0, 5), [allProducts]);
+  const bestSellers = allProducts.slice(0, 5);
 
   // Max number of search results shown in the dropdown
   const SEARCH_RESULTS_PREVIEW_LIMIT = 5;

@@ -2,6 +2,8 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProductSlider from './component/pages/ProductSlider';
 import { useDataContext } from './context/DataContext';
+import ErrorBoundary from './component/ErrorBoundary';
+import ImageWithSkeleton from './component/ImageWithSkeleton';
 
 function Main({ onAddToCart }) {
   // "Shop by activity" and the banners are no longer hardcoded, they come
@@ -26,6 +28,7 @@ function Main({ onAddToCart }) {
   return (
     <main className="w-full overflow-hidden">
       {/* Hero Banner Section */}
+      <ErrorBoundary fallback={null}>
       <div className="relative w-full aspect-4/3 min-[320px]:aspect-video lg:aspect-auto overflow-hidden bg-gray-200">
         <img src="/assets/img/reklam.jpeg" alt="X Ultra 5 Gore-Tex" className="absolute inset-0 w-full h-full object-cover object-bottom-left transition-all duration-300" />
 
@@ -48,8 +51,10 @@ function Main({ onAddToCart }) {
           </Link>
         </div>
       </div>
+      </ErrorBoundary>
 
       {/* Shop By Activity Section */}
+      <ErrorBoundary fallback={null}>
       <section className="max-w-360 mx-auto px-4 md:px-12 py-6 sm:py-10 select-none">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h2 className="text-xl sm:text-2xl font-bold text-black tracking-tight">
@@ -70,7 +75,7 @@ function Main({ onAddToCart }) {
         <div id="activity-slider" className="grid grid-cols-2 gap-2 sm:gap-3 min-[768px]:max-[1168px]:flex min-[768px]:max-[1168px]:overflow-x-auto min-[768px]:max-[1168px]:scroll-smooth min-[768px]:max-[1168px]:scrollbar-none min-[768px]:max-[1168px]:pb-4 min-[1168px]:grid min-[1168px]:grid-cols-5 min-[1168px]:gap-4">
           {activities.map((activity, index) => (
             <Link key={index} to={activity.link} className={`group relative rounded-md overflow-hidden block bg-gray-900 ${index === 0 ? 'col-span-2 aspect-video min-[768px]:max-[1168px]:col-span-1 min-[768px]:max-[1168px]:aspect-[2/3] min-[1168px]:col-span-1 min-[1168px]:aspect-[2/3]' : 'col-span-1 aspect-[2/3]'} min-[768px]:max-[1168px]:shrink-0 min-[768px]:max-[1168px]:w-75`}>
-              <img src={activity.img} alt={activity.name} className={`w-full h-full object-cover ${activity.position} transition-transform duration-500 ease-out group-hover:scale-105 opacity-90`} />
+              <ImageWithSkeleton src={activity.img} alt={activity.name} className={`w-full h-full object-cover ${activity.position} transition-transform duration-500 ease-out group-hover:scale-105 opacity-90`} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 group-hover:from-black/80 transition-colors duration-300" />
               <div className="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-4 flex items-center justify-between text-white z-10">
                 <span className="text-sm sm:text-base md:text-lg font-bold tracking-tight drop-shadow-md leading-tight pr-1">
@@ -84,13 +89,15 @@ function Main({ onAddToCart }) {
           ))}
         </div>
       </section>
+      </ErrorBoundary>
 
       {/* Two-Banner Section */}
+      <ErrorBoundary fallback={null}>
       <section className="w-full py-6 select-none">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-1.5">
           {bannerData.map((banner) => (
             <Link key={banner.id} to={banner.link} className="group relative w-full h-[450px] sm:h-[520px] lg:h-[620px] overflow-hidden bg-gray-900 cursor-pointer block">
-              <img src={banner.image} alt={banner.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out opacity-90" />
+              <ImageWithSkeleton src={banner.image} alt={banner.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out opacity-90" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:bg-black/40 transition-colors duration-300" />
               <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 lg:p-12 flex flex-col items-start gap-3 z-10 text-white">
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight leading-tight drop-shadow-md">
@@ -107,9 +114,12 @@ function Main({ onAddToCart }) {
           ))}
         </div>
       </section>
+      </ErrorBoundary>
 
       {/* Product Slider Component */}
-      <ProductSlider onAddToCart={onAddToCart} />   
+      <ErrorBoundary fallback={null}>
+        <ProductSlider onAddToCart={onAddToCart} />
+      </ErrorBoundary>
     </main>
   );
 }

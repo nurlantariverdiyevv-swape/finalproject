@@ -13,16 +13,26 @@ export default function WishlistProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [wishlist, setWishlist] = useState(() => {
-    const saved = localStorage.getItem('wishlist');
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  const [wishlist, setWishlist] = useState([]);
   const [toast, setToast] = useState({ show: false, message: '', type: 'add' });
 
+  // Wishlist is stored per-account (key includes the user's uid). Logging
+  // out clears it from view immediately; logging back into the SAME
+  // account restores it from that account's own storage slot. Logged-out
+  // visitors never read/write any saved wishlist.
   useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    if (!user) {
+      setWishlist([]);
+      return;
+    }
+    const saved = localStorage.getItem(`wishlist_${user.uid}`);
+    setWishlist(saved ? JSON.parse(saved) : []);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    localStorage.setItem(`wishlist_${user.uid}`, JSON.stringify(wishlist));
+  }, [wishlist, user]);
 
   const toggleWishlist = (product) => {
     // If not logged in, redirect to the Login page before adding to the wishlist.

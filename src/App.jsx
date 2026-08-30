@@ -4,6 +4,8 @@ import { useBasket } from './context/BasketContext'
 import { useDataContext } from './context/DataContext'
 import { SizeSelectionModal, AddedToBagDrawer } from './component/pages/BasketModalDrawer'
 import RouteTransitionLoader from './component/inc/RouteTransitionLoader'
+import ErrorBoundary from './component/ErrorBoundary'
+import GlobalErrorNotice from './component/GlobalErrorNotice'
 
 function App() {
   const { openSizeModal } = useBasket();
@@ -22,10 +24,22 @@ function App() {
     <>
       <RouteTransitionLoader />
       {/* Header and Footer now live inside Layout.jsx, shown for every page
-          except login/register (see AppRouter.jsx) */}
-      <AppRouter onAddToCart={openSizeModal} />
-      <SizeSelectionModal />
-      <AddedToBagDrawer />
+          except login/register (see AppRouter.jsx). Each route already has
+          its own ErrorBoundary (see AppRouter.jsx); this outer one is just a
+          last-resort net in case something outside the routes themselves
+          (e.g. Layout) ever throws. */}
+      <ErrorBoundary>
+        <AppRouter onAddToCart={openSizeModal} />
+      </ErrorBoundary>
+      <ErrorBoundary fallback={null}>
+        <SizeSelectionModal />
+      </ErrorBoundary>
+      <ErrorBoundary fallback={null}>
+        <AddedToBagDrawer />
+      </ErrorBoundary>
+      {/* Catches what ErrorBoundary structurally can't: errors thrown in
+          event handlers or async code (see GlobalErrorNotice.jsx). */}
+      <GlobalErrorNotice />
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Star, Heart, X, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, RotateCcw, Sparkles } from "lucide-react";
 import { useDataContext } from "../../context/DataContext";
@@ -6,6 +6,8 @@ import { useWishlist } from "../../context/WishlistContext";
 import { useBasket } from "../../context/BasketContext";
 import { useAuth } from "../../context/AuthContext";
 import ProductInfoLinks from "./ProductInfoLinks";
+import NotFoundPage from "./NotFoundPage";
+import ImageWithSkeleton from "../ImageWithSkeleton";
 
 const slugify = (str) => (str || "").toString().toLowerCase().trim().replace(/\s+/g, "-");
 
@@ -122,7 +124,7 @@ function ImageMagnifier({ src, alt, onClick }) {
 
   return (
     <div className="relative w-full h-full overflow-hidden cursor-crosshair group" onMouseEnter={handleMouseEnter} onMouseMove={handleMouseMove} onMouseLeave={() => setShow(false)} onClick={onClick}>
-      <img src={src} alt={alt} className="w-full h-full object-cover select-none" />
+      <ImageWithSkeleton src={src} alt={alt} className="w-full h-full object-cover select-none" />
       {show && (
         <div style={{ position: "absolute", pointerEvents: "none", height: `${magSize}px`, width: `${magSize}px`, top: `${xy.y - magSize / 2}px`, left: `${xy.x - magSize / 2}px`, borderRadius: "50%", border: "2px solid white", boxShadow: "0 10px 25px rgba(0,0,0,0.3)", backgroundImage: `url('${src}')`, backgroundRepeat: "no-repeat", backgroundSize: `${size.width * zoom}px ${size.height * zoom}px`, backgroundPositionX: `${-xy.x * zoom + magSize / 2}px`, backgroundPositionY: `${-xy.y * zoom + magSize / 2}px`, zIndex: 30 }} />
       )}
@@ -203,12 +205,52 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
   );
 }
 
+// Description + feature data that lives in the product record, presented as
+// an editorial-style "details" block instead of a collapsible accordion: a
+// pull-quote style intro paragraph followed by a compact grid of feature
+// cards that invert to black on hover.
+function ProductDetailsSection({ description, features = [], articleRef }) {
+  if (!description && features.length === 0) return null;
+
+  return (
+    <div className="pt-6 border-t border-gray-200">
+      <div className="flex items-center gap-2 mb-5">
+        <span className="w-8 h-[2px] bg-black" />
+        <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">The Details</span>
+      </div>
+
+      {description && (
+        <div className="relative pl-5 mb-6 border-l-2 border-black">
+          <p className="text-[15px] sm:text-base text-gray-900 leading-relaxed font-medium">{description}</p>
+        </div>
+      )}
+
+      {features.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {features.map((feature, idx) => (
+            <div
+              key={idx}
+              className="p-3.5 rounded-xl bg-gray-50 hover:bg-black transition-colors duration-300 group"
+            >
+              <span className="text-sm leading-snug text-gray-800 group-hover:text-white transition-colors duration-300">
+                {feature}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {articleRef && <p className="text-[11px] text-gray-400 mt-5 tracking-wide">STYLE Nº {articleRef}</p>}
+    </div>
+  );
+}
+
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const { slider = [], fetchSlider, sliderLoading, shopProducts = [], fetchShopProducts, shopLoading, content } = useDataContext();
+  const { shopProducts = [], fetchShopProducts, shopLoading, content } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
   const { addToBasket } = useBasket();
 
@@ -223,27 +265,18 @@ function ProductDetail() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    fetchSlider();
     fetchShopProducts();
-  }, [fetchSlider, fetchShopProducts]);
+  }, [fetchShopProducts]);
 
-  // The trimmed productSlider.json (only the fields the slider card needs) is
-  // merged with the full products.json. If the same id exists in both (all 12
-  // slider products also exist in products.json), the FULL version from
-  // shopProducts must win so sizes/description/gallery aren't lost.
-  const allProducts = useMemo(() => {
-    const map = new Map();
-    [...slider, ...shopProducts].forEach((p) => {
-      if (p && p.id != null) map.set(p.id, { ...map.get(p.id), ...p });
-    });
-    return Array.from(map.values());
-  }, [slider, shopProducts]);
-  const product = allProducts.find((item) => String(item.id) === String(id));
+  // shopProducts is the single source of truth now, so there's nothing to
+  // merge - just look the product up by id directly.
+  const product = shopProducts.find((item) => String(item.id) === String(id));
   const isLiked = product ? wishlist.some((item) => item.id === product.id) : false;
-  const isLoading = (sliderLoading && slider.length === 0) || (shopLoading && shopProducts.length === 0);
+  const isLoading = shopLoading && shopProducts.length === 0;
 
   if (isLoading && !product) return <div className="p-10 text-center font-bold">Loading...</div>;
-  if (!product) return <div className="p-10 text-center font-bold text-red-600">Product not found!</div>;
+  // No product matches this :id -> broken/incorrect slug, show the 404 page.
+  if (!product) return <NotFoundPage />;
 
   const categoryLabel = product.subCategory ? `${product.subCategory} Footwear` : "Footwear";
   const activeColor = product.colors?.[activeColorIndex] || product.colors?.[0];
@@ -333,6 +366,8 @@ function ProductDetail() {
               <span>{isLiked ? "In Wishlist" : "Add to wishlist"}</span>
             </button>
           </div>
+
+          <ProductDetailsSection description={product.description} features={product.features} articleRef={product.articleRef} />
 
           {/* This used to be 3 separate buttons + 3 separate InfoDrawers.
               It all now lives inside the ProductInfoLinks component. */}

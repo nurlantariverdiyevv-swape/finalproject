@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { X, Heart, ShoppingBag } from 'lucide-react';
 import { useBasket } from '../../context/BasketContext';
@@ -91,29 +91,20 @@ export function SizeSelectionModal() {
 // 2. Added To Bag Drawer
 export function AddedToBagDrawer() {
   const { addedSuccessProduct, setAddedSuccessProduct, totalBasketCount, openSizeModal } = useBasket();
-  const { slider = [], shopProducts = [] } = useDataContext();
+  const { shopProducts = [] } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
-  // The trimmed slider data is merged with the full shopProducts data; matching ids
-  // (all 12 slider products also exist in products.json) are deduplicated by id
-  // so nothing shows twice (the full shopProducts version takes priority).
-  const allProducts = useMemo(() => {
-    const map = new Map();
-    [...slider, ...shopProducts].forEach((p) => {
-      if (p && p.id != null) map.set(p.id, { ...map.get(p.id), ...p });
-    });
-    return Array.from(map.values());
-  }, [slider, shopProducts]);
+  // shopProducts is the single product source now, use it directly.
+  const allProducts = shopProducts;
 
   // For the "Complete this product with..." section, real products from the data
   // are picked (same category first, if available) and shown as a stacked list.
-  const recommendedProducts = useMemo(() => {
-    if (!addedSuccessProduct) return [];
+  const recommendedProducts = !addedSuccessProduct ? [] : (() => {
     const pool = allProducts.filter((p) => p.id !== addedSuccessProduct.id);
     const sameCategory = pool.filter((p) => p.category === addedSuccessProduct.category);
     const rest = pool.filter((p) => p.category !== addedSuccessProduct.category);
     return [...sameCategory, ...rest].slice(0, 4);
-  }, [addedSuccessProduct, allProducts]);
+  })();
 
   if (!addedSuccessProduct) return null;
 

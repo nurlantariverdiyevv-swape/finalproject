@@ -1,7 +1,28 @@
 @import "tailwindcss";
 
+/* Fixed-position drawers/panels (size guide, basket, mobile menu, etc.) are
+   moved off-screen with translate-x-full while closed. On some browsers that
+   still leaves a sliver of them reachable via horizontal scroll, which shows
+   up as a thin grey "shadow" strip and scrollbar on the right edge of the
+   page. Locking horizontal scroll on the document root prevents that. */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   font-family: 'Inter', sans-serif;
+}
+
+#root {
+  overflow-x: clip;
+}
+
+/* Shimmer sweep used by ImageWithSkeleton's loading placeholder. */
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Page-transition fade-in: applied to the route content in Layout.jsx so
@@ -19,4 +40,17 @@ body {
 
 .route-fade-in {
   animation: route-fade-in 0.35s ease-out;
+}
+
+/* Used when a product card finishes its skeleton phase and swaps in its
+   real image/text - a small fade + rise so the swap doesn't feel abrupt. */
+@keyframes card-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

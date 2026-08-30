@@ -1,18 +1,44 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { useDataContext } from '../../context/DataContext';
 import { useWishlist } from '../../context/WishlistContext';
+import ImageWithSkeleton from '../ImageWithSkeleton';
 
 function ProductSlider({ onAddToCart }) {
   const [activeTab, setActiveTab] = useState('Shoes');
   const [selectedColors, setSelectedColors] = useState({});
   const sliderRef = useRef(null);
 
-  const { slider = [], fetchSlider } = useDataContext();
+  const { shopProducts = [], fetchShopProducts } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
-  const filteredProducts = slider.filter((product) => product.category === activeTab);
+  // "Recommended for you" = 6 random Shoes + 6 random Gear picked straight
+  // out of the same product catalogue as the rest of the site (no separate
+  // "featured" flag needed). Recomputed only when shopProducts changes, so
+  // the picks stay stable while browsing but reshuffle on every refresh.
+  const randomPicks = useMemo(() => {
+    const shuffle = (arr) => {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    };
+
+    const byCategory = { Shoes: [], Gear: [] };
+    shopProducts.forEach((product) => {
+      if (byCategory[product.category]) byCategory[product.category].push(product);
+    });
+
+    return {
+      Shoes: shuffle(byCategory.Shoes).slice(0, 6),
+      Gear: shuffle(byCategory.Gear).slice(0, 6),
+    };
+  }, [shopProducts]);
+
+  const filteredProducts = randomPicks[activeTab] || [];
 
   const handleScroll = (direction) => {
     if (sliderRef.current) {
@@ -40,8 +66,8 @@ function ProductSlider({ onAddToCart }) {
   };
 
   useEffect(() => {
-    fetchSlider();
-  }, [fetchSlider]);
+    fetchShopProducts();
+  }, [fetchShopProducts]);
 
   return (
     <section className="max-w-360 mx-auto px-4 md:px-10 py-10 select-none">
@@ -79,7 +105,7 @@ function ProductSlider({ onAddToCart }) {
             <Link key={identifier} to={`/product/${identifier}`} className="snap-start group min-w-[260px] sm:min-w-[300px] max-w-[320px] shrink-0 flex flex-col justify-between no-underline">
               <div>
                 <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-xs overflow-hidden mb-3">
-                  <img src={activeImage} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none" />
+                  <ImageWithSkeleton src={activeImage} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none" />
 
                   <button type="button" onClick={(e) => handleWishlistClick(e, product)} className="absolute top-3 right-3 p-1.5 rounded-full bg-white/70 hover:bg-white transition-colors cursor-pointer z-20" aria-label="Add to wishlist">
                     <Heart className={`w-5 h-5 transition-colors ${isLiked ? 'fill-black text-black' : 'text-gray-700'}`} />

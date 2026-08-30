@@ -1,8 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { Heart, ShoppingBag, SlidersHorizontal, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useDataContext } from '../../context/DataContext';
 import { useWishlist } from '../../context/WishlistContext';
+import NotFoundPage from './NotFoundPage';
+import ProductCardSkeleton from '../ProductCardSkeleton';
+import ShopProductCard from './ShopProductCard';
 
 // ------- Slug matching helpers -------
 const slugify = (str) => (str || '').toString().toLowerCase().trim().replace(/\s+/g, '-');
@@ -40,6 +43,23 @@ function matchesCategory(product, categoryName, categories) {
   return fields.some((f) => slugify(f) === slug);
 }
 
+// A /shop/:categoryName slug is only "real" if it's either one of the known
+// category rules from the API, or it matches at least one product's own
+// category/subCategory/subType/sub field somewhere in the FULL catalog
+// (i.e. not just the currently-filtered list). If neither is true, the slug
+// is a typo/dead link and should 404 instead of rendering an empty grid.
+function isValidCategorySlug(categoryName, categories, allProducts) {
+  if (!categoryName || categoryName.toLowerCase() === 'all') return true;
+
+  const slug = slugify(categoryName);
+  if (categories[slug]) return true;
+
+  return allProducts.some((product) => {
+    const fields = [product.category, product.subCategory, product.subType, product.sub];
+    return fields.some((f) => slugify(f) === slug);
+  });
+}
+
 // ------- Search-query matching -------
 function matchesSearch(product, searchTerm) {
   if (!searchTerm) return true;
@@ -56,7 +76,14 @@ function ShopPage({ onAddToCart }) {
   const [searchParams] = useSearchParams();
   const searchTerm = (searchParams.get('search') || '').trim();
 
-  const { shopProducts = [], fetchShopProducts, shopLoading, content, categories = {} } = useDataContext();
+  const {
+    shopProducts = [],
+    fetchShopProducts,
+    shopLoading,
+    content,
+    categories = {},
+    categoriesLoading,
+  } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
   const [showFilters, setShowFilters] = useState(true);
@@ -89,14 +116,13 @@ function ShopPage({ onAddToCart }) {
     }
   }, [isMobileFilterOpen]);
 
-  const categoryProducts = useMemo(() => {
-    if (!shopProducts || shopProducts.length === 0) return [];
-    return shopProducts
-      .filter((product) => matchesCategory(product, categoryName, categories))
-      .filter((product) => matchesSearch(product, searchTerm));
-  }, [shopProducts, categoryName, searchTerm, categories]);
+  const categoryProducts = !shopProducts || shopProducts.length === 0
+    ? []
+    : shopProducts
+        .filter((product) => matchesCategory(product, categoryName, categories))
+        .filter((product) => matchesSearch(product, searchTerm));
 
-  const availableSizes = useMemo(() => {
+  const availableSizes = (() => {
     const set = new Set();
     categoryProducts.forEach((product) => {
       product.sizes?.forEach((s) => {
@@ -107,9 +133,9 @@ function ShopPage({ onAddToCart }) {
     return Array.from(set).sort((a, b) =>
       a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
     );
-  }, [categoryProducts]);
+  })();
 
-  const availableTypes = useMemo(() => {
+  const availableTypes = (() => {
     const counts = new Map();
     categoryProducts.forEach((product) => {
       const type = product.subType;
@@ -119,7 +145,7 @@ function ShopPage({ onAddToCart }) {
     return Array.from(counts.entries())
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [categoryProducts]);
+  })();
 
   const handleSizeToggle = (sz) => {
     setSelectedSizes((prev) =>
@@ -139,30 +165,28 @@ function ShopPage({ onAddToCart }) {
     setSelectedTypes([]);
   };
 
-  const filteredProducts = useMemo(() => {
-    return categoryProducts
-      .filter((product) => {
-        if (selectedSizes.length > 0) {
-          const hasSize = product.sizes?.some((s) => {
-            const label = typeof s === 'object' ? s.label : s;
-            return selectedSizes.includes(label);
-          });
-          if (!hasSize) return false;
-        }
+  const filteredProducts = categoryProducts
+    .filter((product) => {
+      if (selectedSizes.length > 0) {
+        const hasSize = product.sizes?.some((s) => {
+          const label = typeof s === 'object' ? s.label : s;
+          return selectedSizes.includes(label);
+        });
+        if (!hasSize) return false;
+      }
 
-        if (selectedTypes.length > 0) {
-          if (!selectedTypes.includes(product.subType)) return false;
-        }
+      if (selectedTypes.length > 0) {
+        if (!selectedTypes.includes(product.subType)) return false;
+      }
 
-        return true;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'newest') return new Date(b.createdDate || 0) - new Date(a.createdDate || 0);
-        if (sortBy === 'price-low') return a.price - b.price;
-        if (sortBy === 'price-high') return b.price - a.price;
-        return 0;
-      });
-  }, [categoryProducts, selectedSizes, selectedTypes, sortBy]);
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'newest') return new Date(b.createdDate || 0) - new Date(a.createdDate || 0);
+      if (sortBy === 'price-low') return a.price - b.price;
+      if (sortBy === 'price-high') return b.price - a.price;
+      return 0;
+    });
 
   const handleCardColorChange = (e, productId, colorObj) => {
     e.preventDefault();
@@ -175,12 +199,28 @@ function ShopPage({ onAddToCart }) {
   const sortOptions = content?.shop?.sortOptions || [];
   const currentSortLabel = sortOptions.find((o) => o.id === sortBy)?.label || 'Featured';
 
+  // On first load (or a hard refresh) the product data itself hasn't come
+  // back from the API yet, so there's nothing real to show at all - fill
+  // the grid with plain skeleton cards instead of a "Loading..." message so
+  // the page's shape appears immediately.
   if (shopLoading && shopProducts.length === 0) {
     return (
-      <div className="max-w-[1600px] mx-auto px-4 md:px-12 py-20 text-center text-base font-medium text-gray-500">
-        Loading products...
+      <div className="max-w-[1600px] mx-auto px-4 md:px-12 py-4 md:py-6">
+        <div className="grid gap-x-3 gap-y-6 sm:gap-6 grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
+  }
+
+  // Only judge the slug once both the categories and the products have
+  // finished loading (or failed) - otherwise a real category could briefly
+  // 404 while its data is still in flight.
+  const categoryDataReady = !shopLoading && !categoriesLoading;
+  if (categoryName && categoryDataReady && !isValidCategorySlug(categoryName, categories, shopProducts)) {
+    return <NotFoundPage />;
   }
 
   const renderFilterContent = () => (
@@ -303,59 +343,22 @@ function ShopPage({ onAddToCart }) {
         <div className="flex-1">
           {filteredProducts.length > 0 ? (
             <div className={`grid gap-x-3 gap-y-6 sm:gap-6 grid-cols-2 ${showFilters ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
-              {filteredProducts.map((product) => {
+              {filteredProducts.map((product, index) => {
                 const identifier = product.id;
                 const activeColor = activeCardColors[identifier] || product.colors?.[0];
-                const activeImage = activeColor?.img || product.images?.[0] || product.img;
                 const isLiked = wishlist.some((item) => item.id === identifier);
 
                 return (
-                  <Link key={identifier} to={`/product/${identifier}`} className="group flex flex-col justify-between no-underline">
-                    <div>
-                      <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-xs overflow-hidden mb-2 md:mb-3">
-                        <img src={activeImage} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none" />
-
-                        <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product); }} className="absolute top-2 right-2 md:top-3 md:right-3 p-1 md:p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors cursor-pointer z-10">
-                          <Heart className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${isLiked ? 'fill-black text-black' : 'text-gray-700'}`} />
-                        </button>
-
-                        <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (onAddToCart) onAddToCart(product); }} className="absolute bottom-2 right-2 md:bottom-3 md:right-3 p-1.5 md:p-2 bg-white rounded-full shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer z-10">
-                          <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4 text-black" />
-                        </button>
-                      </div>
-
-                      <div className="flex flex-row flex-wrap items-center gap-1 mb-1.5 min-h-[22px] md:min-h-[28px]">
-                        {product.colors?.map((color, cIdx) => {
-                          const colorId = color.id || cIdx;
-                          const isActive = activeColor?.id === colorId || activeColor === color;
-                          return (
-                            <button type="button" key={colorId} onClick={(e) => handleCardColorChange(e, identifier, color)} className={`w-4 h-4 md:w-6 md:h-6 rounded-xs overflow-hidden border cursor-pointer transition-all ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>
-                              <img src={color.img} alt={color.name} className="w-full h-full object-cover pointer-events-none" />
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {product.badge && (
-                        <span className={`block text-[11px] md:text-xs font-semibold mb-0.5 ${product.badgeType === 'outlet' ? 'text-red-700' : 'text-red-600'}`}>
-                          {product.badge}
-                        </span>
-                      )}
-                      <h3 className="text-[13px] md:text-[16px] font-semibold text-black tracking-tight leading-snug group-hover:underline">
-                        {product.name}
-                      </h3>
-                      <p className="text-[11px] md:text-sm text-gray-500 font-normal mt-0.5">
-                        {product.sub || product.subCategory || product.category}
-                      </p>
-                    </div>
-
-                    <div className="mt-1.5 md:mt-2.5 flex items-center gap-1.5">
-                      <span className="text-[13px] md:text-[16px] font-semibold text-black">${product.price}</span>
-                      {product.oldPrice && (
-                        <span className="text-xs md:text-sm text-gray-400 line-through">${product.oldPrice}</span>
-                      )}
-                    </div>
-                  </Link>
+                  <ShopProductCard
+                    key={identifier}
+                    product={product}
+                    index={index}
+                    activeColor={activeColor}
+                    onColorChange={handleCardColorChange}
+                    isLiked={isLiked}
+                    onToggleWishlist={toggleWishlist}
+                    onAddToCart={onAddToCart}
+                  />
                 );
               })}
             </div>

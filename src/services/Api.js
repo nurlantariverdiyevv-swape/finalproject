@@ -8,12 +8,10 @@ const api = axios.create({
   baseURL: API_BASE,
 });
 
-const getSliderProduct = async () => {
-  const res = await api.get("productSlider");
-  return res.data;
-};
-
-// Fetches all products for ShopPage:
+// Fetches all products for ShopPage, ProductSlider, ProductDetail, search, basket, etc.
+// This is the single source of truth for product data - there is no separate
+// "productSlider" endpoint anymore. The homepage slider simply filters this
+// same list for items with `featured: true`.
 const getShopProducts = async () => {
   const res = await api.get("products");
   return res.data;
@@ -36,7 +34,6 @@ const getCategories = async () => {
 };
 
 export default {
-  getSliderProduct,
   getShopProducts,
   getContent,
   getCategories,

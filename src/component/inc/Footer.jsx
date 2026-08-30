@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { RiFacebookCircleFill, RiInstagramFill, RiYoutubeFill } from 'react-icons/ri';
 import { useDataContext } from '../../context/DataContext';
-import ShippingReturnsBar from './ShippingReturnsBar';
 
 function Footer() {
   // The footer columns are no longer hardcoded, they come from the Vercel
@@ -9,11 +10,15 @@ function Footer() {
   const { content } = useDataContext();
   const footerData = content?.footer || [];
 
+  // Mobile footer is an accordion: each section starts collapsed and opens
+  // on tap, toggled by its own chevron-down/chevron-up icon.
+  const [openSections, setOpenSections] = useState({});
+  const toggleSection = (title) => {
+    setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
+
   return (
     <footer className="font-sans">
-      {/* The "Free Returns / Free Shipping" bar above the footer (matches the real site) */}
-      <ShippingReturnsBar />
-
       <div className="bg-black text-white pt-12 pb-8 px-6 md:px-16">
       <div className="max-w-[1400px] mx-auto">
 
@@ -55,38 +60,81 @@ function Footer() {
           </div>
         </div>
 
-        {/* MOBILE VIEW (plain links, same as desktop - no expand/collapse) */}
+        {/* MOBILE VIEW: accordion sections, each toggled by its own up/down chevron */}
         <div className="md:hidden flex flex-col pb-8">
-          {footerData.map((section) => (
-            <div key={section.title} className="py-4 border-b border-[#333]">
-              <h3 className="font-bold text-[17px] text-white mb-3">{section.title}</h3>
-              <div className="flex flex-col gap-3">
-                {section.links.map((link) => (
-                  <Link
-                    key={link.label}
-                    to={link.path}
-                    className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+          {footerData.map((section) => {
+            const isOpen = !!openSections[section.title];
+            return (
+              <div key={section.title} className="border-b border-[#333]">
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.title)}
+                  aria-expanded={isOpen}
+                  className="w-full flex items-center justify-between py-4 cursor-pointer"
+                >
+                  <h3 className="font-bold text-[17px] text-white">{section.title}</h3>
+                  {isOpen ? (
+                    <ChevronUp size={20} className="text-white shrink-0" />
+                  ) : (
+                    <ChevronDown size={20} className="text-white shrink-0" />
+                  )}
+                </button>
+                <div
+                  className={`grid transition-all duration-300 ease-in-out ${
+                    isOpen ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="flex flex-col gap-3">
+                      {section.links.map((link) => (
+                        <Link
+                          key={link.label}
+                          to={link.path}
+                          className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Shipping Mobile - same accordion pattern */}
+          <div className="border-b border-[#333]">
+            <button
+              type="button"
+              onClick={() => toggleSection('Shipping')}
+              aria-expanded={!!openSections.Shipping}
+              className="w-full flex items-center justify-between py-4 cursor-pointer"
+            >
+              <h3 className="font-bold text-[17px] text-white">Shipping</h3>
+              {openSections.Shipping ? (
+                <ChevronUp size={20} className="text-white shrink-0" />
+              ) : (
+                <ChevronDown size={20} className="text-white shrink-0" />
+              )}
+            </button>
+            <div
+              className={`grid transition-all duration-300 ease-in-out ${
+                openSections.Shipping ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <Link to="/country-select" className="flex items-center gap-2.5 text-[15px] font-medium text-white">
+                  <svg className="w-6 h-4 rounded-[1px] object-cover" viewBox="0 0 640 480">
+                    <g fillRule="evenodd">
+                      <path fill="#bd3d44" d="M0 0h640v480H0z"/>
+                      <path fill="#fff" d="M0 36.9h640v36.9H0zm0 73.8h640v36.9H0zm0 73.9h640v36.9H0zm0 73.8h640v36.9H0zm0 73.9h640v36.9H0zm0 73.8h640v36.9H0z"/>
+                      <path fill="#192f5d" d="M0 0h256v258.5H0z"/>
+                    </g>
+                  </svg>
+                  <span>USA</span>
+                </Link>
               </div>
             </div>
-          ))}
-
-          {/* Shipping Mobile */}
-          <div className="py-4 border-b border-[#333]">
-            <h3 className="font-bold text-[17px] mb-3 text-white">Shipping</h3>
-            <Link to="/country-select" className="flex items-center gap-2.5 text-[15px] font-medium text-white">
-              <svg className="w-6 h-4 rounded-[1px] object-cover" viewBox="0 0 640 480">
-                <g fillRule="evenodd">
-                  <path fill="#bd3d44" d="M0 0h640v480H0z"/>
-                  <path fill="#fff" d="M0 36.9h640v36.9H0zm0 73.8h640v36.9H0zm0 73.9h640v36.9H0zm0 73.8h640v36.9H0zm0 73.9h640v36.9H0zm0 73.8h640v36.9H0z"/>
-                  <path fill="#192f5d" d="M0 0h256v258.5H0z"/>
-                </g>
-              </svg>
-              <span>USA</span>
-            </Link>
           </div>
         </div>
 

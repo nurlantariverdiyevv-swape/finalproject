@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, Plus, Minus, ChevronRight, Package, X } from 'lucide-react';
+import { Trash2, Plus, Minus, ChevronRight, Package, X, ShoppingBag } from 'lucide-react';
 import { useBasket } from '../../context/BasketContext';
 import { useDataContext } from '../../context/DataContext';
+import ImageWithSkeleton from '../ImageWithSkeleton';
 
 function InfoDrawer({ open, onClose, title, children }) {
   return (
     <>
-      <div onClick={onClose} className={`fixed inset-0 bg-black/40 z-[110] transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto ${open ? "translate-x-0" : "translate-x-full"}`}>
+      <div onClick={onClose} className={`fixed inset-0 bg-black/40 backdrop-blur-xs z-[110] transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
+      <div className={`fixed top-0 right-0 h-full w-full sm:max-w-md bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto text-black antialiased ${open ? "translate-x-0" : "translate-x-full"}`} style={{ fontFamily: "Inter, sans-serif" }}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h2 className="text-[14px] font-semibold text-black">{title}</h2>
+          <h2 className="text-[17px] leading-[1.3] font-bold text-black">{title}</h2>
           <button onClick={onClose} className="p-1 hover:opacity-70 cursor-pointer" aria-label="Close">
-            <X size={18} strokeWidth={1.5} />
+            <X size={20} className="text-black" strokeWidth={1.5} />
           </button>
         </div>
-        <div className="p-6 text-[11px] text-gray-700 leading-relaxed font-light">{children}</div>
+        <div className="p-6 text-[15px] text-gray-700 leading-relaxed font-light">{children}</div>
       </div>
     </>
   );
@@ -59,7 +60,7 @@ function BasketPage() {
                       
                       <div className="flex gap-4 items-start">
                         <Link to={`/product/${item.id}`} className="w-[96px] h-[96px] bg-[#f5f5f5] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center cursor-pointer">
-                          <img src={itemImage} alt={item.name} className="w-full h-full object-cover" />
+                          <ImageWithSkeleton src={itemImage} alt={item.name} className="w-full h-full object-cover" />
                         </Link>
 
                         <div className="flex flex-col gap-[3px]">
@@ -176,12 +177,27 @@ function BasketPage() {
 
           </div>
         ) : (
-          <div className="bg-white rounded-xl p-10 text-center border border-gray-200/80 max-w-xl mx-auto">
-            <h1 className="text-[14px] font-semibold mb-2 text-black">Your cart is empty</h1>
-            <p className="text-[11px] text-gray-500 mb-5 font-light">Discover our product range</p>
-            <Link to="/shop" className="px-6 py-[10px] bg-black text-white rounded-full text-[11px] font-semibold inline-block hover:bg-gray-800">
-              Start Shopping
-            </Link>
+          <div className="bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80 max-w-2xl mx-auto">
+            <div className="flex flex-col items-center justify-center text-center py-16">
+              <p className="text-[15px] text-gray-500 max-w-[400px] mb-6 font-light">
+                Items you add to your bag will show up here.
+              </p>
+
+              <Link
+                to="/shop"
+                className="bg-black text-white rounded-full px-8 py-[13px] font-semibold text-[15px] hover:bg-gray-800 transition-colors mb-12"
+              >
+                Start shopping
+              </Link>
+
+              <div className="flex flex-col items-center gap-2">
+                <ShoppingBag className="w-6 h-6 text-black" strokeWidth={1.5} />
+                <h2 className="font-bold text-[17px] text-black">Your cart is empty</h2>
+                <p className="text-[15px] text-gray-500 font-light">
+                  Discover our product range and start shopping!
+                </p>
+              </div>
+            </div>
           </div>
         )}
 

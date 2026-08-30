@@ -4,43 +4,19 @@ import Api from "../services/Api";
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-  const [slider, setSlider] = useState([]);
   const [shopProducts, setShopProducts] = useState([]);
   const [content, setContent] = useState(null);
   const [categories, setCategories] = useState({});
-  const [sliderLoading, setSliderLoading] = useState(false);
   const [shopLoading, setShopLoading] = useState(false);
   const [contentLoading, setContentLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [loaded, setLoaded] = useState({});
   const [apiNotConfigured, setApiNotConfigured] = useState(false);
 
-  const fetchSlider = async () => {
-    if (loaded.slider) return;
-    try {
-      setSliderLoading(true);
-      const sliderData = await Api.getSliderProduct();
-      const list = Array.isArray(sliderData)
-        ? sliderData
-        : Array.isArray(sliderData?.slider)
-        ? sliderData.slider
-        : null;
-      if (list) {
-        setSlider(list);
-        setLoaded((prev) => ({ ...prev, slider: true }));
-      } else {
-        // API_BASE in Api.js hasn't been set yet (the Vercel link is empty), or
-        // the backend isn't responding in the expected format - we keep it as an empty array instead of coercing it.
-        console.warn("Slider API did not return the expected format. Has API_BASE (Vercel link) been set in Api.js?", sliderData);
-        setApiNotConfigured(true);
-      }
-    } catch (error) {
-      console.error("Slider API Error:", error);
-      setApiNotConfigured(true);
-    } finally {
-      setSliderLoading(false);
-    }
-  };
-
+  // shopProducts is now the ONLY product dataset in the app (single source of
+  // truth). It comes from the /products endpoint and every screen - the
+  // homepage slider, the shop grid, product detail, search, basket - reads
+  // from it instead of each keeping/merging its own partial copy.
   const fetchShopProducts = async () => {
     if (loaded.shop) return;
     try {
@@ -96,6 +72,7 @@ export const DataProvider = ({ children }) => {
   const fetchCategories = async () => {
     if (loaded.categories) return;
     try {
+      setCategoriesLoading(true);
       const categoriesData = await Api.getCategories();
       const isValidObject = categoriesData && typeof categoriesData === "object" && !Array.isArray(categoriesData);
       if (isValidObject) {
@@ -108,15 +85,14 @@ export const DataProvider = ({ children }) => {
     } catch (error) {
       console.error("Categories API Error:", error);
       setApiNotConfigured(true);
+    } finally {
+      setCategoriesLoading(false);
     }
   };
 
   return (
     <DataContext.Provider
       value={{
-        slider,
-        fetchSlider,
-        sliderLoading,
         shopProducts,
         fetchShopProducts,
         shopLoading,
@@ -125,6 +101,7 @@ export const DataProvider = ({ children }) => {
         contentLoading,
         categories,
         fetchCategories,
+        categoriesLoading,
         // true means API_BASE in Api.js is still empty (or the backend
         // hasn't been deployed to Vercel yet) - the UI can surface this if it wants to.
         apiNotConfigured,
