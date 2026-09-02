@@ -37,11 +37,11 @@ function DesktopProductCard({ product, onNavigate }) {
   );
 }
 
-function MobileProductCard({ product }) {
+function MobileProductCard({ product, onNavigate }) {
   const activeColor = product.colors?.[0];
   const activeImage = activeColor?.img || product.images?.[0] || product.img;
   return (
-    <Link to={`/product/${product.id}`} className="flex flex-col no-underline">
+    <Link to={`/product/${product.id}`} onClick={onNavigate} className="flex flex-col no-underline">
       <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-xs overflow-hidden mb-2">
         <img src={activeImage} alt={product.name} className="w-full h-full object-cover" />
         <span className="absolute bottom-2 right-2 w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center">
@@ -231,7 +231,7 @@ export function MobileSearchOverlay({
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4">Best sellers</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                   {bestSellers.map((product) => (
-                    <MobileProductCard key={product.id} product={product} />
+                    <MobileProductCard key={product.id} product={product} onNavigate={closeSearch} />
                   ))}
                 </div>
               </>
@@ -255,7 +255,7 @@ export function MobileSearchOverlay({
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4">Results</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                   {searchResults.slice(0, SEARCH_RESULTS_PREVIEW_LIMIT).map((product) => (
-                    <MobileProductCard key={product.id} product={product} />
+                    <MobileProductCard key={product.id} product={product} onNavigate={closeSearch} />
                   ))}
                 </div>
 

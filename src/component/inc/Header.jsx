@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, User, Heart, Menu, ShoppingBag, X, ChevronRight, ArrowRight, HelpCircle, MapPin, Mail, LogOut } from 'lucide-react';
+import { Search, User, UserCheck, Heart, Menu, ShoppingBag, X, ChevronRight, ArrowRight, HelpCircle, MapPin, Mail, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
 import { useBasket } from '../../context/BasketContext';
@@ -149,7 +149,7 @@ function Header() {
   };
 
   return (
-    <header className="w-full bg-white border-b border-gray-100 select-none relative z-40">
+    <header className="w-full bg-white border-b border-gray-100 select-none sticky top-0 z-40">
       {/* 1. TOP ANNOUNCEMENT BAR */}
       <div className="w-full bg-[#0d0d0d] text-white text-[11px] sm:text-xs py-2 px-4 md:px-8 flex justify-between items-center tracking-wide font-light">
         <div className="hidden lg:block lg:w-1/3">
@@ -190,7 +190,7 @@ function Header() {
                   className="text-black p-1 hover:opacity-70 cursor-pointer"
                   aria-label="Account"
                 >
-                  <User size={24} strokeWidth={1.5} />
+                  <UserCheck size={24} strokeWidth={1.5} />
                 </button>
 
                 {mobileAccountMenuOpen && (
@@ -272,7 +272,7 @@ function Header() {
                   onClick={() => setAccountMenuOpen((prev) => !prev)}
                   className="flex items-center gap-2 text-black hover:opacity-70 cursor-pointer"
                 >
-                  <User size={20} strokeWidth={1.5} />
+                  <UserCheck size={20} strokeWidth={1.5} />
                   <span className="text-sm font-semibold">{user.displayName ? user.displayName.split(' ')[0] : 'Account'}</span>
                 </button>
 
@@ -354,7 +354,7 @@ function Header() {
                     onClick={() => { logout(); closeAllMenus(); }}
                     className="flex items-center gap-2 text-black font-medium text-sm cursor-pointer"
                   >
-                    <User size={18} />
+                    <UserCheck size={18} />
                     <span>Log out</span>
                   </button>
                 ) : (
@@ -447,7 +447,7 @@ function Header() {
             {user && (
               <div className="flex items-center justify-between text-sm font-medium text-black">
                 <div className="flex items-center gap-3">
-                  <User size={20} strokeWidth={1.5} />
+                  <UserCheck size={20} strokeWidth={1.5} />
                   <span className="truncate max-w-[160px]">{user.displayName ? user.displayName.split(' ')[0] : (user.email || 'My Account')}</span>
                 </div>
                 <button

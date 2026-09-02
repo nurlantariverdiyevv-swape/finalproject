@@ -200,20 +200,16 @@ function ShopPage({ onAddToCart }) {
   const currentSortLabel = sortOptions.find((o) => o.id === sortBy)?.label || 'Featured';
 
   // On first load (or a hard refresh) the product data itself hasn't come
-  // back from the API yet, so there's nothing real to show at all - fill
-  // the grid with plain skeleton cards instead of a "Loading..." message so
-  // the page's shape appears immediately.
-  if (shopLoading && shopProducts.length === 0) {
-    return (
-      <div className="max-w-[1600px] mx-auto px-4 md:px-12 py-4 md:py-6">
-        <div className="grid gap-x-3 gap-y-6 sm:gap-6 grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <ProductCardSkeleton key={i} />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  // back from the API yet. Previously this returned an early, DIFFERENT
+  // layout (skeleton grid only, no breadcrumb/title/filter sidebar) - once
+  // the real data arrived the page swapped to the full layout WITH the
+  // 280px filter sidebar, which suddenly took up horizontal space the
+  // skeleton grid didn't account for, visibly resizing/shifting every card.
+  // Now the loading state renders inside the exact same shell (breadcrumb,
+  // title, control bar, filter sidebar included) so nothing shifts width
+  // once the real content swaps in - only the skeleton pieces themselves
+  // get replaced.
+  const isInitialLoading = shopLoading && shopProducts.length === 0;
 
   // Only judge the slug once both the categories and the products have
   // finished loading (or failed) - otherwise a real category could briefly
@@ -222,6 +218,16 @@ function ShopPage({ onAddToCart }) {
   if (categoryName && categoryDataReady && !isValidCategorySlug(categoryName, categories, shopProducts)) {
     return <NotFoundPage />;
   }
+
+  const renderFilterSkeleton = () => (
+    <>
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="border-b border-gray-200 py-4">
+          <div className="h-4 w-2/3 rounded bg-gray-200 animate-pulse" />
+        </div>
+      ))}
+    </>
+  );
 
   const renderFilterContent = () => (
     <>
@@ -307,7 +313,9 @@ function ShopPage({ onAddToCart }) {
 
       {/* Page Title */}
       <h1 className="text-2xl md:text-4xl font-extrabold text-black uppercase tracking-tight mb-4 md:mb-6">
-        {searchTerm
+        {isInitialLoading ? (
+          <span className="inline-block h-8 w-56 rounded bg-gray-200 animate-pulse align-middle" />
+        ) : searchTerm
           ? `Results for "${searchTerm}"`
           : categoryName
             ? `${getCategoryLabel(categoryName, categories)} Collection`
@@ -327,7 +335,9 @@ function ShopPage({ onAddToCart }) {
         </button>
 
         <span className="text-xs md:text-sm font-semibold text-gray-800">
-          {filteredProducts.length} products
+          {isInitialLoading ? (
+            <span className="inline-block h-4 w-20 rounded bg-gray-200 animate-pulse align-middle" />
+          ) : `${filteredProducts.length} products`}
         </span>
       </div>
 
@@ -335,13 +345,19 @@ function ShopPage({ onAddToCart }) {
       <div className="flex gap-8 items-start">
         {showFilters && (
           <div className="hidden lg:block w-[280px] shrink-0 sticky top-6 max-h-[calc(100vh-100px)] overflow-y-auto pr-2">
-            {renderFilterContent()}
+            {isInitialLoading ? renderFilterSkeleton() : renderFilterContent()}
           </div>
         )}
 
         {/* PRODUCT GRID */}
         <div className="flex-1">
-          {filteredProducts.length > 0 ? (
+          {isInitialLoading ? (
+            <div className={`grid gap-x-3 gap-y-6 sm:gap-6 grid-cols-2 ${showFilters ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className={`grid gap-x-3 gap-y-6 sm:gap-6 grid-cols-2 ${showFilters ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
               {filteredProducts.map((product, index) => {
                 const identifier = product.id;

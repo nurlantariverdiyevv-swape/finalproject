@@ -7,9 +7,17 @@ export const DataProvider = ({ children }) => {
   const [shopProducts, setShopProducts] = useState([]);
   const [content, setContent] = useState(null);
   const [categories, setCategories] = useState({});
-  const [shopLoading, setShopLoading] = useState(false);
-  const [contentLoading, setContentLoading] = useState(false);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  // These start as `true` (not `false`) on purpose: on a hard refresh /
+  // direct URL visit, the very first render happens BEFORE the fetch
+  // effect has had a chance to run and flip loading to true. If the
+  // initial value were `false`, that one render would see
+  // "not loading, but data is empty" and pages like ProductDetail/ShopPage
+  // would briefly (and wrongly) show a "not found" / empty state before
+  // snapping to the real content once the fetch resolves. Starting `true`
+  // means that race window shows a normal loading state instead.
+  const [shopLoading, setShopLoading] = useState(true);
+  const [contentLoading, setContentLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [loaded, setLoaded] = useState({});
   const [apiNotConfigured, setApiNotConfigured] = useState(false);
 

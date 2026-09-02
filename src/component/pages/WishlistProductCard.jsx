@@ -76,7 +76,7 @@ function WishlistProductCard({ product, index, activeColor, onColorChange, onTog
                 {product.badge}
               </span>
             )}
-            <h3 className="text-[15px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black group-hover:underline">
+            <h3 className="text-[17px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black group-hover:underline">
               {product.name}
             </h3>
             <p className="text-[13px] text-gray-500 font-light mt-0.5">{product.sub}</p>
@@ -87,7 +87,7 @@ function WishlistProductCard({ product, index, activeColor, onColorChange, onTog
               <SkeletonBlock className="w-6 h-6" rounded="rounded-[4px]" />
               <SkeletonBlock className="w-6 h-6" rounded="rounded-[4px]" />
             </div>
-            <SkeletonBlock className="h-3.5 w-3/4 mb-1.5" />
+            <SkeletonBlock className="h-4 w-3/4 mb-1.5" />
             <SkeletonBlock className="h-3 w-1/2" />
           </div>
         )}

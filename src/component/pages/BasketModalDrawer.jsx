@@ -25,7 +25,7 @@ export function SizeSelectionModal() {
       <div className="w-full max-w-md bg-white h-full flex flex-col justify-between p-6 shadow-2xl animate-in slide-in-from-right duration-300 overflow-y-auto">
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-            <h2 className="text-[17px] leading-[1.3] font-bold text-black">Select size</h2>
+            <h2 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase text-black">Select size</h2>
             <button type="button" onClick={closeSizeModal} className="p-1 hover:opacity-70 cursor-pointer">
               <X size={20} className="text-black" strokeWidth={1.5} />
             </button>
@@ -36,7 +36,7 @@ export function SizeSelectionModal() {
               <img src={selectedImage} alt={sizeModalProduct.name} className="w-full h-full object-cover" />
             </div>
             <div>
-              <h3 className="text-[15px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black">{sizeModalProduct.name}</h3>
+              <h3 className="text-[17px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black">{sizeModalProduct.name}</h3>
               <p className="text-[13px] text-gray-500 font-light mt-0.5">Color: {selectedColor}</p>
               <p className="text-[15px] font-semibold text-black mt-1.5">${sizeModalProduct.price}</p>
             </div>
@@ -128,7 +128,7 @@ export function AddedToBagDrawer() {
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs text-black antialiased" style={{ fontFamily: "Inter, sans-serif" }}>
       <div className="w-full max-w-md bg-white h-full flex flex-col p-6 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300">
         <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-          <h2 className="text-[17px] leading-[1.3] font-bold text-black">Product added to your bag</h2>
+          <h2 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase text-black">Product added to your bag</h2>
           <button type="button" onClick={() => setAddedSuccessProduct(null)} className="p-1 hover:opacity-70 cursor-pointer">
             <X size={20} className="text-black" strokeWidth={1.5} />
           </button>
@@ -143,7 +143,7 @@ export function AddedToBagDrawer() {
             <img src={itemImage} alt={addedSuccessProduct.name} className="w-full h-full object-cover" />
           </div>
           <div>
-            <h3 className="text-[15px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black hover:underline">{addedSuccessProduct.name}</h3>
+            <h3 className="text-[17px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black hover:underline">{addedSuccessProduct.name}</h3>
             <p className="text-[13px] text-gray-500 font-light mt-0.5">{addedSuccessProduct.subCategory || 'Sneakers'} - Unisex</p>
             <div className="flex flex-col text-[13px] text-gray-500 font-light mt-0.5">
               <span>Size: {addedSuccessProduct.selectedSize}</span>

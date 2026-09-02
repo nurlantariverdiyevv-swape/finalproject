@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Star, Heart, X, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, RotateCcw, Sparkles } from "lucide-react";
 import { useDataContext } from "../../context/DataContext";
@@ -154,6 +155,13 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [lightbox, goPrev, goNext]);
 
+  useEffect(() => {
+    if (!lightbox) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prevOverflow; };
+  }, [lightbox]);
+
   return (
     <div className="w-full relative">
       <div className="relative w-full aspect-square bg-[#f7f7f7] rounded-xl overflow-hidden border border-gray-200/60 group">
@@ -177,7 +185,7 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
         )}
       </div>
 
-      {lightbox && (
+      {lightbox && createPortal(
         <div className="fixed inset-0 z-[200] bg-black/95 flex flex-col justify-between p-4 select-none">
           <div className="flex items-center justify-between text-white z-20">
             <span className="text-xs font-bold bg-white/10 px-3 py-1 rounded-full">{currentSlide + 1} / {total}</span>
@@ -199,7 +207,8 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -311,7 +320,7 @@ function ProductDetail() {
         <div className="lg:col-span-5 space-y-6">
           <div className="space-y-1.5">
             {product.badge && <span className="text-red-600 font-semibold text-sm block">{product.badge}</span>}
-            <h1 className="text-3xl sm:text-4xl font-bold uppercase tracking-tight text-black leading-none">{product.name}</h1>
+            <h1 className="font-heading-runova text-3xl sm:text-4xl font-bold uppercase tracking-tight text-black leading-none">{product.name}</h1>
             <p className="text-base text-gray-600 font-medium">{product.sub || product.subCategory || "Sneakers - Unisex"}</p>
             <div className="pt-1"><span className="text-2xl font-bold text-black">${product.price}</span></div>
 

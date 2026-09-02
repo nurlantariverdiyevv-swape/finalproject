@@ -26,7 +26,7 @@ function Footer() {
         <div className="hidden md:grid md:grid-cols-5 gap-8 pb-16">
           {footerData.map((section) => (
             <div key={section.title} className="flex flex-col gap-4">
-              <h3 className="font-bold text-[17px] text-white">{section.title}</h3>
+              <h3 className="font-bold text-[19px] uppercase text-white">{section.title}</h3>
               <div className="flex flex-col gap-3">
                 {section.links.map((link) => (
                   <Link
@@ -43,7 +43,7 @@ function Footer() {
 
           {/* Shipping Section */}
           <div className="flex flex-col gap-4">
-            <h3 className="font-bold text-[17px] text-white">Shipping</h3>
+            <h3 className="font-bold text-[19px] uppercase text-white">Shipping</h3>
             <Link to="/country-select" className="flex items-center gap-2.5 text-[15px] font-medium text-white">
               <svg className="w-6 h-4 rounded-[1px] object-cover" viewBox="0 0 640 480">
                 <g fillRule="evenodd">
@@ -72,7 +72,7 @@ function Footer() {
                   aria-expanded={isOpen}
                   className="w-full flex items-center justify-between py-4 cursor-pointer"
                 >
-                  <h3 className="font-bold text-[17px] text-white">{section.title}</h3>
+                  <h3 className="font-bold text-[19px] uppercase text-white">{section.title}</h3>
                   {isOpen ? (
                     <ChevronUp size={20} className="text-white shrink-0" />
                   ) : (
@@ -110,7 +110,7 @@ function Footer() {
               aria-expanded={!!openSections.Shipping}
               className="w-full flex items-center justify-between py-4 cursor-pointer"
             >
-              <h3 className="font-bold text-[17px] text-white">Shipping</h3>
+              <h3 className="font-bold text-[19px] uppercase text-white">Shipping</h3>
               {openSections.Shipping ? (
                 <ChevronUp size={20} className="text-white shrink-0" />
               ) : (

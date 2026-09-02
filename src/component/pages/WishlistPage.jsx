@@ -20,7 +20,7 @@ function WishlistPage({ onAddToCart }) {
       <div className="max-w-[1440px] mx-auto px-4 md:px-8">
         <div className="bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-[24px]">
-            <h1 className="text-[17px] leading-[1.3] font-bold text-black">
+            <h1 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase text-black">
               Your wishlist ({wishlist.length} {wishlist.length === 1 ? 'item' : 'items'})
             </h1>
 
@@ -69,7 +69,7 @@ function WishlistPage({ onAddToCart }) {
 
               <div className="flex flex-col items-center gap-2">
                 <Heart className="w-6 h-6 text-black" strokeWidth={1.5} />
-                <h2 className="font-bold text-[17px] text-black">Save your favorites</h2>
+                <h2 className="font-heading-runova font-bold text-[19px] uppercase text-black">Save your favorites</h2>
                 <p className="text-[15px] text-gray-500 font-light">
                   Add all the items you want to save and find them here!
                 </p>

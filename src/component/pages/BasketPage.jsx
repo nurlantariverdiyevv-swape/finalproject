@@ -11,7 +11,7 @@ function InfoDrawer({ open, onClose, title, children }) {
       <div onClick={onClose} className={`fixed inset-0 bg-black/40 backdrop-blur-xs z-[110] transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
       <div className={`fixed top-0 right-0 h-full w-full sm:max-w-md bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto text-black antialiased ${open ? "translate-x-0" : "translate-x-full"}`} style={{ fontFamily: "Inter, sans-serif" }}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h2 className="text-[17px] leading-[1.3] font-bold text-black">{title}</h2>
+          <h2 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase text-black">{title}</h2>
           <button onClick={onClose} className="p-1 hover:opacity-70 cursor-pointer" aria-label="Close">
             <X size={20} className="text-black" strokeWidth={1.5} />
           </button>
@@ -44,7 +44,7 @@ function BasketPage() {
             
             {/* SOL TƏRƏF */}
             <div className="lg:col-span-6 bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80">
-              <h1 className="text-[17px] leading-[1.3] font-bold mb-[24px] text-black">
+              <h1 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase mb-[24px] text-black">
                 Your bag ({totalItems} {totalItems === 1 ? 'item' : 'items'})
               </h1>
 
@@ -99,7 +99,7 @@ function BasketPage() {
 
             {/* RIGHT SIDE */}
             <div className="lg:col-span-6 bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80 sticky top-6">
-              <h2 className="text-[17px] leading-[1.3] font-bold mb-[24px] text-black">Order Summary</h2>
+              <h2 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase mb-[24px] text-black">Order Summary</h2>
 
               {/* PROMO CODE SECTION (OPTIMIZED) */}
               <div className="mb-5">
@@ -192,7 +192,7 @@ function BasketPage() {
 
               <div className="flex flex-col items-center gap-2">
                 <ShoppingBag className="w-6 h-6 text-black" strokeWidth={1.5} />
-                <h2 className="font-bold text-[17px] text-black">Your cart is empty</h2>
+                <h2 className="font-heading-runova font-bold text-[19px] uppercase text-black">Your cart is empty</h2>
                 <p className="text-[15px] text-gray-500 font-light">
                   Discover our product range and start shopping!
                 </p>

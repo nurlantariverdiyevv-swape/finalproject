@@ -68,7 +68,7 @@ function LoginPage() {
       <div className="max-w-md mx-auto px-4 py-10 sm:py-14">
         {/* rounded-2xl applied to the outer card */}
         <div className="border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8">
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-black mt-3 mb-8 leading-tight">
+          <h1 className="font-heading-runova text-3xl sm:text-4xl font-black tracking-tight text-black mt-3 mb-8 leading-tight">
             ACCESS YOUR<br />ACCOUNT
           </h1>
 

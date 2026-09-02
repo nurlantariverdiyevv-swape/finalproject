@@ -75,7 +75,7 @@ function ShopProductCard({ product, index, activeColor, onColorChange, isLiked, 
                 {product.badge}
               </span>
             )}
-            <h3 className="text-[13px] md:text-[16px] font-semibold text-black tracking-tight leading-snug group-hover:underline">
+            <h3 className="text-[15px] md:text-[18px] font-semibold text-black tracking-tight leading-snug group-hover:underline">
               {product.name}
             </h3>
             <p className="text-[11px] md:text-sm text-gray-500 font-normal mt-0.5">
@@ -88,7 +88,7 @@ function ShopProductCard({ product, index, activeColor, onColorChange, isLiked, 
               <SkeletonBlock className="w-4 h-4 md:w-6 md:h-6" rounded="rounded-xs" />
               <SkeletonBlock className="w-4 h-4 md:w-6 md:h-6" rounded="rounded-xs" />
             </div>
-            <SkeletonBlock className="h-3 md:h-4 w-3/4 mb-1.5" />
+            <SkeletonBlock className="h-3.5 md:h-[18px] w-3/4 mb-1.5" />
             <SkeletonBlock className="h-2.5 md:h-3 w-1/2" />
           </div>
         )}

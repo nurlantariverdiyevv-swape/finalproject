@@ -15,7 +15,7 @@ function ProductCardSkeleton() {
           <SkeletonBlock className="w-4 h-4 md:w-6 md:h-6" rounded="rounded-xs" />
           <SkeletonBlock className="w-4 h-4 md:w-6 md:h-6" rounded="rounded-xs" />
         </div>
-        <SkeletonBlock className="h-3 md:h-4 w-3/4 mb-1.5" />
+        <SkeletonBlock className="h-3.5 md:h-[18px] w-3/4 mb-1.5" />
         <SkeletonBlock className="h-2.5 md:h-3 w-1/2" />
       </div>
       <SkeletonBlock className="h-3 md:h-4 w-1/3 mt-1.5 md:mt-2.5" />

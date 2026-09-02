@@ -39,7 +39,7 @@ function Main({ onAddToCart }) {
         <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/30 to-transparent" />
 
         <div className="absolute inset-0 max-w-360 mx-auto p-4 sm:p-6 md:p-12 flex flex-col justify-center items-start text-white z-10">
-          <h1 className="text-xl sm:text-3xl md:text-5xl font-black tracking-wide uppercase max-w-xl mb-1.5 sm:mb-3 drop-shadow-md leading-tight">
+          <h1 className="font-heading-runova text-xl sm:text-3xl md:text-5xl font-black tracking-wide uppercase max-w-xl mb-1.5 sm:mb-3 drop-shadow-md leading-tight">
             X Ultra 5 Gore-Tex
           </h1>
           <p className="text-xs sm:text-base md:text-lg font-medium text-gray-200 mb-4 sm:mb-8 max-w-md drop-shadow-md">
@@ -100,7 +100,7 @@ function Main({ onAddToCart }) {
               <ImageWithSkeleton src={banner.image} alt={banner.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out opacity-90" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:bg-black/40 transition-colors duration-300" />
               <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 lg:p-12 flex flex-col items-start gap-3 z-10 text-white">
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight leading-tight drop-shadow-md">
+                <h2 className="font-heading-runova text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight leading-tight drop-shadow-md">
                   {banner.title}
                 </h2>
                 <p className="text-sm sm:text-base text-gray-200 font-light mb-2 drop-shadow">
