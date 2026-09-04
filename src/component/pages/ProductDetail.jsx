@@ -224,8 +224,8 @@ function ProductDetailsSection({ description, features = [], articleRef }) {
   return (
     <div className="pt-6 border-t border-gray-200">
       <div className="flex items-center gap-2 mb-5">
-        <span className="w-8 h-[2px] bg-black" />
-        <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">The Details</span>
+        <span className="w-10 h-[2px] bg-black" />
+        {/* <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">The Details</span> */}
       </div>
 
       {description && (
@@ -248,8 +248,6 @@ function ProductDetailsSection({ description, features = [], articleRef }) {
           ))}
         </div>
       )}
-
-      {articleRef && <p className="text-[11px] text-gray-400 mt-5 tracking-wide">STYLE Nº {articleRef}</p>}
     </div>
   );
 }
