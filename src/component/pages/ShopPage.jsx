@@ -339,7 +339,7 @@ function ShopPage({ onAddToCart }) {
         {isInitialLoading ? (
           <span className="inline-block h-8 w-56 rounded bg-gray-200 animate-pulse align-middle" />
         ) : searchTerm
-          ? `Results for "${searchTerm}"`
+          ? `Search results for "${searchTerm}"`
           : categoryName
             ? `${getCategoryLabel(categoryName, categories)} Collection`
             : 'All Products'}
@@ -400,6 +400,28 @@ function ShopPage({ onAddToCart }) {
                   />
                 );
               })}
+            </div>
+          ) : searchTerm ? (
+            <div className="text-center py-12 md:py-16">
+              <h2 className="text-xl md:text-2xl font-extrabold text-black mb-8">
+                Sorry, we didn&apos;t find any results.
+              </h2>
+              {(content?.header?.popularSearches || []).length > 0 && (
+                <>
+                  <h3 className="text-sm font-medium text-gray-500 mb-4">Popular searches</h3>
+                  <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+                    {content.header.popularSearches.map((term) => (
+                      <Link
+                        key={term}
+                        to={`/shop?search=${encodeURIComponent(term)}`}
+                        className="px-4 py-2 border border-gray-300 rounded-full text-sm font-semibold text-black capitalize hover:border-black transition-all"
+                      >
+                        {term}
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <div className="text-center py-20 text-gray-500 font-medium text-base">
