@@ -46,7 +46,7 @@ function SizeGuidePanel({ open, onClose, categoryLabel, maxRows, sizeGuideData =
       <div className={`fixed top-0 right-0 h-full w-full sm:w-[460px] bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-bold uppercase tracking-tight">{categoryLabel}</h2>
-          <button onClick={onClose} className="p-1 hover:opacity-70 cursor-pointer" aria-label="Close"><X size={22} strokeWidth={1.5} /></button>
+          <button type="button" onClick={onClose} className="p-1 hover:opacity-70 cursor-pointer" aria-label="Close"><X size={22} strokeWidth={1.5} /></button>
         </div>
         <div className="px-6 py-4">
           <div className="border-b border-gray-200 py-4">
@@ -169,17 +169,17 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
 
         {total > 1 && (
           <>
-            <button type="button" onClick={goPrev} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-black shadow-md flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-20"><ChevronLeft size={22} /></button>
-            <button type="button" onClick={goNext} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-black shadow-md flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-20"><ChevronRight size={22} /></button>
+            <button type="button" onClick={goPrev} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-black shadow-md flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-20" aria-label="Previous image"><ChevronLeft size={22} /></button>
+            <button type="button" onClick={goNext} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-black shadow-md flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-20" aria-label="Next image"><ChevronRight size={22} /></button>
           </>
         )}
 
-        <button type="button" onClick={() => setLightbox(true)} className="absolute top-3 right-3 p-2 rounded-full bg-white/80 text-black shadow-sm cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-20"><Maximize2 size={16} /></button>
+        <button type="button" onClick={() => setLightbox(true)} className="absolute top-3 right-3 p-2 rounded-full bg-white/80 text-black shadow-sm cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-20" aria-label="Fullscreen view"><Maximize2 size={16} /></button>
 
         {total > 1 && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/60 px-3 py-1.5 rounded-full z-20">
             {images.map((_, idx) => (
-              <button key={idx} type="button" onClick={() => setCurrentSlide(idx)} className={`h-1.5 rounded-full cursor-pointer transition-all ${idx === currentSlide ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />
+              <button key={idx} type="button" onClick={() => setCurrentSlide(idx)} className={`h-1.5 rounded-full cursor-pointer transition-all ${idx === currentSlide ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} aria-label={`Go to slide ${idx + 1}`} />
             ))}
           </div>
         )}
@@ -190,11 +190,11 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
           <div className="flex items-center justify-between text-white z-20">
             <span className="text-xs font-bold bg-white/10 px-3 py-1 rounded-full">{currentSlide + 1} / {total}</span>
             <div className="flex items-center gap-1 bg-white/10 p-1 rounded-full">
-              <button type="button" onClick={() => setScale(p => Math.min(p + 0.5, 3))} className="p-1.5 hover:bg-white/20 rounded-full text-white cursor-pointer"><ZoomIn size={16} /></button>
-              <button type="button" onClick={() => setScale(p => Math.max(p - 0.5, 1))} className="p-1.5 hover:bg-white/20 rounded-full text-white cursor-pointer"><ZoomOut size={16} /></button>
-              <button type="button" onClick={() => setScale(1)} className="p-1.5 hover:bg-white/20 rounded-full text-white cursor-pointer"><RotateCcw size={14} /></button>
+              <button type="button" onClick={() => setScale(p => Math.min(p + 0.5, 3))} className="p-1.5 hover:bg-white/20 rounded-full text-white cursor-pointer" aria-label="Zoom in"><ZoomIn size={16} /></button>
+              <button type="button" onClick={() => setScale(p => Math.max(p - 0.5, 1))} className="p-1.5 hover:bg-white/20 rounded-full text-white cursor-pointer" aria-label="Zoom out"><ZoomOut size={16} /></button>
+              <button type="button" onClick={() => setScale(1)} className="p-1.5 hover:bg-white/20 rounded-full text-white cursor-pointer" aria-label="Reset zoom"><RotateCcw size={14} /></button>
             </div>
-            <button type="button" onClick={() => setLightbox(false)} className="p-2 rounded-full bg-white/10 text-white cursor-pointer"><X size={20} /></button>
+            <button type="button" onClick={() => setLightbox(false)} className="p-2 rounded-full bg-white/10 text-white cursor-pointer" aria-label="Close modal"><X size={20} /></button>
           </div>
           <div className="relative flex-1 flex items-center justify-center my-2 overflow-hidden">
             <div style={{ transform: `scale(${scale})` }} className="transition-transform duration-200 max-h-full max-w-full flex items-center justify-center">
@@ -202,8 +202,8 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
             </div>
             {total > 1 && (
               <>
-                <button type="button" onClick={goPrev} className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 text-white cursor-pointer"><ChevronLeft size={24} /></button>
-                <button type="button" onClick={goNext} className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 text-white cursor-pointer"><ChevronRight size={24} /></button>
+                <button type="button" onClick={goPrev} className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 text-white cursor-pointer" aria-label="Previous image"><ChevronLeft size={24} /></button>
+                <button type="button" onClick={goNext} className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 text-white cursor-pointer" aria-label="Next image"><ChevronRight size={24} /></button>
               </>
             )}
           </div>
@@ -214,18 +214,13 @@ function ModernImageGallery({ images, currentSlide, setCurrentSlide, alt }) {
   );
 }
 
-// Description + feature data that lives in the product record, presented as
-// an editorial-style "details" block instead of a collapsible accordion: a
-// pull-quote style intro paragraph followed by a compact grid of feature
-// cards that invert to black on hover.
-function ProductDetailsSection({ description, features = [], articleRef }) {
+function ProductDetailsSection({ description, features = [] }) {
   if (!description && features.length === 0) return null;
 
   return (
     <div className="pt-6 border-t border-gray-200">
       <div className="flex items-center gap-2 mb-5">
         <span className="w-10 h-[2px] bg-black" />
-        {/* <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">The Details</span> */}
       </div>
 
       {description && (
@@ -237,10 +232,7 @@ function ProductDetailsSection({ description, features = [], articleRef }) {
       {features.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {features.map((feature, idx) => (
-            <div
-              key={idx}
-              className="p-3.5 rounded-xl bg-gray-50 hover:bg-black transition-colors duration-300 group"
-            >
+            <div key={idx} className="p-3.5 rounded-xl bg-gray-50 hover:bg-black transition-colors duration-300 group">
               <span className="text-sm leading-snug text-gray-800 group-hover:text-white transition-colors duration-300">
                 {feature}
               </span>
@@ -261,8 +253,6 @@ function ProductDetail() {
   const { wishlist, toggleWishlist } = useWishlist();
   const { addToBasket } = useBasket();
 
-  // The size chart and measuring steps are no longer hardcoded, they come
-  // from the Vercel API's content.json (content.productDetail).
   const sizeGuideData = content?.productDetail?.sizeGuide || [];
   const measureSteps = content?.productDetail?.measureSteps || [];
 
@@ -275,14 +265,11 @@ function ProductDetail() {
     fetchShopProducts();
   }, [fetchShopProducts]);
 
-  // shopProducts is the single source of truth now, so there's nothing to
-  // merge - just look the product up by id directly.
   const product = shopProducts.find((item) => String(item.id) === String(id));
   const isLiked = product ? wishlist.some((item) => item.id === product.id) : false;
   const isLoading = shopLoading && shopProducts.length === 0;
 
   if (isLoading && !product) return <div className="p-10 text-center font-bold">Loading...</div>;
-  // No product matches this :id -> broken/incorrect slug, show the 404 page.
   if (!product) return <NotFoundPage />;
 
   const categoryLabel = product.subCategory ? `${product.subCategory} Footwear` : "Footwear";
@@ -292,7 +279,6 @@ function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!selectedSize) return;
-    // If not logged in, redirect to the Login page before adding to the basket.
     if (!user) {
       navigate('/login', { state: { from: location.pathname } });
       return;
@@ -351,7 +337,7 @@ function ProductDetail() {
                   const label = typeof size === "object" ? size.label : size;
                   const inStock = typeof size === "object" ? size.inStock !== false : true;
                   return (
-                    <button key={idx} disabled={!inStock} onClick={() => setSelectedSize(label)} className={`py-3 text-sm font-semibold rounded-lg border cursor-pointer ${!inStock ? "border-gray-200 text-gray-300 line-through bg-gray-50" : selectedSize === label ? "border-black bg-white text-black ring-1 ring-black" : "border-gray-300 text-black hover:border-gray-400"}`}>
+                    <button key={idx} type="button" disabled={!inStock} onClick={() => setSelectedSize(label)} className={`py-3 text-sm font-semibold rounded-lg border cursor-pointer ${!inStock ? "border-gray-200 text-gray-300 line-through bg-gray-50" : selectedSize === label ? "border-black bg-white text-black ring-1 ring-black" : "border-gray-300 text-black hover:border-gray-400"}`}>
                       {label}
                     </button>
                   );
@@ -361,23 +347,16 @@ function ProductDetail() {
           )}
 
           <div className="space-y-2.5">
-            <button
-              onClick={handleAddToCart}
-              disabled={!selectedSize}
-              className={`w-full font-bold text-base py-3.5 rounded-full transition-colors uppercase ${selectedSize ? "bg-black text-white hover:bg-gray-800 cursor-pointer" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
-            >
+            <button type="button" onClick={handleAddToCart} disabled={!selectedSize} className={`w-full font-bold text-base py-3.5 rounded-full transition-colors uppercase ${selectedSize ? "bg-black text-white hover:bg-gray-800 cursor-pointer" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}>
               Add to cart
             </button>
-            <button onClick={() => toggleWishlist(product)} className="w-full border border-gray-300 font-bold text-base py-3 rounded-full flex items-center justify-center gap-2 hover:border-black cursor-pointer">
+            <button type="button" onClick={() => toggleWishlist(product)} className="w-full border border-gray-300 font-bold text-base py-3 rounded-full flex items-center justify-center gap-2 hover:border-black cursor-pointer">
               <Heart className={`w-5 h-5 ${isLiked ? "fill-red-500 text-red-500" : "text-black"}`} />
               <span>{isLiked ? "In Wishlist" : "Add to wishlist"}</span>
             </button>
           </div>
 
-          <ProductDetailsSection description={product.description} features={product.features} articleRef={product.articleRef} />
-
-          {/* This used to be 3 separate buttons + 3 separate InfoDrawers.
-              It all now lives inside the ProductInfoLinks component. */}
+          <ProductDetailsSection description={product.description} features={product.features} />
           <ProductInfoLinks />
         </div>
       </div>

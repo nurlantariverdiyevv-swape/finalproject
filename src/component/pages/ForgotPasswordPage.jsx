@@ -17,8 +17,6 @@ function ForgotPasswordPage() {
     setError('');
     setLoading(true);
 
-    // Sends a real email with Firebase's own reset link.
-    // The person can click the link in the email to set a new password.
     const { error: authError } = await resetPassword(email);
 
     setLoading(false);
@@ -45,10 +43,7 @@ function ForgotPasswordPage() {
                 If an account exists for <span className="font-semibold text-black">{email}</span>, we've sent a
                 password reset link to it. Open the email and follow the link to set a new password.
               </p>
-              <Link
-                to="/login"
-                className="block w-full text-center bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity"
-              >
+              <Link to="/login" className="block w-full text-center bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity">
                 Back to login
               </Link>
             </>
@@ -72,30 +67,16 @@ function ForgotPasswordPage() {
                   <label htmlFor="email" className="block text-sm font-bold text-black mb-2">
                     Email address <span className="text-[#c8102e]">*</span>
                   </label>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors"
-                  />
+                  <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
+                <button type="submit" disabled={loading} className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                   {loading && <Loader2 size={16} className="animate-spin" />}
                   <span>Continue</span>
                 </button>
               </form>
 
-              <Link
-                to="/login"
-                className="block text-sm text-black underline underline-offset-4 hover:text-gray-600 mt-6"
-              >
+              <Link to="/login" className="block text-sm text-black underline underline-offset-4 hover:text-gray-600 mt-6">
                 Back to login
               </Link>
             </>

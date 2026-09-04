@@ -5,8 +5,6 @@ import { useDataContext } from '../../context/DataContext';
 
 const ICONS = { package: Package, truck: Truck };
 
-// Fallback content so the bar never appears empty even if the backend
-// (content.json) hasn't been updated yet - content.infoBar from the API takes priority once available.
 const DEFAULT_ITEMS = [
   {
     icon: 'package',
@@ -30,11 +28,6 @@ const DEFAULT_ITEMS = [
   },
 ];
 
-// Matches the real site: "Free Returns Within 45 Days" /
-// "Free Shipping for R+ Members" rows above the footer, clicking opens
-// a right-side sliding panel (same style as the R+ modal in Header).
-// Content comes from content.json (content.infoBar); if the backend
-// hasn't been updated yet, DEFAULT_ITEMS is used so the bar is never missing.
 function ShippingReturnsBar({ variant = 'bar' }) {
   const { content } = useDataContext();
   const items = content?.infoBar?.length ? content.infoBar : DEFAULT_ITEMS;
@@ -53,14 +46,7 @@ function ShippingReturnsBar({ variant = 'bar' }) {
         {items.map((item, idx) => {
           const Icon = ICONS[item.icon] || Package;
           return (
-            <button
-              key={item.title}
-              type="button"
-              onClick={() => setActiveItem(item)}
-              className={`w-full flex items-center justify-between gap-3 px-4 sm:px-6 py-4 text-left text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer ${
-                idx === 0 ? 'sm:border-r border-b sm:border-b-0 border-gray-200' : ''
-              }`}
-            >
+            <button key={item.title} type="button" onClick={() => setActiveItem(item)} className={`w-full flex items-center justify-between gap-3 px-4 sm:px-6 py-4 text-left text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer ${idx === 0 ? 'sm:border-r border-b sm:border-b-0 border-gray-200' : ''}`}>
               <span className="flex items-center gap-3">
                 <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
                 <span>{item.title}</span>
@@ -72,23 +58,14 @@ function ShippingReturnsBar({ variant = 'bar' }) {
       </div>
 
       {/* RIGHT-SIDE SLIDING PANEL */}
-      <div
-        onClick={() => setActiveItem(null)}
-        className={`fixed inset-0 z-[100] bg-black/40 transition-opacity duration-300 ${
-          activeItem ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-      />
-      <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-[110] shadow-2xl transition-transform duration-300 transform overflow-y-auto ${
-          activeItem ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
+      <div onClick={() => setActiveItem(null)} className={`fixed inset-0 z-[100] bg-black/40 transition-opacity duration-300 ${activeItem ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} />
+      <div className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-[110] shadow-2xl transition-transform duration-300 transform overflow-y-auto ${activeItem ? 'translate-x-0' : 'translate-x-full'}`}>
         {activeItem && (
           <>
             <div className="flex items-start justify-between gap-4 px-6 py-6 border-b border-gray-100 sticky top-0 bg-white z-10">
               <h2 className="text-lg sm:text-xl font-bold text-black leading-snug">{activeItem.title}</h2>
-              <button type="button" onClick={() => setActiveItem(null)} className="shrink-0 p-1 hover:opacity-70 cursor-pointer" aria-label="Close">
-                <X size={22} className="text-black" strokeWidth={1.5} />
+              <button type="button" onClick={() => setActiveItem(null)} aria-label="Close" className="shrink-0 p-1 hover:opacity-70 cursor-pointer">
+                <X size={22} strokeWidth={1.5} className="text-black" />
               </button>
             </div>
             <div className="p-6 text-[15px] leading-relaxed text-black space-y-4">

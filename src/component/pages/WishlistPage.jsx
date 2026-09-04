@@ -15,7 +15,6 @@ function WishlistPage({ onAddToCart }) {
   };
 
   return (
-    // Same font (Inter) and same background/card style as the Basket page
     <div className="bg-[#f5f5f5] min-h-screen py-8 text-black antialiased">
       <div className="max-w-[1440px] mx-auto px-4 md:px-8">
         <div className="bg-white p-5 sm:p-[28px] rounded-xl border border-gray-200/80">
@@ -25,11 +24,7 @@ function WishlistPage({ onAddToCart }) {
             </h1>
 
             {wishlist.length > 0 && (
-              <button
-                type="button"
-                onClick={clearWishlist}
-                className="border border-gray-300 hover:border-black rounded-full px-5 py-[9px] text-[13px] font-semibold text-black transition-all cursor-pointer bg-white hover:bg-gray-50"
-              >
+              <button type="button" onClick={clearWishlist} className="border border-gray-300 hover:border-black rounded-full px-5 py-[9px] text-[13px] font-semibold text-black transition-all cursor-pointer bg-white hover:bg-gray-50">
                 Clear wishlist
               </button>
             )}
@@ -42,15 +37,7 @@ function WishlistPage({ onAddToCart }) {
                 const activeColor = selectedColors[identifier] || product.colors?.[0];
 
                 return (
-                  <WishlistProductCard
-                    key={identifier}
-                    product={product}
-                    index={index}
-                    activeColor={activeColor}
-                    onColorChange={changeColor}
-                    onToggleWishlist={toggleWishlist}
-                    onAddToCart={onAddToCart}
-                  />
+                  <WishlistProductCard key={identifier} product={product} index={index} activeColor={activeColor} onColorChange={changeColor} onToggleWishlist={toggleWishlist} onAddToCart={onAddToCart} />
                 );
               })}
             </div>
@@ -60,10 +47,7 @@ function WishlistPage({ onAddToCart }) {
                 Items added to your favorites will be on your wishlist.
               </p>
 
-              <Link
-                to="/"
-                className="bg-black text-white rounded-full px-8 py-[13px] font-semibold text-[15px] hover:bg-gray-800 transition-colors mb-12"
-              >
+              <Link to="/" className="bg-black text-white rounded-full px-8 py-[13px] font-semibold text-[15px] hover:bg-gray-800 transition-colors mb-12">
                 Continue shopping
               </Link>
 

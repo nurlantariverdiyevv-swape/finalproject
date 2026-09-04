@@ -4,16 +4,6 @@ import ImageWithSkeleton from '../ImageWithSkeleton';
 import SkeletonBlock from '../SkeletonBlock';
 import { useCardReveal } from '../../hooks/useCardReveal';
 
-/**
- * One card in the shop grid. Pulled out of ShopPage so it can have its own
- * useCardReveal() hook call (one per card instance) - that's not possible
- * to do safely for a variable-length list from inside .map() in the parent
- * component itself, since the number of hook calls has to stay constant
- * across renders.
- *
- * Until `ready`, every part of the card (image, swatches, badge, title,
- * subtitle, price) renders as a skeleton block instead of just the image.
- */
 function ShopProductCard({ product, index, activeColor, onColorChange, isLiked, onToggleWishlist, onAddToCart }) {
   const identifier = product.id;
   const activeImage = activeColor?.img || product.images?.[0] || product.img;
@@ -23,15 +13,7 @@ function ShopProductCard({ product, index, activeColor, onColorChange, isLiked, 
     <Link ref={ref} to={`/product/${identifier}`} className="group flex flex-col justify-between no-underline">
       <div>
         <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-xs overflow-hidden mb-2 md:mb-3">
-          {/* Mounted as soon as the card is armed, so the real image can
-              already be loading in the background while the skeleton
-              overlay below is still showing. */}
-          <ImageWithSkeleton
-            src={armed ? activeImage : undefined}
-            onSettled={notifySettled}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none"
-          />
+          <ImageWithSkeleton src={armed ? activeImage : undefined} onSettled={notifySettled} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none" />
 
           {!ready && (
             <div className="absolute inset-0 z-10">
@@ -39,19 +21,11 @@ function ShopProductCard({ product, index, activeColor, onColorChange, isLiked, 
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product); }}
-            className={`absolute top-2 right-2 md:top-3 md:right-3 p-1 md:p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors cursor-pointer z-20 ${ready ? '' : 'invisible'}`}
-          >
+          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product); }} className={`absolute top-2 right-2 md:top-3 md:right-3 p-1 md:p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors cursor-pointer z-20 ${ready ? '' : 'invisible'}`}>
             <Heart className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${isLiked ? 'fill-black text-black' : 'text-gray-700'}`} />
           </button>
 
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (onAddToCart) onAddToCart(product); }}
-            className={`absolute bottom-2 right-2 md:bottom-3 md:right-3 p-1.5 md:p-2 bg-white rounded-full shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer z-20 ${ready ? '' : 'invisible'}`}
-          >
+          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (onAddToCart) onAddToCart(product); }} className={`absolute bottom-2 right-2 md:bottom-3 md:right-3 p-1.5 md:p-2 bg-white rounded-full shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer z-20 ${ready ? '' : 'invisible'}`}>
             <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4 text-black" />
           </button>
         </div>
@@ -63,7 +37,7 @@ function ShopProductCard({ product, index, activeColor, onColorChange, isLiked, 
                 const colorId = color.id || cIdx;
                 const isActive = activeColor?.id === colorId || activeColor === color;
                 return (
-                  <button type="button" key={colorId} onClick={(e) => onColorChange(e, identifier, color)} className={`w-4 h-4 md:w-6 md:h-6 rounded-xs overflow-hidden border cursor-pointer transition-all ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>
+                  <button type="button" key={colorId} onClick={(e) => onColorChange(e, identifier, color)} className={`w-4 h-4 md:w-6 md:h-6 rounded-xs overflow-hidden border cursor-pointer transition-all ${isActive ? 'border-white scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>
                     <img src={color.img} alt={color.name} className="w-full h-full object-cover pointer-events-none" />
                   </button>
                 );

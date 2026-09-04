@@ -7,15 +7,8 @@ import NotFoundPage from './NotFoundPage';
 import ProductCardSkeleton from '../ProductCardSkeleton';
 import ShopProductCard from './ShopProductCard';
 
-// ------- Slug matching helpers -------
 const slugify = (str) => (str || '').toString().toLowerCase().trim().replace(/\s+/g, '-');
 
-// Category filter rules & labels (used to be two big hardcoded objects here)
-// now come from the API's /categories endpoint. Each entry looks like:
-//   { label: 'Men’s Running', match: { subCategory: 'Men', subType: 'running' } }
-// `match` fields are ANDed together; an array value means "match any of these" (OR).
-// `subType` is compared after slugify (since product subTypes are things like
-// "Trail Running"); other fields are compared as-is.
 function ruleMatches(product, match) {
   return Object.entries(match).every(([field, expected]) => {
     const actual = field === 'subType' ? slugify(product.subType) : product[field];
@@ -43,11 +36,6 @@ function matchesCategory(product, categoryName, categories) {
   return fields.some((f) => slugify(f) === slug);
 }
 
-// A /shop/:categoryName slug is only "real" if it's either one of the known
-// category rules from the API, or it matches at least one product's own
-// category/subCategory/subType/sub field somewhere in the FULL catalog
-// (i.e. not just the currently-filtered list). If neither is true, the slug
-// is a typo/dead link and should 404 instead of rendering an empty grid.
 function isValidCategorySlug(categoryName, categories, allProducts) {
   if (!categoryName || categoryName.toLowerCase() === 'all') return true;
 
@@ -60,7 +48,6 @@ function isValidCategorySlug(categoryName, categories, allProducts) {
   });
 }
 
-// ------- Search-query matching -------
 function matchesSearch(product, searchTerm) {
   if (!searchTerm) return true;
   const q = searchTerm.toLowerCase();
@@ -94,9 +81,6 @@ function ShopPage({ onAddToCart }) {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [activeCardColors, setActiveCardColors] = useState({});
 
-  // Stable random order for "Featured" sort. Shuffled once per product list
-  // (not recomputed on every render/filter toggle), so the order doesn't
-  // keep jumping around every time a filter checkbox is clicked.
   const featuredOrder = useMemo(() => {
     const ids = shopProducts.map((p) => p.id);
     for (let i = ids.length - 1; i > 0; i--) {
@@ -198,8 +182,6 @@ function ShopPage({ onAddToCart }) {
     })
     .sort((a, b) => {
       if (sortBy === 'newest') {
-        // "New" badged products always float to the top; within each group
-        // (new / not-new) fall back to createdDate where available.
         const aIsNew = a.badgeType === 'new' ? 1 : 0;
         const bIsNew = b.badgeType === 'new' ? 1 : 0;
         if (aIsNew !== bIsNew) return bIsNew - aIsNew;
@@ -217,26 +199,11 @@ function ShopPage({ onAddToCart }) {
     setActiveCardColors((prev) => ({ ...prev, [productId]: colorObj }));
   };
 
-  // Sort options are no longer hardcoded, they come from the Vercel
-  // API's content.json (content.shop.sortOptions).
   const sortOptions = content?.shop?.sortOptions || [];
   const currentSortLabel = sortOptions.find((o) => o.id === sortBy)?.label || 'Featured';
 
-  // On first load (or a hard refresh) the product data itself hasn't come
-  // back from the API yet. Previously this returned an early, DIFFERENT
-  // layout (skeleton grid only, no breadcrumb/title/filter sidebar) - once
-  // the real data arrived the page swapped to the full layout WITH the
-  // 280px filter sidebar, which suddenly took up horizontal space the
-  // skeleton grid didn't account for, visibly resizing/shifting every card.
-  // Now the loading state renders inside the exact same shell (breadcrumb,
-  // title, control bar, filter sidebar included) so nothing shifts width
-  // once the real content swaps in - only the skeleton pieces themselves
-  // get replaced.
   const isInitialLoading = shopLoading && shopProducts.length === 0;
 
-  // Only judge the slug once both the categories and the products have
-  // finished loading (or failed) - otherwise a real category could briefly
-  // 404 while its data is still in flight.
   const categoryDataReady = !shopLoading && !categoriesLoading;
   if (categoryName && categoryDataReady && !isValidCategorySlug(categoryName, categories, shopProducts)) {
     return <NotFoundPage />;
@@ -254,7 +221,6 @@ function ShopPage({ onAddToCart }) {
 
   const renderFilterContent = () => (
     <>
-      {/* SORT BY */}
       <div className="border-b border-gray-200 py-4">
         <button type="button" onClick={() => toggleSection('sort')} className="w-full flex items-center justify-between text-[16px] font-semibold text-black tracking-tight cursor-pointer">
           <span>Sort by: {currentSortLabel}</span>
@@ -275,7 +241,6 @@ function ShopPage({ onAddToCart }) {
         )}
       </div>
 
-      {/* SIZE */}
       <div className="border-b border-gray-200 py-4">
         <button type="button" onClick={() => toggleSection('size')} className="w-full flex items-center justify-between text-[16px] font-semibold text-black tracking-tight cursor-pointer">
           <span>Size</span>
@@ -297,7 +262,6 @@ function ShopPage({ onAddToCart }) {
         )}
       </div>
 
-      {/* TYPE OF PRODUCT */}
       <div className="border-b border-gray-200 py-4">
         <button type="button" onClick={() => toggleSection('type')} className="w-full flex items-center justify-between text-[16px] font-semibold text-black tracking-tight cursor-pointer">
           <span>Type of product</span>
@@ -325,7 +289,6 @@ function ShopPage({ onAddToCart }) {
 
   return (
     <div className="max-w-[1600px] mx-auto px-4 md:px-12 py-4 md:py-6 select-none">
-      {/* Breadcrumb */}
       <div className="text-xs text-gray-500 mb-2 flex items-center gap-1">
         <Link to="/" className="hover:underline">Home</Link>
         <span>/</span>
@@ -334,7 +297,6 @@ function ShopPage({ onAddToCart }) {
         </span>
       </div>
 
-      {/* Page Title */}
       <h1 className="text-2xl md:text-4xl font-extrabold text-black uppercase tracking-tight mb-4 md:mb-6">
         {isInitialLoading ? (
           <span className="inline-block h-8 w-56 rounded bg-gray-200 animate-pulse align-middle" />
@@ -345,7 +307,6 @@ function ShopPage({ onAddToCart }) {
             : 'All Products'}
       </h1>
 
-      {/* CONTROL BAR */}
       <div className="border-b border-gray-200 pb-3 mb-4 flex items-center justify-between">
         <button type="button" onClick={() => setIsMobileFilterOpen(true)} className="lg:hidden flex items-center gap-1.5 border border-gray-300 rounded-full px-4 py-1.5 text-xs font-semibold text-black hover:bg-black hover:text-white transition-all cursor-pointer">
           <SlidersHorizontal size={14} />
@@ -364,7 +325,6 @@ function ShopPage({ onAddToCart }) {
         </span>
       </div>
 
-      {/* MAIN CONTAINER */}
       <div className="flex gap-8 items-start">
         {showFilters && (
           <div className="hidden lg:block w-[280px] shrink-0 sticky top-6 max-h-[calc(100vh-100px)] overflow-y-auto pr-2">
@@ -372,7 +332,6 @@ function ShopPage({ onAddToCart }) {
           </div>
         )}
 
-        {/* PRODUCT GRID */}
         <div className="flex-1">
           {isInitialLoading ? (
             <div className={`grid gap-x-3 gap-y-6 sm:gap-6 grid-cols-2 ${showFilters ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
@@ -388,16 +347,7 @@ function ShopPage({ onAddToCart }) {
                 const isLiked = wishlist.some((item) => item.id === identifier);
 
                 return (
-                  <ShopProductCard
-                    key={identifier}
-                    product={product}
-                    index={index}
-                    activeColor={activeColor}
-                    onColorChange={handleCardColorChange}
-                    isLiked={isLiked}
-                    onToggleWishlist={toggleWishlist}
-                    onAddToCart={onAddToCart}
-                  />
+                  <ShopProductCard key={identifier} product={product} index={index} activeColor={activeColor} onColorChange={handleCardColorChange} isLiked={isLiked} onToggleWishlist={toggleWishlist} onAddToCart={onAddToCart} />
                 );
               })}
             </div>
@@ -411,11 +361,7 @@ function ShopPage({ onAddToCart }) {
                   <h3 className="text-sm font-medium text-gray-500 mb-4">Popular searches</h3>
                   <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
                     {content.header.popularSearches.map((term) => (
-                      <Link
-                        key={term}
-                        to={`/shop?search=${encodeURIComponent(term)}`}
-                        className="px-4 py-2 border border-gray-300 rounded-full text-sm font-semibold text-black capitalize hover:border-black transition-all"
-                      >
+                      <Link key={term} to={`/shop?search=${encodeURIComponent(term)}`} className="px-4 py-2 border border-gray-300 rounded-full text-sm font-semibold text-black capitalize hover:border-black transition-all">
                         {term}
                       </Link>
                     ))}
@@ -431,7 +377,6 @@ function ShopPage({ onAddToCart }) {
         </div>
       </div>
 
-      {/* RUNOVA MOBILE FILTER DRAWER */}
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-50 bg-white flex flex-col justify-between overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between shrink-0">

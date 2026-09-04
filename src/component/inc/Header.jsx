@@ -9,13 +9,12 @@ import { DesktopSearchOverlay, MobileSearchOverlay } from '../pages/SearchOverla
 
 function Header() {
   const navigate = useNavigate();
-  const { wishlist } = useWishlist();
-  const { totalBasketCount } = useBasket();
+  const { wishlist = [] } = useWishlist();
+  const { totalBasketCount = 0 } = useBasket();
   const { shopProducts = [], fetchShopProducts, content } = useDataContext();
   const { user, logout } = useAuth();
 
-  // Menu, banners, and search suggestions are no longer hardcoded,
-  // they come from the Vercel API's content.json (content.header).
+  // Dynamic content setup
   const categories = content?.header?.categories || [];
   const desktopMenuData = content?.header?.desktopMenuData || {};
   const popularSearches = content?.header?.popularSearches || [];
@@ -24,10 +23,16 @@ function Header() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // ------- HESAB DROPDOWN (Log out) -------
+  // Account Dropdown
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef(null);
 
+  // Modals & Search
+  const [splusModalOpen, setSplusModalOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Outside click listener for Account menu
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (accountMenuRef.current && !accountMenuRef.current.contains(e.target)) {
@@ -38,15 +43,35 @@ function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [accountMenuOpen]);
 
+  // Lock body scroll when mobile menu, search, or modal is active
+  useEffect(() => {
+    const isLocked = searchOpen || mobileMenuOpen || splusModalOpen || desktopMenuOpen;
+    document.body.style.overflow = isLocked ? 'hidden' : 'unset';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [searchOpen, mobileMenuOpen, splusModalOpen, desktopMenuOpen]);
+
+  // Escape key handler
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') {
+        closeSearch();
+        setDesktopMenuOpen(false);
+        setMobileMenuOpen(false);
+        setSplusModalOpen(false);
+        setAccountMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
   const handleLogout = () => {
     logout();
     setAccountMenuOpen(false);
+    closeAllMenus();
   };
-
-  // ------- R+ MEMBERS MODALI -------
-  const [splusModalOpen, setSplusModalOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleDesktopMenu = () => {
     setDesktopMenuOpen((prev) => !prev);
@@ -65,6 +90,7 @@ function Header() {
     setDesktopMenuOpen(false);
     setMobileMenuOpen(false);
     setActiveCategory(null);
+    setAccountMenuOpen(false);
   };
 
   const openSearch = () => {
@@ -78,24 +104,11 @@ function Header() {
     setSearchQuery('');
   };
 
-  useEffect(() => {
-    const handleKey = (e) => {
-      if (e.key === 'Escape') closeSearch();
-    };
-    if (searchOpen) window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [searchOpen]);
-
-  useEffect(() => {
-    document.body.style.overflow = searchOpen ? 'hidden' : 'unset';
-  }, [searchOpen]);
-
-  const allProducts = shopProducts;
-
+  // Search Logic
   const searchResults = (() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
-    return allProducts.filter((p) => {
+    return shopProducts.filter((p) => {
       const haystack = [p.name, p.sub, p.subCategory, p.subType, p.category]
         .filter(Boolean)
         .join(' ')
@@ -108,25 +121,16 @@ function Header() {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
     const names = new Set();
-    allProducts.forEach((p) => {
+    shopProducts.forEach((p) => {
       if (p.name && p.name.toLowerCase().includes(q)) names.add(p.name);
     });
     return Array.from(names).slice(0, 5);
   })();
 
-  const bestSellers = allProducts.slice(0, 5);
-
-  // Max number of search results shown in the dropdown
+  const bestSellers = shopProducts.slice(0, 5);
   const SEARCH_RESULTS_PREVIEW_LIMIT = 5;
-
   const seeAllResultsLink = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
 
-  // "Find a store" / "Get exclusive news" / "Help" all point at the home
-  // page ("/"). If the person is already on "/" (e.g. scrolled down to the
-  // footer), a <Link to="/"> is a no-op for react-router since the pathname
-  // doesn't change - nothing visibly happens, which feels broken. Scrolling
-  // to the top here makes the click always do something noticeable, whether
-  // or not the route itself changes.
   const goHome = () => {
     closeAllMenus();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -148,11 +152,7 @@ function Header() {
         </div>
 
         <div className="w-full lg:w-1/3 text-center">
-          <button
-            type="button"
-            onClick={() => setSplusModalOpen(true)}
-            className="underline underline-offset-4 hover:text-gray-300 transition-all cursor-pointer bg-transparent border-0 p-0 text-white text-[11px] sm:text-xs font-light tracking-wide"
-          >
+          <button type="button" onClick={() => setSplusModalOpen(true)} className="underline underline-offset-4 hover:text-gray-300 transition-all cursor-pointer bg-transparent border-0 p-0 text-white text-[11px] sm:text-xs font-light tracking-wide">
             R+ Members: Free Shipping and More
           </button>
         </div>
@@ -172,7 +172,7 @@ function Header() {
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link to="/basket" onClick={closeAllMenus} className="relative text-black p-1 hover:opacity-70">
+            <Link to="/basket" onClick={closeAllMenus} aria-label="Basket" className="relative text-black p-1 hover:opacity-70">
               <ShoppingBag size={24} strokeWidth={1.5} />
               {totalBasketCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#c8102e] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -180,7 +180,7 @@ function Header() {
                 </span>
               )}
             </Link>
-            <button onClick={() => setMobileMenuOpen(true)} className="text-black p-1 hover:opacity-70 cursor-pointer">
+            <button onClick={() => setMobileMenuOpen(true)} aria-label="Open Menu" className="text-black p-1 hover:opacity-70 cursor-pointer">
               <Menu size={26} strokeWidth={1.5} />
             </button>
           </div>
@@ -223,24 +223,20 @@ function Header() {
 
           <div className="flex items-center justify-end gap-6 w-1/3">
             {user ? (
-              <div className="relative" ref={accountMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setAccountMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 text-black hover:opacity-70 cursor-pointer"
-                >
+              <div ref={accountMenuRef} className="relative">
+                <button type="button" onClick={() => setAccountMenuOpen((prev) => !prev)} className="flex items-center gap-2 text-black hover:opacity-70 cursor-pointer">
                   <UserCheck size={20} strokeWidth={1.5} />
                   <span className="text-sm font-semibold">{user.displayName ? user.displayName.split(' ')[0] : 'Account'}</span>
                 </button>
 
-                {/* Dropdown that opens when clicking the account name - Log out lives here */}
+                {/* Account Dropdown */}
                 {accountMenuOpen && (
-                  <div className="absolute right-0 top-full mt-3 w-44 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1 animate-[fadeIn_0.15s_ease-out]">
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 cursor-pointer"
-                    >
+                  <div className="absolute right-0 top-full mt-3 w-48 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1 animate-[fadeIn_0.15s_ease-out]">
+                    <Link to="/profile" onClick={() => setAccountMenuOpen(false)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 border-b border-gray-100">
+                      <User size={16} strokeWidth={1.5} />
+                      <span>My Profile</span>
+                    </Link>
+                    <button type="button" onClick={handleLogout} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 cursor-pointer">
                       <LogOut size={16} strokeWidth={1.5} />
                       <span>Log out</span>
                     </button>
@@ -254,7 +250,7 @@ function Header() {
               </Link>
             )}
 
-            <Link to="/wishlist" className="relative hover:opacity-70 text-black">
+            <Link to="/wishlist" aria-label="Wishlist" className="relative hover:opacity-70 text-black">
               <Heart size={22} strokeWidth={1.5} />
               {wishlist.length > 0 && (
                 <span className="absolute -top-1.5 -right-2 bg-[#c8102e] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -263,7 +259,7 @@ function Header() {
               )}
             </Link>
 
-            <Link to="/basket" className="relative hover:opacity-70 text-black">
+            <Link to="/basket" aria-label="Basket" className="relative hover:opacity-70 text-black">
               <ShoppingBag size={22} strokeWidth={1.5} />
               {totalBasketCount > 0 && (
                 <span className="absolute -top-1.5 -right-2 bg-[#c8102e] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -275,7 +271,7 @@ function Header() {
         </nav>
       </div>
 
-      {/* 4. FULL SCREEN DRAWER MENYU */}
+      {/* 4. FULL SCREEN DESKTOP DRAWER MENU */}
       {desktopMenuOpen && (
         <div className="hidden lg:block fixed inset-0 z-[100] h-screen w-screen overflow-hidden">
           <div onClick={closeAllMenus} className="absolute inset-0 bg-black/40 transition-opacity duration-300" />
@@ -306,11 +302,7 @@ function Header() {
 
               <div className="pt-6 border-t border-gray-100 flex items-center justify-between mt-auto">
                 {user ? (
-                  <button
-                    type="button"
-                    onClick={() => { logout(); closeAllMenus(); }}
-                    className="flex items-center gap-2 text-black font-medium text-sm cursor-pointer"
-                  >
+                  <button type="button" onClick={handleLogout} className="flex items-center gap-2 text-black font-medium text-sm cursor-pointer">
                     <UserCheck size={18} />
                     <span>Log out</span>
                   </button>
@@ -328,7 +320,7 @@ function Header() {
               <div className="flex flex-1 overflow-hidden h-full animate-[fadeIn_0.2s_ease-out]">
                 <div className="w-[260px] border-r border-gray-100 p-8 overflow-y-auto shrink-0 bg-white h-full">
                   <div className="flex flex-col gap-4">
-                    {desktopMenuData[activeCategory].subCategories.map((sub, i) => (
+                    {desktopMenuData[activeCategory].subCategories?.map((sub, i) => (
                       <Link key={i} to={sub.link} onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-gray-800 hover:text-black py-1 transition-colors">
                         <span>{sub.name}</span>
                         <ChevronRight size={16} className="text-gray-400" />
@@ -338,7 +330,7 @@ function Header() {
                 </div>
 
                 <div className="flex-1 p-8 overflow-y-auto bg-white flex flex-col gap-5 justify-start h-full">
-                  {desktopMenuData[activeCategory].banners.map((banner, i) => (
+                  {desktopMenuData[activeCategory].banners?.map((banner, i) => (
                     <Link key={i} to={banner.link} onClick={closeAllMenus} className="group relative w-full h-[220px] overflow-hidden rounded-sm block bg-gray-900 shadow-sm shrink-0">
                       <img src={banner.img} alt={banner.title} className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-5">
@@ -362,7 +354,7 @@ function Header() {
       <div onClick={closeAllMenus} className={`lg:hidden fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} />
 
       <div className={`lg:hidden fixed top-0 right-0 h-full w-[85%] sm:w-[380px] bg-white z-50 shadow-2xl transition-transform duration-300 transform flex flex-col ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="p-4 flex items-center gap-3">
+        <div className="p-4 flex items-center gap-3 border-b border-gray-100">
           <button type="button" onClick={openSearch} className="relative flex-1 text-left cursor-pointer">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
               <Search size={18} strokeWidth={1.8} />
@@ -382,7 +374,7 @@ function Header() {
             {categories.slice(0, 5).map((category, idx) => (
               <Link key={idx} to={`/shop/${category.toLowerCase()}`} onClick={closeAllMenus} className="py-3 flex items-center justify-between text-base font-bold text-black border-b border-transparent">
                 <span>{category}</span>
-                <ChevronRight size={18} className="text-black" strokeWidth={1.5} />
+                <ChevronRight size={18} strokeWidth={1.5} className="text-black" />
               </Link>
             ))}
           </div>
@@ -393,27 +385,27 @@ function Header() {
             {categories.slice(5).map((category, idx) => (
               <Link key={idx} to={`/shop/${category.toLowerCase()}`} onClick={closeAllMenus} className="py-3 flex items-center justify-between text-base font-medium text-black">
                 <span>{category}</span>
-                <ChevronRight size={18} className="text-black" strokeWidth={1.5} />
+                <ChevronRight size={18} strokeWidth={1.5} className="text-black" />
               </Link>
             ))}
           </div>
 
           <div className="mt-auto pt-8 pb-6 flex flex-col gap-5">
-            {/* Login/Logout now lives here in the menu instead of the top
-                mobile bar, so the top bar only has Basket + Menu (keeps the
-                logo from getting squeezed for space). */}
             {user ? (
-              <div className="flex items-center justify-between text-sm font-medium text-black">
-                <div className="flex items-center gap-3">
-                  <UserCheck size={20} strokeWidth={1.5} />
-                  <span className="truncate max-w-[160px]">{user.displayName ? user.displayName.split(' ')[0] : (user.email || 'My Account')}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => { logout(); closeAllMenus(); }}
-                  className="text-xs font-bold text-gray-500 hover:text-black underline underline-offset-4 cursor-pointer"
-                >
-                  Log out
+              <div className="flex flex-col gap-3 pt-2 border-t border-gray-100">
+                <Link to="/profile" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+                  <div className="flex items-center gap-3">
+                    <UserCheck size={20} strokeWidth={1.5} />
+                    <span className="truncate max-w-[180px]">
+                      {user.displayName ? user.displayName.split(' ')[0] : (user.email || 'My Profile')}
+                    </span>
+                  </div>
+                  <ChevronRight size={16} strokeWidth={1.5} className="text-black" />
+                </Link>
+
+                <button type="button" onClick={handleLogout} className="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 cursor-pointer pt-1">
+                  <LogOut size={14} />
+                  <span>Log out</span>
                 </button>
               </div>
             ) : (
@@ -422,7 +414,7 @@ function Header() {
                   <User size={20} strokeWidth={1.5} />
                   <span>Log in</span>
                 </div>
-                <ChevronRight size={16} className="text-black" strokeWidth={1.5} />
+                <ChevronRight size={16} strokeWidth={1.5} className="text-black" />
               </Link>
             )}
 
@@ -445,7 +437,7 @@ function Header() {
                 <HelpCircle size={20} strokeWidth={1.5} />
                 <span>Help</span>
               </div>
-              <ChevronRight size={16} className="text-black" strokeWidth={1.5} />
+              <ChevronRight size={16} strokeWidth={1.5} className="text-black" />
             </Link>
 
             <Link to="/" onClick={goHome} className="flex items-center gap-3 text-sm font-medium text-black">
@@ -490,28 +482,16 @@ function Header() {
         seeAllResultsLink={seeAllResultsLink}
       />
 
-      {/* 8. R+ MEMBERS MODAL (right-side sliding panel, matches the real site) */}
+      {/* 8. R+ MEMBERS MODAL */}
       {splusModalOpen && (
-        <div
-          className="fixed inset-0 z-[60] flex justify-end bg-black/40"
-          onClick={() => setSplusModalOpen(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md bg-white h-full shadow-2xl p-6 sm:p-8 overflow-y-auto animate-in slide-in-from-right duration-300"
-           
-          >
+        <div onClick={() => setSplusModalOpen(false)} className="fixed inset-0 z-[60] flex justify-end bg-black/40">
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md bg-white h-full shadow-2xl p-6 sm:p-8 overflow-y-auto animate-in slide-in-from-right duration-300">
             <div className="flex items-start justify-between gap-4 mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-black leading-snug">
                 R+ Members: Free Shipping and More
               </h2>
-              <button
-                type="button"
-                onClick={() => setSplusModalOpen(false)}
-                className="shrink-0 p-1 hover:opacity-70 cursor-pointer"
-                aria-label="Close"
-              >
-                <X size={22} className="text-black" strokeWidth={1.5} />
+              <button type="button" onClick={() => setSplusModalOpen(false)} aria-label="Close" className="shrink-0 p-1 hover:opacity-70 cursor-pointer">
+                <X size={22} strokeWidth={1.5} className="text-black" />
               </button>
             </div>
 
@@ -524,11 +504,7 @@ function Header() {
                 +50 bonus points are only applicable to new members. Unfortunately, we cannot accommodate PO, FPO,
                 or APO boxes at this time.
               </p>
-              <Link
-                to="/register"
-                onClick={() => setSplusModalOpen(false)}
-                className="inline-block font-semibold underline underline-offset-4 hover:text-gray-600"
-              >
+              <Link to="/register" onClick={() => setSplusModalOpen(false)} className="inline-block font-semibold underline underline-offset-4 hover:text-gray-600">
                 Click here to sign up.
               </Link>
             </div>

@@ -5,23 +5,14 @@ import { RiFacebookCircleFill, RiInstagramFill, RiYoutubeFill } from 'react-icon
 import { useDataContext } from '../../context/DataContext';
 
 function Footer() {
-  // The footer columns are no longer hardcoded, they come from the Vercel
-  // API's content.json (content.footer).
   const { content } = useDataContext();
   const footerData = content?.footer || [];
 
-  // Mobile footer is an accordion: each section starts collapsed and opens
-  // on tap, toggled by its own chevron-down/chevron-up icon.
   const [openSections, setOpenSections] = useState({});
   const toggleSection = (title) => {
     setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
   };
 
-  // These links all point at "/". If you're already on the home page (very
-  // likely, since you'd have had to scroll all the way down to the footer
-  // to see them), a <Link to="/"> is a no-op for react-router - nothing
-  // visibly happens. Scrolling to the top makes the click always do
-  // something, whether or not the route itself changes.
   const goHome = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
@@ -36,12 +27,7 @@ function Footer() {
                 <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">{section.title}</h3>
                 <div className="flex flex-col gap-3">
                   {section.links.map((link) => (
-                    <Link
-                      key={link.label}
-                      to="/"
-                      onClick={goHome}
-                      className="text-[15px] font-medium text-[#e5e5e5] hover:text-white transition-colors"
-                    >
+                    <Link key={link.label} to="/" onClick={goHome} className="text-[15px] font-medium text-[#e5e5e5] hover:text-white transition-colors">
                       {link.label}
                     </Link>
                   ))}
@@ -68,18 +54,13 @@ function Footer() {
             </div>
           </div>
 
-          {/* MOBILE VIEW: accordion sections, each toggled by its own up/down chevron */}
+          {/* MOBILE VIEW */}
           <div className="md:hidden flex flex-col pb-8">
             {footerData.map((section) => {
               const isOpen = !!openSections[section.title];
               return (
                 <div key={section.title} className="border-b border-[#333]">
-                  <button
-                    type="button"
-                    onClick={() => toggleSection(section.title)}
-                    aria-expanded={isOpen}
-                    className="w-full flex items-center justify-between py-4 cursor-pointer"
-                  >
+                  <button type="button" onClick={() => toggleSection(section.title)} aria-expanded={isOpen} className="w-full flex items-center justify-between py-4 cursor-pointer">
                     <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">{section.title}</h3>
                     {isOpen ? (
                       <ChevronUp size={20} className="text-white shrink-0" />
@@ -87,19 +68,11 @@ function Footer() {
                       <ChevronDown size={20} className="text-white shrink-0" />
                     )}
                   </button>
-                  <div
-                    className={`grid transition-all duration-300 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"
-                      }`}
-                  >
+                  <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"}`}>
                     <div className="overflow-hidden">
                       <div className="flex flex-col gap-3">
                         {section.links.map((link) => (
-                          <Link
-                            key={link.label}
-                            to="/"
-                            onClick={goHome}
-                            className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block"
-                          >
+                          <Link key={link.label} to="/" onClick={goHome} className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block">
                             {link.label}
                           </Link>
                         ))}
@@ -110,14 +83,9 @@ function Footer() {
               );
             })}
 
-            {/* Shipping Mobile - same accordion pattern */}
+            {/* Shipping Mobile */}
             <div className="border-b border-[#333]">
-              <button
-                type="button"
-                onClick={() => toggleSection('Shipping')}
-                aria-expanded={!!openSections.Shipping}
-                className="w-full flex items-center justify-between py-4 cursor-pointer"
-              >
+              <button type="button" onClick={() => toggleSection('Shipping')} aria-expanded={!!openSections.Shipping} className="w-full flex items-center justify-between py-4 cursor-pointer">
                 <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">Shipping</h3>
                 {openSections.Shipping ? (
                   <ChevronUp size={20} className="text-white shrink-0" />
@@ -125,10 +93,7 @@ function Footer() {
                   <ChevronDown size={20} className="text-white shrink-0" />
                 )}
               </button>
-              <div
-                className={`grid transition-all duration-300 ease-in-out ${openSections.Shipping ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"
-                  }`}
-              >
+              <div className={`grid transition-all duration-300 ease-in-out ${openSections.Shipping ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"}`}>
                 <div className="overflow-hidden">
                   <Link to="/country-select" className="flex items-center gap-2.5 text-[15px] font-medium text-white">
                     <svg className="w-6 h-4 rounded-[1px] object-cover" viewBox="0 0 640 480">
@@ -145,9 +110,8 @@ function Footer() {
             </div>
           </div>
 
-          {/* BOTTOM SECTION AND THIN GRAY DIVIDER */}
+          {/* BOTTOM SECTION */}
           <div className="pt-8 border-t border-[#333] flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Social Media Icons */}
             <div className="flex items-center gap-5 w-full md:w-auto">
               <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity">
                 <RiFacebookCircleFill className="w-8 h-8 text-white" />
@@ -160,7 +124,6 @@ function Footer() {
               </a>
             </div>
 
-            {/* Copyright Text */}
             <div className="text-[14px] text-[#e5e5e5] w-full md:w-auto text-left md:text-center">
               ©2026 Runova. All rights reserved.
             </div>

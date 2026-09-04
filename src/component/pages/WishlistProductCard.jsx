@@ -4,11 +4,6 @@ import ImageWithSkeleton from '../ImageWithSkeleton';
 import SkeletonBlock from '../SkeletonBlock';
 import { useCardReveal } from '../../hooks/useCardReveal';
 
-/**
- * One card in the wishlist grid - same skeleton/reveal behaviour as
- * ShopProductCard, kept as a separate component because the wishlist
- * card's markup/sizes differ slightly from the shop grid's.
- */
 function WishlistProductCard({ product, index, activeColor, onColorChange, onToggleWishlist, onAddToCart }) {
   const identifier = product.id;
   const activeImage = activeColor?.img || product.images?.[0] || product.img;
@@ -18,12 +13,7 @@ function WishlistProductCard({ product, index, activeColor, onColorChange, onTog
     <Link ref={ref} to={`/product/${identifier}`} className="group flex flex-col justify-between no-underline">
       <div>
         <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-[10px] overflow-hidden mb-3">
-          <ImageWithSkeleton
-            src={armed ? activeImage : undefined}
-            onSettled={notifySettled}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none"
-          />
+          <ImageWithSkeleton src={armed ? activeImage : undefined} onSettled={notifySettled} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none" />
 
           {!ready && (
             <div className="absolute inset-0 z-10">
@@ -31,21 +21,11 @@ function WishlistProductCard({ product, index, activeColor, onColorChange, onTog
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product); }}
-            className={`absolute top-3 right-3 p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors cursor-pointer z-20 ${ready ? '' : 'invisible'}`}
-            aria-label="Remove from wishlist"
-          >
+          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product); }} className={`absolute top-3 right-3 p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors cursor-pointer z-20 ${ready ? '' : 'invisible'}`} aria-label="Remove from wishlist">
             <Heart className="w-[18px] h-[18px] fill-black text-black transition-colors" />
           </button>
 
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (onAddToCart) onAddToCart(product); }}
-            className={`absolute bottom-3 right-3 p-2 bg-white rounded-full shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer z-20 ${ready ? '' : 'invisible'}`}
-            aria-label="Add to cart"
-          >
+          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (onAddToCart) onAddToCart(product); }} className={`absolute bottom-3 right-3 p-2 bg-white rounded-full shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer z-20 ${ready ? '' : 'invisible'}`} aria-label="Add to cart">
             <ShoppingBag className="w-4 h-4 text-black" strokeWidth={1.5} />
           </button>
         </div>
@@ -57,14 +37,7 @@ function WishlistProductCard({ product, index, activeColor, onColorChange, onTog
                 const colorId = color.id || cIdx;
                 const isActive = activeColor?.id === colorId || activeColor === color;
                 return (
-                  <button
-                    type="button"
-                    key={colorId}
-                    onClick={(e) => onColorChange(e, identifier, color)}
-                    className={`w-6 h-6 rounded-[4px] overflow-hidden border cursor-pointer transition-all z-20 ${
-                      isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'
-                    }`}
-                  >
+                  <button type="button" key={colorId} onClick={(e) => onColorChange(e, identifier, color)} className={`w-6 h-6 rounded-[4px] overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>
                     <img src={color.img} alt={color.name} className="w-full h-full object-cover bg-[#f5f5f5] pointer-events-none" />
                   </button>
                 );

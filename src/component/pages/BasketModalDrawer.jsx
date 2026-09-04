@@ -46,14 +46,7 @@ export function SizeSelectionModal() {
             {sizesToRender.map((size) => {
               const isSelected = selectedSize === size;
               return (
-                <button
-                  type="button"
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`py-3 px-4 text-[13px] font-semibold rounded-[6px] border transition-all cursor-pointer ${
-                    isSelected ? 'border-black bg-black text-white' : 'border-gray-300 bg-white text-black hover:border-black'
-                  }`}
-                >
+                <button type="button" key={size} onClick={() => setSelectedSize(size)} className={`py-3 px-4 text-[13px] font-semibold rounded-[6px] border transition-all cursor-pointer ${isSelected ? 'border-black bg-black text-white' : 'border-gray-300 bg-white text-black hover:border-black'}`}>
                   {size}
                 </button>
               );
@@ -62,23 +55,12 @@ export function SizeSelectionModal() {
         </div>
 
         <div>
-          <button
-            type="button"
-            disabled={!selectedSize}
-            onClick={() => addToBasket(sizeModalProduct, selectedSize, selectedColor, selectedImage)}
-            className={`w-full py-[14px] rounded-full text-[15px] font-semibold transition-all cursor-pointer ${
-              selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-            }`}
-          >
+          <button type="button" disabled={!selectedSize} onClick={() => addToBasket(sizeModalProduct, selectedSize, selectedColor, selectedImage)} className={`w-full py-[14px] rounded-full text-[15px] font-semibold transition-all cursor-pointer ${selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
             Add to cart
           </button>
 
           <div className="text-center mt-4">
-            <Link
-              to={`/product/${sizeModalProduct.id}`}
-              onClick={closeSizeModal}
-              className="text-[13px] font-semibold text-black underline underline-offset-4 hover:text-gray-600"
-            >
+            <Link to={`/product/${sizeModalProduct.id}`} onClick={closeSizeModal} className="text-[13px] font-semibold text-black underline underline-offset-4 hover:text-gray-600">
               Product details {sizeModalProduct.colors?.length ? `• ${sizeModalProduct.colors.length} colors` : ''}
             </Link>
           </div>
@@ -94,11 +76,8 @@ export function AddedToBagDrawer() {
   const { shopProducts = [] } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
-  // shopProducts is the single product source now, use it directly.
   const allProducts = shopProducts;
 
-  // For the "Complete this product with..." section, real products from the data
-  // are picked (same category first, if available) and shown as a stacked list.
   const recommendedProducts = !addedSuccessProduct ? [] : (() => {
     const pool = allProducts.filter((p) => p.id !== addedSuccessProduct.id);
     const sameCategory = pool.filter((p) => p.category === addedSuccessProduct.category);
@@ -134,11 +113,7 @@ export function AddedToBagDrawer() {
           </button>
         </div>
 
-        <Link
-          to={`/product/${addedSuccessProduct.id}`}
-          onClick={() => setAddedSuccessProduct(null)}
-          className="flex gap-4 mb-6 no-underline"
-        >
+        <Link to={`/product/${addedSuccessProduct.id}`} onClick={() => setAddedSuccessProduct(null)} className="flex gap-4 mb-6 no-underline">
           <div className="w-24 h-24 bg-[#f5f5f5] rounded-[10px] overflow-hidden shrink-0">
             <img src={itemImage} alt={addedSuccessProduct.name} className="w-full h-full object-cover" />
           </div>
@@ -154,19 +129,11 @@ export function AddedToBagDrawer() {
         </Link>
 
         <div className="space-y-2 mb-8">
-          <Link
-            to="/basket"
-            onClick={() => setAddedSuccessProduct(null)}
-            className="block w-full py-[13px] border border-black rounded-full text-center text-[15px] font-semibold text-black hover:bg-black hover:text-white transition-all"
-          >
+          <Link to="/basket" onClick={() => setAddedSuccessProduct(null)} className="block w-full py-[13px] border border-black rounded-full text-center text-[15px] font-semibold text-black hover:bg-black hover:text-white transition-all">
             See cart ({totalBasketCount})
           </Link>
 
-          <Link
-            to="/basket"
-            onClick={() => setAddedSuccessProduct(null)}
-            className="block w-full py-[13px] bg-black text-white rounded-full text-center text-[15px] font-semibold hover:bg-gray-800 transition-all"
-          >
+          <Link to="/basket" onClick={() => setAddedSuccessProduct(null)} className="block w-full py-[13px] bg-black text-white rounded-full text-center text-[15px] font-semibold hover:bg-gray-800 transition-all">
             Proceed to checkout
           </Link>
         </div>
@@ -183,12 +150,7 @@ export function AddedToBagDrawer() {
                 const itemImg = item.images?.[0] || item.img;
 
                 return (
-                  <Link
-                    key={item.id}
-                    to={`/product/${item.id}`}
-                    onClick={() => setAddedSuccessProduct(null)}
-                    className="flex items-center gap-3 py-3 no-underline group"
-                  >
+                  <Link key={item.id} to={`/product/${item.id}`} onClick={() => setAddedSuccessProduct(null)} className="flex items-center gap-3 py-3 no-underline group">
                     <div className="w-14 h-14 bg-[#f5f5f5] rounded-[8px] overflow-hidden shrink-0">
                       <img src={itemImg} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     </div>
@@ -200,20 +162,10 @@ export function AddedToBagDrawer() {
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        onClick={(e) => handleRecommendedWishlist(e, item)}
-                        className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                        aria-label="Add to wishlist"
-                      >
+                      <button type="button" onClick={(e) => handleRecommendedWishlist(e, item)} className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer" aria-label="Add to wishlist">
                         <Heart size={16} strokeWidth={1.5} className={isLiked ? 'fill-black text-black' : 'text-black'} />
                       </button>
-                      <button
-                        type="button"
-                        onClick={(e) => handleRecommendedCart(e, item)}
-                        className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                        aria-label="Add to cart"
-                      >
+                      <button type="button" onClick={(e) => handleRecommendedCart(e, item)} className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer" aria-label="Add to cart">
                         <ShoppingBag size={16} strokeWidth={1.5} className="text-black" />
                       </button>
                     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
@@ -6,87 +6,99 @@ import { useAuth } from '../../context/AuthContext';
 import { useDataContext } from '../../context/DataContext';
 import AuthTopBar from '../inc/AuthTopBar';
 
+const INITIAL_FORM_STATE = {
+  email: '',
+  password: '',
+  firstName: '',
+  lastName: '',
+  dob: '',
+  gender: '',
+  phone: '',
+  stayInLoopEmail: true,
+  stayInLoopText: false,
+  categories: [],
+};
+
 function RegisterPage() {
   const navigate = useNavigate();
   const { registerWithEmail } = useAuth();
-  // Categories and password rules are no longer hardcoded, they come
-  // from the Vercel API's content.json (content.register).
   const { content } = useDataContext();
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    dob: '',
-    gender: '',
-    phone: '',
-    stayInLoopEmail: true,
-    stayInLoopText: false,
-    categories: []
-  });
-
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const availableCategories = content?.register?.availableCategories || [];
+  const availableCategories = content?.register?.availableCategories ?? [];
+  const passwordRules = content?.register?.passwordRules ?? [];
 
-  const passwordValidations = (content?.register?.passwordRules || []).map((rule) => ({
-    label: rule.label,
-    valid: new RegExp(rule.pattern).test(formData.password),
-  }));
+  const passwordValidations = useMemo(() => {
+    return passwordRules.map((rule) => {
+      let isValid = false;
+      try {
+        isValid = new RegExp(rule.pattern).test(formData.password);
+      } catch {
+        isValid = false;
+      }
+      return { label: rule.label, valid: isValid };
+    });
+  }, [passwordRules, formData.password]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-  };
+  }, []);
 
-  const handleCategoryToggle = (category) => {
+  const handleCategoryToggle = useCallback((category) => {
     setFormData((prev) => {
       const exists = prev.categories.includes(category);
       return {
         ...prev,
         categories: exists
           ? prev.categories.filter((c) => c !== category)
-          : [...prev.categories, category]
+          : [...prev.categories, category],
       };
     });
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const { user, error: authError } = await registerWithEmail(formData.email, formData.password);
+    try {
+      const { user, error: authError } = await registerWithEmail(formData.email, formData.password);
 
-    if (authError) {
-      setLoading(false);
-      setError(authError);
-      return;
-    }
-
-    const fullName = [formData.firstName, formData.lastName].filter(Boolean).join(' ');
-    if (user && fullName) {
-      try {
-        await updateProfile(user, { displayName: fullName });
-      } catch {
-        // Registration still succeeds even if the display name update fails, this step isn't critical
+      if (authError) {
+        setError(authError);
+        setLoading(false);
+        return;
       }
-    }
 
-    setLoading(false);
-    navigate('/', { replace: true });
+      const fullName = [formData.firstName, formData.lastName].filter(Boolean).join(' ');
+
+      if (user && fullName) {
+        try {
+          await updateProfile(user, { displayName: fullName });
+        } catch {
+        }
+      }
+
+      setLoading(false);
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err?.message || 'An unexpected error occurred.');
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-full min-h-screen bg-white">
       <AuthTopBar />
-      <div className="max-w-md mx-auto px-4 py-10 sm:py-14">
+      <main className="max-w-md mx-auto px-4 py-10 sm:py-14">
         <div className="border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8">
           
           <h1 className="font-heading-runova text-3xl sm:text-4xl font-black tracking-tight text-black mb-2 leading-tight">
@@ -98,7 +110,7 @@ function RegisterPage() {
           </p>
 
           {error && (
-            <div className="mb-5 rounded-md bg-red-50 border border-red-200 text-[#c8102e] text-sm px-4 py-3">
+            <div role="alert" className="mb-5 rounded-md bg-red-50 border border-red-200 text-[#c8102e] text-sm px-4 py-3">
               {error}
             </div>
           )}
@@ -110,7 +122,7 @@ function RegisterPage() {
               <label htmlFor="email" className="block text-sm font-bold text-black mb-2">
                 Email address <span className="text-[#c8102e]">*</span>
               </label>
-              <input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} required className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
+              <input id="email" name="email" type="email" autoComplete="email" value={formData.email} onChange={handleInputChange} required className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
             </div>
 
             {/* Password */}
@@ -119,23 +131,25 @@ function RegisterPage() {
                 Password <span className="text-[#c8102e]">*</span>
               </label>
               <div className="relative">
-                <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleInputChange} required className="w-full border border-gray-300 rounded-md px-4 py-3 pr-11 text-sm text-black focus:outline-none focus:border-black transition-colors" />
-                <button type="button" onClick={() => setShowPassword((prev) => !prev)} className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 hover:text-black cursor-pointer">
+                <input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={formData.password} onChange={handleInputChange} required className="w-full border border-gray-300 rounded-md px-4 py-3 pr-11 text-sm text-black focus:outline-none focus:border-black transition-colors" />
+                <button type="button" onClick={() => setShowPassword((prev) => !prev)} className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 hover:text-black cursor-pointer" aria-label={showPassword ? 'Hide password' : 'Show password'}>
                   {showPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                 </button>
               </div>
 
               {/* Password Requirements */}
-              <div className="mt-3 flex flex-col gap-1.5">
-                {passwordValidations.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 text-xs">
-                    <CheckCircle2 size={14} className={item.valid ? 'text-black fill-black/10' : 'text-gray-300'} />
-                    <span className={item.valid ? 'text-black font-medium' : 'text-gray-500'}>
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {passwordValidations.length > 0 && (
+                <div className="mt-3 flex flex-col gap-1.5">
+                  {passwordValidations.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs">
+                      <CheckCircle2 size={14} className={item.valid ? 'text-black fill-black/10' : 'text-gray-300'} />
+                      <span className={item.valid ? 'text-black font-medium' : 'text-gray-500'}>
+                        {item.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* First Name */}
@@ -143,7 +157,7 @@ function RegisterPage() {
               <label htmlFor="firstName" className="block text-sm font-bold text-black mb-2">
                 First name
               </label>
-              <input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
+              <input id="firstName" name="firstName" type="text" autoComplete="given-name" value={formData.firstName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
             </div>
 
             {/* Last Name */}
@@ -151,7 +165,7 @@ function RegisterPage() {
               <label htmlFor="lastName" className="block text-sm font-bold text-black mb-2">
                 Last name
               </label>
-              <input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
+              <input id="lastName" name="lastName" type="text" autoComplete="family-name" value={formData.lastName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
             </div>
 
             {/* Date of Birth */}
@@ -178,10 +192,10 @@ function RegisterPage() {
             {/* Stay in the Loop */}
             <div className="mt-2 flex flex-col gap-4">
               <span className="block text-sm font-bold text-black">Stay in the loop</span>
-              
-              {/* By Email Section */}
+
+              {/* By Email */}
               <div className="flex flex-col gap-2">
-                <label className="flex items-center gap-3 cursor-pointer">
+                <label className="flex items-center gap-3 cursor-pointer select-none">
                   <input type="checkbox" name="stayInLoopEmail" checked={formData.stayInLoopEmail} onChange={handleInputChange} className="accent-black w-4 h-4 cursor-pointer" />
                   <span className="text-xs font-bold text-black">By email</span>
                 </label>
@@ -191,14 +205,13 @@ function RegisterPage() {
                 </p>
               </div>
 
-              {/* By Text Section */}
+              {/* By Text */}
               <div className="flex flex-col gap-2">
-                <label className="flex items-center gap-3 cursor-pointer">
+                <label className="flex items-center gap-3 cursor-pointer select-none">
                   <input type="checkbox" name="stayInLoopText" checked={formData.stayInLoopText} onChange={handleInputChange} className="accent-black w-4 h-4 cursor-pointer" />
                   <span className="text-xs font-bold text-black">By text</span>
                 </label>
 
-                {/* Section that appears right under the checkbox when "By Text" is selected */}
                 {formData.stayInLoopText && (
                   <div className="flex flex-col gap-3 mt-1">
                     <p className="text-xs text-gray-700 leading-relaxed">
@@ -209,37 +222,37 @@ function RegisterPage() {
                       <label htmlFor="phone" className="block text-sm font-bold text-black mb-2">
                         Phone number
                       </label>
-                      <input id="phone" name="phone" type="tel" placeholder="+1 (201) 555-0123" value={formData.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
+                      <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="+1 (201) 555-0123" value={formData.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm text-black focus:outline-none focus:border-black transition-colors" />
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Tell us more about your interests */}
-            <div className="mt-4 flex flex-col gap-3">
-              <span className="block text-sm font-bold text-black">Tell us more about your interests</span>
-              <div className="flex flex-col gap-2.5">
-                {availableCategories.map((cat) => (
-                  <label key={cat} className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked={formData.categories.includes(cat)} onChange={() => handleCategoryToggle(cat)} className="accent-black w-4 h-4 cursor-pointer rounded" />
-                    <span className="text-xs text-gray-800">{cat}</span>
-                  </label>
-                ))}
+            {/* Interest Categories */}
+            {availableCategories.length > 0 && (
+              <div className="mt-4 flex flex-col gap-3">
+                <span className="block text-sm font-bold text-black">Tell us more about your interests</span>
+                <div className="flex flex-col gap-2.5">
+                  {availableCategories.map((cat) => (
+                    <label key={cat} className="flex items-center gap-3 cursor-pointer select-none">
+                      <input type="checkbox" checked={formData.categories.includes(cat)} onChange={() => handleCategoryToggle(cat)} className="accent-black w-4 h-4 cursor-pointer rounded" />
+                      <span className="text-xs text-gray-800">{cat}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer mt-4 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
+            {/* Submit Button */}
+            <button type="submit" disabled={loading} className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer mt-4 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
               {loading && <Loader2 size={16} className="animate-spin" />}
-              <span>Sign up</span>
+              <span>{loading ? 'Creating account...' : 'Sign up'}</span>
             </button>
           </form>
         </div>
 
+        {/* Footer Navigation Links */}
         <p className="text-center text-sm text-black mt-8">
           Already have an account?{' '}
           <Link to="/login" className="underline underline-offset-4 font-bold">
@@ -255,7 +268,7 @@ function RegisterPage() {
           To learn more about how we manage your personal information and your rights, please see our{' '}
           <Link to="/privacy" className="underline underline-offset-2 hover:text-black">Privacy Policy</Link>.
         </p>
-      </div>
+      </main>
     </div>
   );
 }

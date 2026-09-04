@@ -17,7 +17,6 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  // Tracks which button is in a loading state: 'email' | 'google' | 'apple' | null
   const [loading, setLoading] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -42,9 +41,7 @@ function LoginPage() {
       setError(authError);
       return;
     }
-    // On mobile the browser is navigating away to Google right now; once it
-    // comes back, AuthProvider's redirect-result handler takes care of the
-    // navigation, so there's nothing further to do here.
+   
     if (redirecting) return;
     navigate(redirectTo, { replace: true });
   };
@@ -79,22 +76,12 @@ function LoginPage() {
           )}
 
           <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={loading !== null}
-              className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            >
+            <button type="button" onClick={handleGoogleLogin} disabled={loading !== null} className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
               {loading === 'google' ? <Loader2 size={18} className="animate-spin" /> : <FcGoogle size={20} />}
               <span>Continue with Google</span>
             </button>
 
-            <button
-              type="button"
-              onClick={handleAppleLogin}
-              disabled={loading !== null}
-              className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            >
+            <button type="button" onClick={handleAppleLogin} disabled={loading !== null} className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-full py-3 text-sm font-semibold text-black hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
               {loading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <FaApple size={20} />}
               <span>Continue with Apple</span>
             </button>
@@ -130,11 +117,7 @@ function LoginPage() {
               Forgot your password?
             </Link>
 
-            <button
-              type="submit"
-              disabled={loading !== null}
-              className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
+            <button type="submit" disabled={loading !== null} className="w-full bg-black text-white rounded-full py-3.5 text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
               {loading === 'email' && <Loader2 size={16} className="animate-spin" />}
               <span>Sign in</span>
             </button>

@@ -29,9 +29,7 @@ function BasketPage() {
   const [activeDrawer, setActiveDrawer] = useState(null);
 
   const totalItems = basket.reduce((a, b) => a + b.quantity, 0);
-
-  // The payment logos are no longer hardcoded, they come from the Vercel
-  // API's content.json (content.basket.paymentLogos).
+  
   const { content } = useDataContext();
   const paymentLogos = content?.basket?.paymentLogos || [];
 
@@ -110,13 +108,7 @@ function BasketPage() {
 
                 {hasPromoCode && (
                   <div className="flex flex-col sm:flex-row gap-2 mt-3 items-stretch sm:items-center">
-                    <input 
-                      type="text" 
-                      value={promoInput} 
-                      onChange={(e) => setPromoInput(e.target.value)} 
-                      placeholder="Type your code" 
-                      className="w-full sm:w-auto sm:max-w-[240px] px-[14px] py-[9px] border border-gray-300 rounded-[6px] text-[15px] font-light outline-none focus:border-black placeholder-gray-400 text-black" 
-                    />
+                    <input type="text" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} placeholder="Type your code" className="w-full sm:w-auto sm:max-w-[240px] px-[14px] py-[9px] border border-gray-300 rounded-[6px] text-[15px] font-light outline-none focus:border-black placeholder-gray-400 text-black" />
                     <button type="button" className="px-[22px] py-[9px] bg-black text-white rounded-full text-[15px] font-semibold hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap">
                       Apply
                     </button>
@@ -183,10 +175,7 @@ function BasketPage() {
                 Items you add to your bag will show up here.
               </p>
 
-              <Link
-                to="/shop"
-                className="bg-black text-white rounded-full px-8 py-[13px] font-semibold text-[15px] hover:bg-gray-800 transition-colors mb-12"
-              >
+              <Link to="/shop" className="bg-black text-white rounded-full px-8 py-[13px] font-semibold text-[15px] hover:bg-gray-800 transition-colors mb-12">
                 Start shopping
               </Link>
 

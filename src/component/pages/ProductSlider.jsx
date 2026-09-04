@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { useDataContext } from '../../context/DataContext';
@@ -13,10 +13,6 @@ function ProductSlider({ onAddToCart }) {
   const { shopProducts = [], fetchShopProducts } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
-  // "Recommended for you" = 6 random Shoes + 6 random Gear picked straight
-  // out of the same product catalogue as the rest of the site (no separate
-  // "featured" flag needed). Recomputed only when shopProducts changes, so
-  // the picks stay stable while browsing but reshuffle on every refresh.
   const randomPicks = useMemo(() => {
     const shuffle = (arr) => {
       const copy = [...arr];
@@ -40,30 +36,30 @@ function ProductSlider({ onAddToCart }) {
 
   const filteredProducts = randomPicks[activeTab] || [];
 
-  const handleScroll = (direction) => {
+  const handleScroll = useCallback((direction) => {
     if (sliderRef.current) {
       const scrollAmount = sliderRef.current.clientWidth * 0.75;
       sliderRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
     }
-  };
+  }, []);
 
-  const handleWishlistClick = (e, product) => {
+  const handleWishlistClick = useCallback((e, product) => {
     e.preventDefault();
     e.stopPropagation();
     toggleWishlist(product);
-  };
+  }, [toggleWishlist]);
 
-  const changeColor = (e, productId, colorObj) => {
+  const changeColor = useCallback((e, productId, colorObj) => {
     e.preventDefault();
     e.stopPropagation();
     setSelectedColors((prev) => ({ ...prev, [productId]: colorObj }));
-  };
+  }, []);
 
-  const handleCartClick = (e, product) => {
+  const handleCartClick = useCallback((e, product) => {
     e.preventDefault();
     e.stopPropagation();
     if (onAddToCart) onAddToCart(product);
-  };
+  }, [onAddToCart]);
 
   useEffect(() => {
     fetchShopProducts();
@@ -76,10 +72,10 @@ function ProductSlider({ onAddToCart }) {
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-black">Recommended for you</h2>
 
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => handleScroll('left')} className="w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center transition-colors active:scale-95 cursor-pointer" aria-label="Previous">
+            <button type="button" onClick={() => handleScroll('left')} className="w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center transition-colors active:scale-95 cursor-pointer" aria-label="Previous products">
               <ChevronLeft className="w-5 h-5 text-black" />
             </button>
-            <button type="button" onClick={() => handleScroll('right')} className="w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center transition-colors active:scale-95 cursor-pointer" aria-label="Next">
+            <button type="button" onClick={() => handleScroll('right')} className="w-10 h-10 rounded-full border border-gray-200 hover:border-black flex items-center justify-center transition-colors active:scale-95 cursor-pointer" aria-label="Next products">
               <ChevronRight className="w-5 h-5 text-black" />
             </button>
           </div>
@@ -107,7 +103,7 @@ function ProductSlider({ onAddToCart }) {
                 <div className="relative w-full aspect-square bg-[#f5f5f5] rounded-xs overflow-hidden mb-3">
                   <ImageWithSkeleton src={activeImage} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out pointer-events-none" />
 
-                  <button type="button" onClick={(e) => handleWishlistClick(e, product)} className="absolute top-3 right-3 p-1.5 rounded-full bg-white/70 hover:bg-white transition-colors cursor-pointer z-20" aria-label="Add to wishlist">
+                  <button type="button" onClick={(e) => handleWishlistClick(e, product)} className="absolute top-3 right-3 p-1.5 rounded-full bg-white/70 hover:bg-white transition-colors cursor-pointer z-20" aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}>
                     <Heart className={`w-5 h-5 transition-colors ${isLiked ? 'fill-black text-black' : 'text-gray-700'}`} />
                   </button>
 
@@ -122,8 +118,8 @@ function ProductSlider({ onAddToCart }) {
                     const isActive = activeColor?.id === colorId || activeColor === color;
 
                     return (
-                      <button type="button" key={colorId} onClick={(e) => changeColor(e, identifier, color)} className={`w-6 h-6 rounded-xs overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>
-                        <img src={color.img} alt={color.name} className="w-full h-full object-cover bg-[#f5f5f5] pointer-events-none" />
+                      <button type="button" key={colorId} onClick={(e) => changeColor(e, identifier, color)} className={`w-6 h-6 rounded-xs overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`} aria-label={`Select ${color.name || 'color'}`}>
+                        <img src={color.img} alt={color.name || 'Product color option'} className="w-full h-full object-cover bg-[#f5f5f5] pointer-events-none" />
                       </button>
                     );
                   })}

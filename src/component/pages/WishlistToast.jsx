@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { useWishlist } from '../../context/WishlistContext';
 
@@ -21,21 +21,12 @@ function WishlistToast() {
         <span className="text-gray-900 font-semibold leading-tight">
           {toast.message}
         </span>
-        <Link
-          to="/wishlist"
-          onClick={handleClose}
-          className="text-gray-900 underline font-semibold mt-2 hover:text-black w-max text-xs"
-        >
+        <Link to="/wishlist" onClick={handleClose} className="text-gray-900 underline font-semibold mt-2 hover:text-black w-max text-xs">
           See my wishlist
         </Link>
       </div>
 
-      <button
-        type="button"
-        onClick={handleClose}
-        className="text-gray-400 hover:text-black transition-colors cursor-pointer p-0.5"
-        aria-label="Close notification"
-      >
+      <button type="button" onClick={handleClose} className="text-gray-400 hover:text-black transition-colors cursor-pointer p-0.5" aria-label="Close notification">
         <X className="w-4 h-4" />
       </button>
     </div>
