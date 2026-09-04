@@ -60,13 +60,31 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setAuthLoading(false);
+
+      // Fallback for the mobile redirect flow: some mobile browsers (in-app
+      // webviews, Safari with cross-site tracking prevention) silently fail
+      // to resolve getRedirectResult() below even though the sign-in itself
+      // succeeded - onAuthStateChanged still fires with the user though, so
+      // if we're still holding a pending-redirect flag at that point, use
+      // this as the trigger to navigate instead of leaving the person
+      // stranded on the login/register page.
+      if (firebaseUser) {
+        const target = sessionStorage.getItem(PENDING_REDIRECT_KEY);
+        if (target) {
+          sessionStorage.removeItem(PENDING_REDIRECT_KEY);
+          navigate(target, { replace: true });
+        }
+      }
     });
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Completes the mobile "sign in with redirect" flow: when the browser comes
   // back from Google/Apple's page, this picks up the result and sends the
-  // person to wherever they were trying to go before signing in.
+  // person to wherever they were trying to go before signing in. (The
+  // onAuthStateChanged handler above also covers this as a fallback, in case
+  // this promise never resolves on some mobile browsers.)
   useEffect(() => {
     getRedirectResult(auth)
       .then((result) => {

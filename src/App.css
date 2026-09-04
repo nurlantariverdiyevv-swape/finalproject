@@ -11,18 +11,16 @@ html, body {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Heading font override - ONLY applied where explicitly opted in via the
-   .font-heading-runova class below (Wishlist/Basket/Basket-drawer titles),
-   not globally on every h1-h6. An earlier global h1-h6 rule here was also
-   changing things that were never meant to change - product card titles,
-   the product page's own <h1>, "The Details" section, footer headings,
-   etc. - so it's been removed; those all just use the normal body font
-   again. */
+   .font-heading-runova class below: the product name on the product detail
+   page, the big Login/Register headings, and the Basket/Wishlist section
+   headings. Everything else (header, footer, product cards, body text,
+   buttons, etc.) stays on the Inter body font above. */
 :root {
-  --font-heading-runova: 'Urbanist', 'Inter', sans-serif;
+  --font-heading-runova: 'Urbanist', system-ui, -apple-system, sans-serif;
 }
 
 /* Some pages (Basket, Wishlist, Basket drawer) set an inline fontFamily on a

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { SlidersHorizontal, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useDataContext } from '../../context/DataContext';
@@ -94,6 +94,21 @@ function ShopPage({ onAddToCart }) {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [activeCardColors, setActiveCardColors] = useState({});
 
+  // Stable random order for "Featured" sort. Shuffled once per product list
+  // (not recomputed on every render/filter toggle), so the order doesn't
+  // keep jumping around every time a filter checkbox is clicked.
+  const featuredOrder = useMemo(() => {
+    const ids = shopProducts.map((p) => p.id);
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    const order = {};
+    ids.forEach((id, idx) => { order[id] = idx; });
+    return order;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shopProducts]);
+
   const [openSections, setOpenSections] = useState({
     sort: true,
     size: false,
@@ -182,9 +197,17 @@ function ShopPage({ onAddToCart }) {
       return true;
     })
     .sort((a, b) => {
-      if (sortBy === 'newest') return new Date(b.createdDate || 0) - new Date(a.createdDate || 0);
+      if (sortBy === 'newest') {
+        // "New" badged products always float to the top; within each group
+        // (new / not-new) fall back to createdDate where available.
+        const aIsNew = a.badgeType === 'new' ? 1 : 0;
+        const bIsNew = b.badgeType === 'new' ? 1 : 0;
+        if (aIsNew !== bIsNew) return bIsNew - aIsNew;
+        return new Date(b.createdDate || 0) - new Date(a.createdDate || 0);
+      }
       if (sortBy === 'price-low') return a.price - b.price;
       if (sortBy === 'price-high') return b.price - a.price;
+      if (sortBy === 'featured') return (featuredOrder[a.id] ?? 0) - (featuredOrder[b.id] ?? 0);
       return 0;
     });
 

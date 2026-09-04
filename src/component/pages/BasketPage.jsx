@@ -8,8 +8,8 @@ import ImageWithSkeleton from '../ImageWithSkeleton';
 function InfoDrawer({ open, onClose, title, children }) {
   return (
     <>
-      <div onClick={onClose} className={`fixed inset-0 bg-black/40 backdrop-blur-xs z-[110] transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 h-full w-full sm:max-w-md bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto text-black antialiased ${open ? "translate-x-0" : "translate-x-full"}`} style={{ fontFamily: "Inter, sans-serif" }}>
+      <div onClick={onClose} className={`fixed inset-0 bg-black/40 z-[110] transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
+      <div className={`fixed top-0 right-0 h-full w-full sm:max-w-md bg-white z-[120] shadow-2xl transition-transform duration-300 transform overflow-y-auto text-black antialiased ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <h2 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase text-black">{title}</h2>
           <button onClick={onClose} className="p-1 hover:opacity-70 cursor-pointer" aria-label="Close">
@@ -36,7 +36,7 @@ function BasketPage() {
   const paymentLogos = content?.basket?.paymentLogos || [];
 
   return (
-    <div className="bg-[#f5f5f5] min-h-screen py-8 text-black antialiased" style={{ fontFamily: "Inter, sans-serif" }}>
+    <div className="bg-[#f5f5f5] min-h-screen py-8 text-black antialiased">
       <div className="max-w-[1440px] mx-auto px-4 md:px-8">
         
         {basket.length > 0 ? (
@@ -147,7 +147,7 @@ function BasketPage() {
               <div className="divide-y divide-gray-100 text-[15px] text-black mt-2 border-t border-gray-100">
                 <button type="button" onClick={() => setActiveDrawer("points")} className="w-full flex items-center justify-between py-[13px] cursor-pointer group text-left">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold italic text-[15px]">s/+</span>
+                    <span className="font-semibold italic text-[15px]">R+</span>
                     <span className="font-normal text-gray-800">+{subtotal} points with this purchase</span>
                   </div>
                   <ChevronRight size={14} strokeWidth={1.5} className="text-black group-hover:translate-x-0.5 transition-transform" />
@@ -203,7 +203,7 @@ function BasketPage() {
 
       </div>
 
-      <InfoDrawer open={activeDrawer === "points"} onClose={() => setActiveDrawer(null)} title="S/PLUS Points">
+      <InfoDrawer open={activeDrawer === "points"} onClose={() => setActiveDrawer(null)} title="R+ Points">
         <p>Earn points with every purchase and enjoy exclusive member rewards.</p>
       </InfoDrawer>
 

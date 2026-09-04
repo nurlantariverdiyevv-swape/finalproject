@@ -21,7 +21,7 @@ export function SizeSelectionModal() {
   const selectedImage = sizeModalProduct.selectedImage || sizeModalProduct.images?.[0] || sizeModalProduct.img;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs text-black antialiased" style={{ fontFamily: "Inter, sans-serif" }}>
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 text-black antialiased">
       <div className="w-full max-w-md bg-white h-full flex flex-col justify-between p-6 shadow-2xl animate-in slide-in-from-right duration-300 overflow-y-auto">
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
@@ -125,7 +125,7 @@ export function AddedToBagDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs text-black antialiased" style={{ fontFamily: "Inter, sans-serif" }}>
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 text-black antialiased">
       <div className="w-full max-w-md bg-white h-full flex flex-col p-6 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300">
         <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
           <h2 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase text-black">Product added to your bag</h2>

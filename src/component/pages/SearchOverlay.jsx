@@ -79,7 +79,7 @@ export function DesktopSearchOverlay({
   return (
     <div className="hidden lg:block fixed inset-0 z-[200]">
       {/* Backdrop - the rest of the page appears blurred/dimmed */}
-      <div onClick={closeSearch} className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" />
+      <div onClick={closeSearch} className="absolute inset-0 bg-black/40 transition-opacity duration-300" />
 
       {/* Top white panel - only as tall as its content */}
       <div className="relative bg-white shadow-2xl max-h-[85vh] overflow-y-auto">
@@ -89,7 +89,7 @@ export function DesktopSearchOverlay({
           </div>
           <div className="w-1/3 text-center">
             <Link to="/membership" onClick={closeSearch} className="underline underline-offset-4 hover:text-gray-300 transition-all">
-              S/PLUS Members: Free Shipping and More
+              R+ Members: Free Shipping and More
             </Link>
           </div>
           <div className="flex w-1/3 items-center justify-end gap-3 text-gray-200">

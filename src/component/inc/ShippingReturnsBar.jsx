@@ -20,9 +20,9 @@ const DEFAULT_ITEMS = [
   },
   {
     icon: 'truck',
-    title: 'Free Shipping for S/PLUS Members',
+    title: 'Free Shipping for R+ Members',
     body: [
-      'S/Plus Members will receive free ground delivery shipping on every purchase and will be gifted +50 bonus points after signing up.',
+      'R+ Members will receive free ground delivery shipping on every purchase and will be gifted +50 bonus points after signing up.',
       'Unfortunately, we cannot accommodate PO, FPO, or APO boxes at this time.',
     ],
     linkTo: '/s-plus-member',
@@ -31,8 +31,8 @@ const DEFAULT_ITEMS = [
 ];
 
 // Matches the real site: "Free Returns Within 45 Days" /
-// "Free Shipping for S/PLUS Members" rows above the footer, clicking opens
-// a right-side sliding panel (same style as the S/PLUS modal in Header).
+// "Free Shipping for R+ Members" rows above the footer, clicking opens
+// a right-side sliding panel (same style as the R+ modal in Header).
 // Content comes from content.json (content.infoBar); if the backend
 // hasn't been updated yet, DEFAULT_ITEMS is used so the bar is never missing.
 function ShippingReturnsBar({ variant = 'bar' }) {
@@ -74,7 +74,7 @@ function ShippingReturnsBar({ variant = 'bar' }) {
       {/* RIGHT-SIDE SLIDING PANEL */}
       <div
         onClick={() => setActiveItem(null)}
-        className={`fixed inset-0 z-[100] bg-black/40 backdrop-blur-xs transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[100] bg-black/40 transition-opacity duration-300 ${
           activeItem ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       />

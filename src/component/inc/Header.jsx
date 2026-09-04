@@ -43,27 +43,7 @@ function Header() {
     setAccountMenuOpen(false);
   };
 
-  // A separate account dropdown for the mobile version (shown right in
-  // the top bar, outside the login/basket menu)
-  const [mobileAccountMenuOpen, setMobileAccountMenuOpen] = useState(false);
-  const mobileAccountMenuRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutsideMobile = (e) => {
-      if (mobileAccountMenuRef.current && !mobileAccountMenuRef.current.contains(e.target)) {
-        setMobileAccountMenuOpen(false);
-      }
-    };
-    if (mobileAccountMenuOpen) document.addEventListener('mousedown', handleClickOutsideMobile);
-    return () => document.removeEventListener('mousedown', handleClickOutsideMobile);
-  }, [mobileAccountMenuOpen]);
-
-  const handleMobileLogout = () => {
-    logout();
-    setMobileAccountMenuOpen(false);
-  };
-
-  // ------- S/PLUS MEMBERS MODALI -------
+  // ------- R+ MEMBERS MODALI -------
   const [splusModalOpen, setSplusModalOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -141,6 +121,17 @@ function Header() {
 
   const seeAllResultsLink = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
 
+  // "Find a store" / "Get exclusive news" / "Help" all point at the home
+  // page ("/"). If the person is already on "/" (e.g. scrolled down to the
+  // footer), a <Link to="/"> is a no-op for react-router since the pathname
+  // doesn't change - nothing visibly happens, which feels broken. Scrolling
+  // to the top here makes the click always do something noticeable, whether
+  // or not the route itself changes.
+  const goHome = () => {
+    closeAllMenus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter' && searchQuery.trim() !== '') {
       navigate(seeAllResultsLink);
@@ -153,7 +144,7 @@ function Header() {
       {/* 1. TOP ANNOUNCEMENT BAR */}
       <div className="w-full bg-[#0d0d0d] text-white text-[11px] sm:text-xs py-2 px-4 md:px-8 flex justify-between items-center tracking-wide font-light">
         <div className="hidden lg:block lg:w-1/3">
-          <Link to="/stores" className="hover:underline transition-all">Find a store</Link>
+          <Link to="/" onClick={goHome} className="hover:underline transition-all">Find a store</Link>
         </div>
 
         <div className="w-full lg:w-1/3 text-center">
@@ -162,59 +153,25 @@ function Header() {
             onClick={() => setSplusModalOpen(true)}
             className="underline underline-offset-4 hover:text-gray-300 transition-all cursor-pointer bg-transparent border-0 p-0 text-white text-[11px] sm:text-xs font-light tracking-wide"
           >
-            S/PLUS Members: Free Shipping and More
+            R+ Members: Free Shipping and More
           </button>
         </div>
 
         <div className="hidden lg:flex lg:w-1/3 items-center justify-end gap-3 text-gray-200">
-          <Link to="/newsletter" className="hover:underline transition-all">Get exclusive news</Link>
+          <Link to="/" onClick={goHome} className="hover:underline transition-all">Get exclusive news</Link>
           <span className="text-white text-[10px]">&bull;</span>
-          <Link to="/help" className="hover:underline transition-all">Help</Link>
+          <Link to="/" onClick={goHome} className="hover:underline transition-all">Help</Link>
         </div>
       </div>
 
       {/* 2. MOBILE HEADER */}
       <div className="lg:hidden px-4 pt-3 pb-3 flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <Link to="/" onClick={closeAllMenus} className="inline-block">
+          <Link to="/" onClick={closeAllMenus} className="inline-block shrink-0">
             <img src="/assets/img/runovalogo.png" alt="Logo" className="h-7 w-auto object-contain" />
           </Link>
 
           <div className="flex items-center gap-3">
-            {/* Account access: right in the top bar, no need to open the menu */}
-            {user ? (
-              <div className="relative" ref={mobileAccountMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setMobileAccountMenuOpen((prev) => !prev)}
-                  className="text-black p-1 hover:opacity-70 cursor-pointer"
-                  aria-label="Account"
-                >
-                  <UserCheck size={24} strokeWidth={1.5} />
-                </button>
-
-                {mobileAccountMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1">
-                    <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 truncate">
-                      {user.displayName || user.email || 'My Account'}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleMobileLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 cursor-pointer"
-                    >
-                      <LogOut size={16} strokeWidth={1.5} />
-                      <span>Log out</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link to="/login" onClick={closeAllMenus} className="text-black p-1 hover:opacity-70" aria-label="Log in">
-                <User size={24} strokeWidth={1.5} />
-              </Link>
-            )}
-
             <Link to="/basket" onClick={closeAllMenus} className="relative text-black p-1 hover:opacity-70">
               <ShoppingBag size={24} strokeWidth={1.5} />
               {totalBasketCount > 0 && (
@@ -258,8 +215,8 @@ function Header() {
             </button>
           </div>
 
-          <div className="flex justify-center w-1/3">
-            <Link to="/" onClick={closeAllMenus}>
+          <div className="flex justify-center w-1/3 shrink-0">
+            <Link to="/" onClick={closeAllMenus} className="shrink-0">
               <img src="/assets/img/runovalogo.png" alt="Logo" className="h-9 w-auto object-contain" />
             </Link>
           </div>
@@ -321,7 +278,7 @@ function Header() {
       {/* 4. FULL SCREEN DRAWER MENYU */}
       {desktopMenuOpen && (
         <div className="hidden lg:block fixed inset-0 z-[100] h-screen w-screen overflow-hidden">
-          <div onClick={closeAllMenus} className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" />
+          <div onClick={closeAllMenus} className="absolute inset-0 bg-black/40 transition-opacity duration-300" />
 
           <div className={`relative bg-white h-full shadow-2xl flex z-10 transition-all duration-300 ease-in-out ${activeCategory ? 'w-[950px]' : 'w-[280px]'}`}>
             <div className="w-[280px] border-r border-gray-100 p-8 flex flex-col justify-between shrink-0 bg-white h-full">
@@ -363,7 +320,7 @@ function Header() {
                     <span>Log in</span>
                   </Link>
                 )}
-                <span className="font-bold text-xs italic tracking-wider">S/PLUS</span>
+                <span className="font-bold text-xs italic tracking-wider">R+</span>
               </div>
             </div>
 
@@ -442,9 +399,10 @@ function Header() {
           </div>
 
           <div className="mt-auto pt-8 pb-6 flex flex-col gap-5">
-            {/* Login/Logout is now handled in the top mobile bar (outside the menu).
-                Here, only the signed-in user's name is shown. */}
-            {user && (
+            {/* Login/Logout now lives here in the menu instead of the top
+                mobile bar, so the top bar only has Basket + Menu (keeps the
+                logo from getting squeezed for space). */}
+            {user ? (
               <div className="flex items-center justify-between text-sm font-medium text-black">
                 <div className="flex items-center gap-3">
                   <UserCheck size={20} strokeWidth={1.5} />
@@ -458,6 +416,14 @@ function Header() {
                   Log out
                 </button>
               </div>
+            ) : (
+              <Link to="/login" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+                <div className="flex items-center gap-3">
+                  <User size={20} strokeWidth={1.5} />
+                  <span>Log in</span>
+                </div>
+                <ChevronRight size={16} className="text-black" strokeWidth={1.5} />
+              </Link>
             )}
 
             <Link to="/wishlist" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
@@ -474,7 +440,7 @@ function Header() {
               </div>
             </Link>
 
-            <Link to="/help" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
+            <Link to="/" onClick={goHome} className="flex items-center justify-between text-sm font-medium text-black">
               <div className="flex items-center gap-3">
                 <HelpCircle size={20} strokeWidth={1.5} />
                 <span>Help</span>
@@ -482,12 +448,12 @@ function Header() {
               <ChevronRight size={16} className="text-black" strokeWidth={1.5} />
             </Link>
 
-            <Link to="/stores" onClick={closeAllMenus} className="flex items-center gap-3 text-sm font-medium text-black">
+            <Link to="/" onClick={goHome} className="flex items-center gap-3 text-sm font-medium text-black">
               <MapPin size={20} strokeWidth={1.5} />
               <span>Find a store</span>
             </Link>
 
-            <Link to="/newsletter" onClick={closeAllMenus} className="flex items-center gap-3 text-sm font-medium text-black">
+            <Link to="/" onClick={goHome} className="flex items-center gap-3 text-sm font-medium text-black">
               <Mail size={20} strokeWidth={1.5} />
               <span>Stay in the loop</span>
             </Link>
@@ -524,20 +490,20 @@ function Header() {
         seeAllResultsLink={seeAllResultsLink}
       />
 
-      {/* 8. S/PLUS MEMBERS MODAL (right-side sliding panel, matches the real site) */}
+      {/* 8. R+ MEMBERS MODAL (right-side sliding panel, matches the real site) */}
       {splusModalOpen && (
         <div
-          className="fixed inset-0 z-[60] flex justify-end bg-black/40 backdrop-blur-xs"
+          className="fixed inset-0 z-[60] flex justify-end bg-black/40"
           onClick={() => setSplusModalOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md bg-white h-full shadow-2xl p-6 sm:p-8 overflow-y-auto animate-in slide-in-from-right duration-300"
-            style={{ fontFamily: 'Inter, sans-serif' }}
+           
           >
             <div className="flex items-start justify-between gap-4 mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-black leading-snug">
-                S/PLUS Members: Free Shipping and More
+                R+ Members: Free Shipping and More
               </h2>
               <button
                 type="button"
@@ -551,7 +517,7 @@ function Header() {
 
             <div className="text-[15px] leading-relaxed text-black space-y-4">
               <p>
-                <span className="font-bold underline underline-offset-2">S/Plus Members</span> will receive free
+                <span className="font-bold underline underline-offset-2">R+ Members</span> will receive free
                 ground shipping on every purchase and will be gifted +50 bonus points after signing up.
               </p>
               <p>

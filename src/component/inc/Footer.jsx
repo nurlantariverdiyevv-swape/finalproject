@@ -17,6 +17,13 @@ function Footer() {
     setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
   };
 
+  // These links all point at "/". If you're already on the home page (very
+  // likely, since you'd have had to scroll all the way down to the footer
+  // to see them), a <Link to="/"> is a no-op for react-router - nothing
+  // visibly happens. Scrolling to the top makes the click always do
+  // something, whether or not the route itself changes.
+  const goHome = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
   return (
     <footer className="font-sans">
       <div className="bg-black text-white pt-12 pb-8 px-6 md:px-16">
@@ -26,12 +33,13 @@ function Footer() {
         <div className="hidden md:grid md:grid-cols-5 gap-8 pb-16">
           {footerData.map((section) => (
             <div key={section.title} className="flex flex-col gap-4">
-              <h3 className="font-bold text-[19px] uppercase text-white">{section.title}</h3>
+              <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">{section.title}</h3>
               <div className="flex flex-col gap-3">
                 {section.links.map((link) => (
                   <Link
                     key={link.label}
-                    to={link.path}
+                    to="/"
+                    onClick={goHome}
                     className="text-[15px] font-medium text-[#e5e5e5] hover:text-white transition-colors"
                   >
                     {link.label}
@@ -43,7 +51,7 @@ function Footer() {
 
           {/* Shipping Section */}
           <div className="flex flex-col gap-4">
-            <h3 className="font-bold text-[19px] uppercase text-white">Shipping</h3>
+            <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">Shipping</h3>
             <Link to="/country-select" className="flex items-center gap-2.5 text-[15px] font-medium text-white">
               <svg className="w-6 h-4 rounded-[1px] object-cover" viewBox="0 0 640 480">
                 <g fillRule="evenodd">
@@ -72,7 +80,7 @@ function Footer() {
                   aria-expanded={isOpen}
                   className="w-full flex items-center justify-between py-4 cursor-pointer"
                 >
-                  <h3 className="font-bold text-[19px] uppercase text-white">{section.title}</h3>
+                  <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">{section.title}</h3>
                   {isOpen ? (
                     <ChevronUp size={20} className="text-white shrink-0" />
                   ) : (
@@ -89,7 +97,8 @@ function Footer() {
                       {section.links.map((link) => (
                         <Link
                           key={link.label}
-                          to={link.path}
+                          to="/"
+                          onClick={goHome}
                           className="text-[15px] font-medium text-[#e5e5e5] hover:text-white block"
                         >
                           {link.label}
@@ -110,7 +119,7 @@ function Footer() {
               aria-expanded={!!openSections.Shipping}
               className="w-full flex items-center justify-between py-4 cursor-pointer"
             >
-              <h3 className="font-bold text-[19px] uppercase text-white">Shipping</h3>
+              <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">Shipping</h3>
               {openSections.Shipping ? (
                 <ChevronUp size={20} className="text-white shrink-0" />
               ) : (

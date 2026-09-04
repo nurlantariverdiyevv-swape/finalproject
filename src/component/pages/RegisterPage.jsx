@@ -89,7 +89,7 @@ function RegisterPage() {
       <div className="max-w-md mx-auto px-4 py-10 sm:py-14">
         <div className="border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8">
           
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-black mb-2 leading-tight">
+          <h1 className="font-heading-runova text-3xl sm:text-4xl font-black tracking-tight text-black mb-2 leading-tight">
             SIGN UP FOR FREE
           </h1>
 

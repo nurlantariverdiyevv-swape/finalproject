@@ -37,7 +37,7 @@ function ProductInfoLinks() {
           <div className="flex items-center gap-3"><Package className="w-5 h-5" strokeWidth={1.5} /><span className="font-medium">Free Returns Within 45 Days</span></div>
         </button>
         <button onClick={() => setActiveDrawer("shipping")} className="w-full py-3 flex items-center justify-between border-b border-gray-200 hover:bg-gray-50 text-left cursor-pointer">
-          <div className="flex items-center gap-3"><Truck className="w-5 h-5" strokeWidth={1.5} /><span className="font-medium">Free Shipping for S/PLUS Members</span></div>
+          <div className="flex items-center gap-3"><Truck className="w-5 h-5" strokeWidth={1.5} /><span className="font-medium">Free Shipping for R+ Members</span></div>
         </button>
         <button onClick={() => setActiveDrawer("store")} className="w-full py-3 flex items-center justify-between border-b border-gray-200 hover:bg-gray-50 text-left cursor-pointer">
           <div className="flex items-center gap-3"><Store className="w-5 h-5" strokeWidth={1.5} /><span className="font-medium">Find in store</span></div>
@@ -48,7 +48,7 @@ function ProductInfoLinks() {
         <p>Free returns by mail within 45 days of delivery.</p>
       </InfoDrawer>
       <InfoDrawer open={activeDrawer === "shipping"} onClose={() => setActiveDrawer(null)} title="Free Shipping">
-        <p>S/Plus Members will receive free shipping on every purchase.</p>
+        <p>R+ Members will receive free shipping on every purchase.</p>
       </InfoDrawer>
       <InfoDrawer open={activeDrawer === "store"} onClose={() => setActiveDrawer(null)} title="Find in store">
         <p>Check stock availability in nearby stores.</p>
