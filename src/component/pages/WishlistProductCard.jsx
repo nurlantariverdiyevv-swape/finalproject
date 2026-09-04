@@ -37,7 +37,7 @@ function WishlistProductCard({ product, index, activeColor, onColorChange, onTog
                 const colorId = color.id || cIdx;
                 const isActive = activeColor?.id === colorId || activeColor === color;
                 return (
-                  <button type="button" key={colorId} onClick={(e) => onColorChange(e, identifier, color)} className={`w-6 h-6 rounded-[4px] overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>
+                  <button type="button" key={colorId} onClick={(e) => onColorChange(e, identifier, color)} className={`w-6 h-6 rounded-[4px] overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-white scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}>
                     <img src={color.img} alt={color.name} className="w-full h-full object-cover bg-[#f5f5f5] pointer-events-none" />
                   </button>
                 );
