@@ -54,19 +54,19 @@ function BasketPage() {
                   const uniqueKey = `${item.id}-${itemSize}-${itemColor}`;
 
                   return (
-                    <div key={uniqueKey} className="py-5 first:pt-0 last:pb-0 flex items-start justify-between gap-4">
+                    <div key={uniqueKey} className="py-5 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-start sm:justify-between gap-2 sm:gap-4">
                       
-                      <div className="flex gap-4 items-start">
-                        <Link to={`/product/${item.id}`} className="w-[96px] h-[96px] bg-[#f5f5f5] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center cursor-pointer">
+                      <div className="flex gap-3 sm:gap-4 items-start min-w-0 w-full sm:flex-1">
+                        <Link to={`/product/${item.id}`} className="w-[80px] h-[80px] sm:w-[96px] sm:h-[96px] bg-[#f5f5f5] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center cursor-pointer">
                           <ImageWithSkeleton src={itemImage} alt={item.name} className="w-full h-full object-cover" />
                         </Link>
 
-                        <div className="flex flex-col gap-[3px]">
-                          <Link to={`/product/${item.id}`} className="text-[15px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black hover:underline cursor-pointer">
+                        <div className="flex flex-col gap-[3px] min-w-0">
+                          <Link to={`/product/${item.id}`} className="text-[14px] sm:text-[15px] leading-[1.3] font-semibold uppercase tracking-[-0.01em] text-black hover:underline cursor-pointer line-clamp-2 break-words">
                             {item.name}
                           </Link>
                           
-                          <div className="flex flex-col text-[15px] leading-[1.5] text-gray-500 font-light mt-[2px]">
+                          <div className="flex flex-col text-[13px] sm:text-[15px] leading-[1.5] text-gray-500 font-light mt-[2px]">
                             <p>Size: {itemSize}</p>
                             <p>Color: {itemColor}</p>
                           </div>
@@ -85,8 +85,8 @@ function BasketPage() {
                         </div>
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <span className="text-[16px] font-semibold text-black whitespace-nowrap">${item.price * item.quantity}</span>
+                      <div className="w-full sm:w-auto text-right sm:shrink-0 sm:pl-1">
+                        <span className="text-[14px] sm:text-[16px] font-semibold text-black whitespace-nowrap">${item.price * item.quantity}</span>
                       </div>
 
                     </div>
