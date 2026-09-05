@@ -100,7 +100,7 @@ function BasketPage() {
               <h2 className="font-heading-runova text-[19px] leading-[1.3] font-bold uppercase mb-[24px] text-black">Order Summary</h2>
 
               {/* PROMO CODE SECTION (OPTIMIZED) */}
-              <div className="mb-5">
+              {/* <div className="mb-5">
                 <label className="flex items-center gap-2 cursor-pointer text-[15px] font-semibold text-black select-none">
                   <input type="checkbox" checked={hasPromoCode} onChange={(e) => setHasPromoCode(e.target.checked)} className="w-[15px] h-[15px] rounded border-black text-black accent-black cursor-pointer" />
                   <span>Have a promo code?</span>
@@ -114,7 +114,7 @@ function BasketPage() {
                     </button>
                   </div>
                 )}
-              </div>
+              </div> */}
 
               <div className="space-y-[5px] pb-4 text-[15px] font-normal text-gray-700">
                 <div className="flex justify-between items-center">
