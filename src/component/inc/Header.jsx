@@ -232,10 +232,6 @@ function Header() {
                 {/* Account Dropdown */}
                 {accountMenuOpen && (
                   <div className="absolute right-0 top-full mt-3 w-48 bg-white border border-gray-100 rounded-md shadow-lg z-50 py-1 animate-[fadeIn_0.15s_ease-out]">
-                    <Link to="/profile" onClick={() => setAccountMenuOpen(false)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 border-b border-gray-100">
-                      <User size={16} strokeWidth={1.5} />
-                      <span>My Profile</span>
-                    </Link>
                     <button type="button" onClick={handleLogout} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50 cursor-pointer">
                       <LogOut size={16} strokeWidth={1.5} />
                       <span>Log out</span>
@@ -393,15 +389,12 @@ function Header() {
           <div className="mt-auto pt-8 pb-6 flex flex-col gap-5">
             {user ? (
               <div className="flex flex-col gap-3 pt-2 border-t border-gray-100">
-                <Link to="/profile" onClick={closeAllMenus} className="flex items-center justify-between text-sm font-medium text-black">
-                  <div className="flex items-center gap-3">
-                    <UserCheck size={20} strokeWidth={1.5} />
-                    <span className="truncate max-w-[180px]">
-                      {user.displayName ? user.displayName.split(' ')[0] : (user.email || 'My Profile')}
-                    </span>
-                  </div>
-                  <ChevronRight size={16} strokeWidth={1.5} className="text-black" />
-                </Link>
+                <div className="flex items-center gap-3 text-sm font-medium text-black">
+                  <UserCheck size={20} strokeWidth={1.5} />
+                  <span className="truncate max-w-[180px]">
+                    {user.displayName ? user.displayName.split(' ')[0] : (user.email || 'Account')}
+                  </span>
+                </div>
 
                 <button type="button" onClick={handleLogout} className="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 cursor-pointer pt-1">
                   <LogOut size={14} />

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { useDataContext } from '../../context/DataContext';
@@ -13,7 +13,9 @@ function ProductSlider({ onAddToCart }) {
   const { shopProducts = [], fetchShopProducts } = useDataContext();
   const { wishlist, toggleWishlist } = useWishlist();
 
-  const randomPicks = useMemo(() => {
+  const [randomPicks, setRandomPicks] = useState({ Shoes: [], Gear: [] });
+
+  useEffect(() => {
     const shuffle = (arr) => {
       const copy = [...arr];
       for (let i = copy.length - 1; i > 0; i--) {
@@ -28,10 +30,10 @@ function ProductSlider({ onAddToCart }) {
       if (byCategory[product.category]) byCategory[product.category].push(product);
     });
 
-    return {
+    setRandomPicks({
       Shoes: shuffle(byCategory.Shoes).slice(0, 6),
       Gear: shuffle(byCategory.Gear).slice(0, 6),
-    };
+    });
   }, [shopProducts]);
 
   const filteredProducts = randomPicks[activeTab] || [];

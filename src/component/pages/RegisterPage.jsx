@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
@@ -32,17 +32,15 @@ function RegisterPage() {
   const availableCategories = content?.register?.availableCategories ?? [];
   const passwordRules = content?.register?.passwordRules ?? [];
 
-  const passwordValidations = useMemo(() => {
-    return passwordRules.map((rule) => {
-      let isValid = false;
-      try {
-        isValid = new RegExp(rule.pattern).test(formData.password);
-      } catch {
-        isValid = false;
-      }
-      return { label: rule.label, valid: isValid };
-    });
-  }, [passwordRules, formData.password]);
+  const passwordValidations = passwordRules.map((rule) => {
+    let isValid = false;
+    try {
+      isValid = new RegExp(rule.pattern).test(formData.password);
+    } catch {
+      isValid = false;
+    }
+    return { label: rule.label, valid: isValid };
+  });
 
   const handleInputChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
