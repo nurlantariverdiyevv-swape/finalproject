@@ -9,12 +9,12 @@ import BasketProvider from './context/BasketContext'
 import { AuthProvider } from './context/AuthContext'
 
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {
-    });
-  });
-}
+// if ("serviceWorker" in navigator) {
+//   window.addEventListener("load", () => {
+//     navigator.serviceWorker.register("/sw.js").catch(() => {
+//     });
+//   });
+// }
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
