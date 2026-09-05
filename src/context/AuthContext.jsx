@@ -14,13 +14,8 @@ import { auth, googleProvider, appleProvider } from '../services/firebase';
 
 const AuthContext = createContext();
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
-// Mobile browsers (Safari on iOS, in-app browsers like Instagram/Facebook,
-// some Android WebViews) frequently block or silently fail window.open-based
-// popups, which is why "Sign in with Google" often does nothing on mobile.
-// The reliable fix is to use the full-page redirect flow on mobile instead.
 function isMobileDevice() {
   if (typeof navigator === 'undefined') return false;
   return /Android|iPhone|iPad|iPod|Mobile|webOS/i.test(navigator.userAgent);
@@ -61,13 +56,6 @@ export function AuthProvider({ children }) {
       setUser(firebaseUser);
       setAuthLoading(false);
 
-      // Fallback for the mobile redirect flow: some mobile browsers (in-app
-      // webviews, Safari with cross-site tracking prevention) silently fail
-      // to resolve getRedirectResult() below even though the sign-in itself
-      // succeeded - onAuthStateChanged still fires with the user though, so
-      // if we're still holding a pending-redirect flag at that point, use
-      // this as the trigger to navigate instead of leaving the person
-      // stranded on the login/register page.
       if (firebaseUser) {
         const target = sessionStorage.getItem(PENDING_REDIRECT_KEY);
         if (target) {
@@ -77,14 +65,8 @@ export function AuthProvider({ children }) {
       }
     });
     return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Completes the mobile "sign in with redirect" flow: when the browser comes
-  // back from Google/Apple's page, this picks up the result and sends the
-  // person to wherever they were trying to go before signing in. (The
-  // onAuthStateChanged handler above also covers this as a fallback, in case
-  // this promise never resolves on some mobile browsers.)
   useEffect(() => {
     getRedirectResult(auth)
       .then((result) => {
@@ -97,7 +79,6 @@ export function AuthProvider({ children }) {
       .catch(() => {
         sessionStorage.removeItem(PENDING_REDIRECT_KEY);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loginWithEmail = async (email, password) => {
@@ -123,7 +104,6 @@ export function AuthProvider({ children }) {
       if (isMobileDevice()) {
         sessionStorage.setItem(PENDING_REDIRECT_KEY, redirectTo);
         await signInWithRedirect(auth, googleProvider);
-        // The page is about to navigate away to Google; there's no result yet.
         return { user: null, error: null, redirecting: true };
       }
       const res = await signInWithPopup(auth, googleProvider);
@@ -149,8 +129,6 @@ export function AuthProvider({ children }) {
 
   const logout = () => signOut(auth);
 
-  // Sends Firebase's own password-reset email with a real reset link the
-  // person can click to set a new password.
   const resetPassword = async (email) => {
     try {
       await sendPasswordResetEmail(auth, email);

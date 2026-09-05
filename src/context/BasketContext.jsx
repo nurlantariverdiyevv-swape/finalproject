@@ -14,10 +14,7 @@ export function BasketProvider({ children }) {
   const [sizeModalProduct, setSizeModalProduct] = useState(null);
   const [addedSuccessProduct, setAddedSuccessProduct] = useState(null);
 
-  // Basket is stored per-account (key includes the user's uid). Logging out
-  // clears it from view immediately; logging back into the SAME account
-  // restores it from that account's own storage slot. Logged-out visitors
-  // never read/write any saved basket.
+ 
   useEffect(() => {
     if (!user) {
       setBasket([]);
@@ -33,8 +30,6 @@ export function BasketProvider({ children }) {
   }, [basket, user]);
 
   const openSizeModal = (product) => {
-    // If not logged in, redirect to the Login page before selecting a size
-    // and adding to the basket. After logging in, the user returns to the same page.
     if (!user) {
       navigate('/login', { state: { from: location.pathname } });
       return;
@@ -43,7 +38,6 @@ export function BasketProvider({ children }) {
   };
   const closeSizeModal = () => setSizeModalProduct(null);
 
-  // 4 Parametr: product, size, color, image
   const addToBasket = (product, size, color, image) => {
     const selectedColor = color || product.selectedColor || product.color || product.colors?.[0]?.name || 'Default';
     const selectedImage = image || product.selectedImage || product.images?.[0] || product.img;

@@ -1,16 +1,5 @@
 import { Component } from "react";
 
-/**
- * Generic error boundary. Wrap any section (a whole page, the header, a
- * single widget) with this so that if THAT piece throws a render error, only
- * that piece falls back to a small message instead of taking down the rest
- * of the page.
- *
- * Pass `resetKey` (e.g. the current route's pathname) when you want the
- * boundary to automatically clear itself once that key changes - otherwise
- * a crashed section would stay crashed even after the user navigates away
- * and back.
- */
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +11,6 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // Keep the failure visible in devtools without crashing the app.
     console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 

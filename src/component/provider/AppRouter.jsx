@@ -29,25 +29,16 @@ const STATIC_INFO_PATHS = [
 function AppRouter({ onAddToCart }) {
   const location = useLocation();
 
-  // Every page element is wrapped in its own ErrorBoundary so a bug on ONE
-  // page (e.g. ProductDetail throwing on bad data) shows a small inline
-  // fallback instead of crashing the whole app/router. `resetKey` is tied to
-  // the current URL, so navigating to a different page (or a different
-  // /shop/:categoryName, /product/:id, etc. on the SAME route) automatically
-  // clears a previously-crashed boundary instead of leaving that page stuck
-  // on the fallback forever.
   const withBoundary = (element) => (
     <ErrorBoundary resetKey={location.pathname + location.search}>{element}</ErrorBoundary>
   );
 
   return (
     <Routes>
-      {/* Login, Register and Forgot Password: standalone pages with no Header/Footer */}
       <Route path="/login" element={withBoundary(<LoginPage />)} />
       <Route path="/register" element={withBoundary(<RegisterPage />)} />
       <Route path="/forgot-password" element={withBoundary(<ForgotPasswordPage />)} />
 
-      {/* All other pages render with Header + Footer (inside Layout) */}
       <Route element={<Layout onAddToCart={onAddToCart} />}>
         <Route path="/" element={withBoundary(<Main onAddToCart={onAddToCart} />)} />
         <Route path="/product/:id" element={withBoundary(<ProductDetail />)} />
@@ -58,7 +49,6 @@ function AppRouter({ onAddToCart }) {
         {STATIC_INFO_PATHS.map((path) => (
           <Route key={path} path={path} element={withBoundary(<StaticInfoPage />)} />
         ))}
-        {/* Unknown/broken URLs (bad slugs, typos, dead links) -> 404 page */}
         <Route path="*" element={withBoundary(<NotFoundPage />)} />
       </Route>
     </Routes>

@@ -6,8 +6,6 @@ import ErrorBoundary from './component/ErrorBoundary';
 import ImageWithSkeleton from './component/ImageWithSkeleton';
 
 function Main({ onAddToCart }) {
-  // "Shop by activity" and the banners are no longer hardcoded, they come
-  // from the Vercel API's content.json (content.home.activities / content.home.banners).
   const { content } = useDataContext();
   const activities = content?.home?.activities || [];
   const bannerData = content?.home?.banners || [];

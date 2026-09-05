@@ -1,11 +1,5 @@
 import SkeletonBlock from "./SkeletonBlock";
 
-/**
- * Plain skeleton card with no product data behind it at all - used to fill
- * the grid on first load / refresh, before the API response with the
- * actual products has come back. Shape matches ShopProductCard so the
- * grid doesn't visually jump once real cards take its place.
- */
 function ProductCardSkeleton() {
   return (
     <div className="flex flex-col justify-between">

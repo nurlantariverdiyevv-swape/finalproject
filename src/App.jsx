@@ -13,10 +13,6 @@ function App() {
   const { openSizeModal } = useBasket();
   const { fetchContent, fetchCategories } = useDataContext();
 
-  // All static content needed by Header, Footer, Main, and other pages
-  // (menu, banners, footer links, etc.) is fetched once from the Vercel
-  // API when the app opens. ShopPage's category filter rules/labels come
-  // from the same API and are fetched here too so they're ready in time.
   useEffect(() => {
     if (fetchContent) fetchContent();
     if (fetchCategories) fetchCategories();
@@ -26,11 +22,7 @@ function App() {
     <>
       <RouteTransitionLoader />
       <ScrollToTop />
-      {/* Header and Footer now live inside Layout.jsx, shown for every page
-          except login/register (see AppRouter.jsx). Each route already has
-          its own ErrorBoundary (see AppRouter.jsx); this outer one is just a
-          last-resort net in case something outside the routes themselves
-          (e.g. Layout) ever throws. */}
+
       <ErrorBoundary>
         <AppRouter onAddToCart={openSizeModal} />
       </ErrorBoundary>
@@ -40,8 +32,7 @@ function App() {
       <ErrorBoundary fallback={null}>
         <AddedToBagDrawer />
       </ErrorBoundary>
-      {/* Catches what ErrorBoundary structurally can't: errors thrown in
-          event handlers or async code (see GlobalErrorNotice.jsx). */}
+
       <GlobalErrorNotice />
       <BackToTopButton />
     </>

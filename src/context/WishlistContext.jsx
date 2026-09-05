@@ -5,7 +5,6 @@ import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext();
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useWishlist = () => useContext(WishlistContext);
 
 export default function WishlistProvider({ children }) {
@@ -16,10 +15,6 @@ export default function WishlistProvider({ children }) {
   const [wishlist, setWishlist] = useState([]);
   const [toast, setToast] = useState({ show: false, message: '', type: 'add' });
 
-  // Wishlist is stored per-account (key includes the user's uid). Logging
-  // out clears it from view immediately; logging back into the SAME
-  // account restores it from that account's own storage slot. Logged-out
-  // visitors never read/write any saved wishlist.
   useEffect(() => {
     if (!user) {
       setWishlist([]);
@@ -35,8 +30,6 @@ export default function WishlistProvider({ children }) {
   }, [wishlist, user]);
 
   const toggleWishlist = (product) => {
-    // If not logged in, redirect to the Login page before adding to the wishlist.
-    // After logging in, the user is sent back to wherever they came from (location.state.from).
     if (!user) {
       navigate('/login', { state: { from: location.pathname } });
       return;
