@@ -12,10 +12,6 @@ import StaticInfoPage from "../pages/StaticInfoPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ErrorBoundary from "../ErrorBoundary";
 
-// Every footer link (and the header's country selector) points to one of
-// these paths. They all render the same generic StaticInfoPage since this
-// demo store doesn't have dedicated content for them yet - the point is
-// just that they're real, working routes instead of an external redirect.
 const STATIC_INFO_PATHS = [
   "/who-we-are", "/s-plus-member", "/pro-deal", "/affiliate", "/forces",
   "/press", "/careers", "/newsletter", "/size-guide", "/order-tracking",
