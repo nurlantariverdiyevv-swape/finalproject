@@ -120,7 +120,7 @@ function ProductSlider({ onAddToCart }) {
                     const isActive = activeColor?.id === colorId || activeColor === color;
 
                     return (
-                      <button type="button" key={colorId} onClick={(e) => changeColor(e, identifier, color)} className={`w-6 h-6 rounded-xs overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`} aria-label={`Select ${color.name || 'color'}`}>
+                      <button type="button" key={colorId} onClick={(e) => changeColor(e, identifier, color)} className={`w-6 h-6 rounded-xs overflow-hidden border cursor-pointer transition-all z-20 ${isActive ? 'border-white scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`} aria-label={`Select ${color.name || 'color'}`}>
                         <img src={color.img} alt={color.name || 'Product color option'} className="w-full h-full object-cover bg-[#f5f5f5] pointer-events-none" />
                       </button>
                     );
