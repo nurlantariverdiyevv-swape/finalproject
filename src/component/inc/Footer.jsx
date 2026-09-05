@@ -24,7 +24,7 @@ function Footer() {
           <div className="hidden md:grid md:grid-cols-5 gap-8 pb-16">
             {footerData.map((section) => (
               <div key={section.title} className="flex flex-col gap-4">
-                <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">{section.title}</h3>
+                <h3 className="font-semibold text-[16px] tracking-wide capitalize text-white">{section.title}</h3>
                 <div className="flex flex-col gap-3">
                   {section.links.map((link) => (
                     <Link key={link.label} to="/" onClick={goHome} className="text-[15px] font-medium text-[#e5e5e5] hover:text-white transition-colors">
@@ -37,7 +37,7 @@ function Footer() {
 
             {/* Shipping Section */}
             <div className="flex flex-col gap-4">
-              <h3 className="font-bold text-[16px] tracking-wide capitalize text-white">Shipping</h3>
+              <h3 className="font-semibold text-[16px] tracking-wide capitalize text-white">Shipping</h3>
               <Link to="/country-select" className="flex items-center gap-2.5 text-[15px] font-medium text-white">
                 <svg className="w-6 h-4 rounded-[1px] object-cover" viewBox="0 0 640 480">
                   <g fillRule="evenodd">
